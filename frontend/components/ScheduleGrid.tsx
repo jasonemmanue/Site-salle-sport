@@ -48,41 +48,88 @@ const MOCK_COACHES: Coach[] = [
   { id: "3", name: "Lucas Bernard", photo_url: "", certifications: [], specialties: [], bio: "", is_active: true, order: 3 },
 ];
 
-function generateMockSlots(): ScheduleSlot[] {
-  const slots: ScheduleSlot[] = [];
-  const times = ["07:00", "08:00", "09:30", "10:30", "12:00", "14:00", "16:00", "17:30", "18:30", "19:30"];
+const SCHEDULE_PATTERN: { activityIdx: number; coachIdx: number; time: string; enrolled: number }[][] = [
+  // Lundi
+  [
+    { activityIdx: 0, coachIdx: 0, time: "07:00", enrolled: 14 },
+    { activityIdx: 1, coachIdx: 2, time: "09:00", enrolled: 12 },
+    { activityIdx: 2, coachIdx: 1, time: "10:30", enrolled: 8 },
+    { activityIdx: 3, coachIdx: 2, time: "12:00", enrolled: 10 },
+    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 11 },
+    { activityIdx: 4, coachIdx: 1, time: "19:00", enrolled: 20 },
+  ],
+  // Mardi
+  [
+    { activityIdx: 7, coachIdx: 2, time: "07:00", enrolled: 16 },
+    { activityIdx: 6, coachIdx: 1, time: "09:30", enrolled: 9 },
+    { activityIdx: 0, coachIdx: 0, time: "12:00", enrolled: 15 },
+    { activityIdx: 1, coachIdx: 2, time: "17:30", enrolled: 13 },
+    { activityIdx: 3, coachIdx: 0, time: "18:30", enrolled: 14 },
+    { activityIdx: 2, coachIdx: 1, time: "19:30", enrolled: 10 },
+  ],
+  // Mercredi
+  [
+    { activityIdx: 5, coachIdx: 0, time: "07:00", enrolled: 10 },
+    { activityIdx: 4, coachIdx: 1, time: "09:00", enrolled: 18 },
+    { activityIdx: 7, coachIdx: 2, time: "10:30", enrolled: 17 },
+    { activityIdx: 0, coachIdx: 0, time: "14:00", enrolled: 12 },
+    { activityIdx: 2, coachIdx: 1, time: "17:30", enrolled: 7 },
+    { activityIdx: 1, coachIdx: 2, time: "19:00", enrolled: 14 },
+  ],
+  // Jeudi
+  [
+    { activityIdx: 3, coachIdx: 2, time: "07:00", enrolled: 11 },
+    { activityIdx: 6, coachIdx: 1, time: "09:30", enrolled: 13 },
+    { activityIdx: 0, coachIdx: 0, time: "12:00", enrolled: 18 },
+    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 12 },
+    { activityIdx: 4, coachIdx: 1, time: "18:30", enrolled: 22 },
+    { activityIdx: 7, coachIdx: 2, time: "19:30", enrolled: 15 },
+  ],
+  // Vendredi
+  [
+    { activityIdx: 1, coachIdx: 2, time: "07:00", enrolled: 10 },
+    { activityIdx: 2, coachIdx: 1, time: "09:00", enrolled: 11 },
+    { activityIdx: 0, coachIdx: 0, time: "10:30", enrolled: 16 },
+    { activityIdx: 3, coachIdx: 2, time: "14:00", enrolled: 13 },
+    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 12 },
+    { activityIdx: 4, coachIdx: 1, time: "19:00", enrolled: 25 },
+  ],
+  // Samedi
+  [
+    { activityIdx: 0, coachIdx: 0, time: "09:00", enrolled: 17 },
+    { activityIdx: 7, coachIdx: 2, time: "10:30", enrolled: 14 },
+    { activityIdx: 2, coachIdx: 1, time: "14:00", enrolled: 9 },
+    { activityIdx: 4, coachIdx: 1, time: "16:00", enrolled: 21 },
+  ],
+  // Dimanche
+  [
+    { activityIdx: 2, coachIdx: 1, time: "09:30", enrolled: 10 },
+    { activityIdx: 6, coachIdx: 1, time: "11:00", enrolled: 12 },
+    { activityIdx: 7, coachIdx: 2, time: "16:00", enrolled: 8 },
+  ],
+];
 
-  let slotId = 1;
-  for (let day = 0; day < 7; day++) {
-    const slotsPerDay = day < 5 ? 6 : day === 5 ? 4 : 3;
-    for (let s = 0; s < slotsPerDay; s++) {
-      const activity = MOCK_ACTIVITIES[Math.floor(Math.random() * MOCK_ACTIVITIES.length)];
-      const coach = MOCK_COACHES[Math.floor(Math.random() * MOCK_COACHES.length)];
-      const startIdx = s % times.length;
-      const startTime = times[startIdx];
-      const endHour = parseInt(startTime.split(":")[0]) + 1;
-      const endTime = `${endHour.toString().padStart(2, "0")}:00`;
-
-      slots.push({
-        id: String(slotId++),
-        activity_id: activity.id,
-        coach_id: coach.id,
-        day_of_week: day as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        start_time: startTime,
-        end_time: endTime,
-        is_recurring: true,
-        is_active: true,
-        activity,
-        coach,
-        enrolled_count: Math.floor(Math.random() * activity.max_capacity),
-      });
-    }
-  }
-
-  return slots;
-}
-
-const MOCK_SLOTS = generateMockSlots();
+const MOCK_SLOTS: ScheduleSlot[] = SCHEDULE_PATTERN.flatMap((daySlots, dayIndex) =>
+  daySlots.map((s, i) => {
+    const activity = MOCK_ACTIVITIES[s.activityIdx];
+    const coach = MOCK_COACHES[s.coachIdx];
+    const startHour = parseInt(s.time.split(":")[0]);
+    const endTime = `${String(startHour + 1).padStart(2, "0")}:00`;
+    return {
+      id: `${dayIndex}-${i}`,
+      activity_id: activity.id,
+      coach_id: coach.id,
+      day_of_week: dayIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+      start_time: s.time,
+      end_time: endTime,
+      is_recurring: true,
+      is_active: true,
+      activity,
+      coach,
+      enrolled_count: s.enrolled,
+    };
+  })
+);
 
 export default function ScheduleGrid() {
   const [selectedDay, setSelectedDay] = useState(0);

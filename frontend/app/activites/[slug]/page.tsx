@@ -131,7 +131,7 @@ function getMockSlots(activityId: string): ScheduleSlot[] {
     end_time: i === 0 ? '10:00' : i === 1 ? '13:00' : '19:30',
     is_recurring: true,
     is_active: true,
-    enrolled_count: Math.floor(Math.random() * 12),
+    enrolled_count: [8, 5, 11][i] ?? 7,
   }));
 }
 
