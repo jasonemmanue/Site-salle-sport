@@ -42,7 +42,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
 
         {/* Author */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full gradient-primary text-sm font-bold text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full gradient-primary text-sm font-bold text-black">
             {review.author_name.charAt(0).toUpperCase()}
           </div>
           <div>

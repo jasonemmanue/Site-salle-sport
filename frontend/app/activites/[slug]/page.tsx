@@ -166,11 +166,11 @@ export default async function ActivityDetailPage({
 
   // Category gradient backgrounds
   const categoryGradients: Record<string, string> = {
-    force: 'rgba(225,29,72,0.15)',
-    cardio: 'rgba(249,115,22,0.15)',
-    flexibility: 'rgba(34,197,94,0.15)',
-    martial_arts: 'rgba(139,92,246,0.15)',
-    dance: 'rgba(236,72,153,0.15)',
+    force: 'rgba(255,255,255,0.05)',
+    cardio: 'rgba(255,255,255,0.04)',
+    flexibility: 'rgba(255,255,255,0.03)',
+    martial_arts: 'rgba(255,255,255,0.04)',
+    dance: 'rgba(255,255,255,0.05)',
   };
 
   return (
@@ -180,7 +180,7 @@ export default async function ActivityDetailPage({
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at 40% 50%, ${categoryGradients[activity.category] || categoryGradients.force} 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 60%, #0a0a0a 100%)`,
+            background: `radial-gradient(ellipse at 40% 50%, ${categoryGradients[activity.category] || categoryGradients.force} 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)`,
           }}
         />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -194,7 +194,7 @@ export default async function ActivityDetailPage({
           </nav>
 
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="gradient-primary rounded-full px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
+            <span className="gradient-primary rounded-full px-4 py-1 text-xs font-bold uppercase tracking-wider text-black">
               {categoryLabels[activity.category]}
             </span>
             <span className="border border-secondary/30 text-secondary rounded-full px-4 py-1 text-xs font-bold">
@@ -241,7 +241,7 @@ export default async function ActivityDetailPage({
                       </div>
                       <Link
                         href="/planning"
-                        className="mt-3 sm:mt-0 inline-flex items-center justify-center rounded-lg gradient-primary px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition-transform hover:scale-105"
+                        className="mt-3 sm:mt-0 inline-flex items-center justify-center rounded-lg gradient-primary px-5 py-2 text-xs font-bold uppercase tracking-wider text-black transition-transform hover:scale-105"
                       >
                         Reserver
                       </Link>
@@ -304,7 +304,7 @@ export default async function ActivityDetailPage({
 
                 <Link
                   href="/planning"
-                  className="mt-8 block text-center gradient-primary py-3.5 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-transform hover:scale-105 animate-pulse-glow"
+                  className="mt-8 block text-center gradient-primary py-3.5 rounded-lg text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
                 >
                   Reserver un creneau
                 </Link>

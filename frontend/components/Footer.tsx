@@ -28,7 +28,7 @@ export default function Footer() {
           {/* About */}
           <div>
             <Link href="/" className="text-2xl font-black tracking-wider">
-              FITNESS<span className="text-primary">PRO</span>
+              <span className="text-white">FITNESS</span><span className="text-white/60">PRO</span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-dark-muted">
               Votre salle de sport premium. Des equipements de pointe,
@@ -116,7 +116,7 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="gradient-primary px-4 py-2.5 rounded-r-lg text-sm font-bold text-white shrink-0 hover:opacity-90 transition-opacity"
+                  className="gradient-primary px-4 py-2.5 rounded-r-lg text-sm font-bold text-black shrink-0 hover:opacity-90 transition-opacity"
                 >
                   OK
                 </button>

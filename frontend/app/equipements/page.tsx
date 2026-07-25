@@ -48,11 +48,11 @@ const FACILITY_FEATURES = [
 
 function ZoneGradient({ zone }: { zone: EquipmentZone }) {
   const gradients: Record<EquipmentZone, string> = {
-    musculation: "from-primary/80 to-accent/60",
-    cardio: "from-red-500/80 to-pink-500/60",
-    stretching: "from-emerald-500/80 to-teal-500/60",
-    functional: "from-secondary/80 to-indigo-500/60",
-    locker: "from-violet-500/80 to-purple-500/60",
+    musculation: "from-white/20 to-white/5",
+    cardio: "from-white/15 to-white/5",
+    stretching: "from-white/10 to-white/5",
+    functional: "from-white/15 to-white/5",
+    locker: "from-white/10 to-white/5",
   };
   return (
     <div className={`absolute inset-0 bg-gradient-to-br ${gradients[zone]} opacity-60`} />
@@ -69,7 +69,7 @@ export default function EquipementsPage() {
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="text-gradient">Nos Equipements</span>
@@ -89,7 +89,7 @@ export default function EquipementsPage() {
               onClick={() => setActiveZone(zone.key)}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 activeZone === zone.key
-                  ? "gradient-primary text-white shadow-lg shadow-primary/30 scale-105"
+                  ? "gradient-primary text-black shadow-lg shadow-white/10 scale-105"
                   : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
               }`}
             >
@@ -119,7 +119,7 @@ export default function EquipementsPage() {
                   </svg>
                 </div>
                 {/* Quantity badge */}
-                <span className="absolute top-3 right-3 rounded-full gradient-primary px-3 py-1 text-xs font-bold text-white shadow-lg">
+                <span className="absolute top-3 right-3 rounded-full gradient-primary px-3 py-1 text-xs font-bold text-black shadow-lg">
                   x{eq.quantity}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-card/80 to-transparent" />
@@ -153,7 +153,7 @@ export default function EquipementsPage() {
               className="glass rounded-2xl p-6 flex items-center gap-4 transition-all duration-300 hover:border-primary/30"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl gradient-primary">
-                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d={feat.icon} />
                 </svg>
               </div>

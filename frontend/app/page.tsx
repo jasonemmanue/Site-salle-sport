@@ -343,7 +343,7 @@ export default function HomePage() {
           <div className="mt-10 text-center">
             <Link
               href="/planning"
-              className="inline-flex items-center gap-2 gradient-primary px-8 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-transform hover:scale-105"
+              className="inline-flex items-center gap-2 gradient-primary px-8 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-105"
             >
               Voir le planning complet
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +454,7 @@ export default function HomePage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 50%, rgba(225,29,72,0.2) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(249,115,22,0.15) 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+              'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 60%), linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
           }}
         />
 
@@ -468,7 +468,7 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/abonnements"
-              className="gradient-primary px-10 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-white transition-transform hover:scale-105 animate-pulse-glow"
+              className="gradient-primary px-10 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
             >
               Choisir mon abonnement
             </Link>

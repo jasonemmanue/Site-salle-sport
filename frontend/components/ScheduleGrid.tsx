@@ -15,11 +15,11 @@ const DAYS = [
 ] as const;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  force: "border-l-red-500 bg-red-500/10",
-  cardio: "border-l-orange-500 bg-orange-500/10",
-  flexibility: "border-l-green-500 bg-green-500/10",
-  martial_arts: "border-l-purple-500 bg-purple-500/10",
-  dance: "border-l-pink-500 bg-pink-500/10",
+  force: "border-l-white bg-white/5",
+  cardio: "border-l-white/80 bg-white/[0.04]",
+  flexibility: "border-l-white/60 bg-white/[0.03]",
+  martial_arts: "border-l-white/70 bg-white/[0.035]",
+  dance: "border-l-white/90 bg-white/[0.045]",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -154,7 +154,7 @@ export default function ScheduleGrid() {
             onClick={() => setSelectedDay(day.key)}
             className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
               selectedDay === day.key
-                ? "gradient-primary text-white shadow-lg shadow-primary/30"
+                ? "gradient-primary text-black shadow-lg shadow-white/10"
                 : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
             }`}
           >
@@ -171,14 +171,14 @@ export default function ScheduleGrid() {
             <span
               className={`h-2.5 w-2.5 rounded-full ${
                 key === "force"
-                  ? "bg-red-500"
+                  ? "bg-white"
                   : key === "cardio"
-                    ? "bg-orange-500"
+                    ? "bg-white/80"
                     : key === "flexibility"
-                      ? "bg-green-500"
+                      ? "bg-white/60"
                       : key === "martial_arts"
-                        ? "bg-purple-500"
-                        : "bg-pink-500"
+                        ? "bg-white/70"
+                        : "bg-white/90"
               }`}
             />
             {label}

@@ -77,7 +77,7 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
           </p>
           <button
             onClick={onClose}
-            className="rounded-xl gradient-primary px-6 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-105"
+            className="rounded-xl gradient-primary px-6 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-105"
           >
             Fermer
           </button>
@@ -190,7 +190,7 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full rounded-xl gradient-primary py-3 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full rounded-xl gradient-primary py-3 text-sm font-bold text-black transition-all hover:shadow-lg hover:shadow-white/10 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {status === "loading" ? (
               <span className="flex items-center justify-center gap-2">

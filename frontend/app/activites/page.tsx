@@ -204,7 +204,7 @@ export default function ActivitesPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 30% 50%, rgba(225,29,72,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(59,130,246,0.1) 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 60%, #0a0a0a 100%)',
+              'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 60%), linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
           }}
         />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
@@ -235,7 +235,7 @@ export default function ActivitesPage() {
                   onClick={() => setSelectedCategory(cat.value)}
                   className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                     selectedCategory === cat.value
-                      ? 'gradient-primary text-white shadow-lg shadow-primary/30'
+                      ? 'gradient-primary text-black shadow-lg shadow-primary/30'
                       : 'border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white'
                   }`}
                 >

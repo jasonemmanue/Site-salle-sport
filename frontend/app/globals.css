@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #e11d48;
-  --color-primary-light: #f43f5e;
-  --color-secondary: #3b82f6;
-  --color-secondary-light: #60a5fa;
-  --color-accent: #f97316;
-  --color-dark: #0a0a0a;
-  --color-dark-card: #1a1a2e;
-  --color-dark-lighter: #16213e;
-  --color-dark-border: #2a2a4a;
-  --color-dark-muted: #9ca3af;
+  --color-primary: #ffffff;
+  --color-primary-light: #e5e5e5;
+  --color-secondary: #d4d4d4;
+  --color-secondary-light: #a3a3a3;
+  --color-accent: #a3a3a3;
+  --color-dark: #000000;
+  --color-dark-card: #0a0a0a;
+  --color-dark-lighter: #111111;
+  --color-dark-border: #1a1a1a;
+  --color-dark-muted: #737373;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
@@ -21,27 +21,28 @@
 /* ── Gradient utilities ── */
 
 .gradient-primary {
-  background: linear-gradient(135deg, #e11d48, #f97316);
+  background: linear-gradient(135deg, #ffffff, #a3a3a3);
+  color: #000000;
 }
 
 .gradient-hero {
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 10, 0.9) 0%,
-    rgba(26, 26, 46, 0.7) 40%,
-    rgba(10, 10, 10, 0.95) 100%
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 40%,
+    rgba(0, 0, 0, 0.95) 100%
   );
 }
 
 .glass {
-  background: rgba(26, 26, 46, 0.6);
+  background: rgba(10, 10, 10, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #e11d48, #f97316);
+  background: linear-gradient(135deg, #ffffff, #737373);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -73,10 +74,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(225, 29, 72, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgba(225, 29, 72, 0.6);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -108,7 +109,7 @@
 /* ── Base styles ── */
 
 body {
-  background: #0a0a0a;
+  background: #000000;
   color: #ededed;
   font-family: var(--font-body);
 }
@@ -124,21 +125,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2a4a;
+  background: #1a1a1a;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #e11d48;
+  background: #ffffff;
 }
 
 /* ── Selection ── */
 
 ::selection {
-  background: rgba(225, 29, 72, 0.4);
+  background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
 }

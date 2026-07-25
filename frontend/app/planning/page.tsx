@@ -15,7 +15,7 @@ export default function PlanningPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.12) 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 60%, #0a0a0a 100%)',
+              'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)',
           }}
         />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
@@ -41,23 +41,23 @@ export default function PlanningPage() {
             </h3>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-red-500" />
+                <span className="h-3 w-3 rounded-full bg-white" />
                 <span className="text-sm text-dark-muted">Force</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-orange-500" />
+                <span className="h-3 w-3 rounded-full bg-white/80" />
                 <span className="text-sm text-dark-muted">Cardio</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-green-500" />
+                <span className="h-3 w-3 rounded-full bg-white/60" />
                 <span className="text-sm text-dark-muted">Souplesse</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-purple-500" />
+                <span className="h-3 w-3 rounded-full bg-white/70" />
                 <span className="text-sm text-dark-muted">Arts Martiaux</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-pink-500" />
+                <span className="h-3 w-3 rounded-full bg-white/90" />
                 <span className="text-sm text-dark-muted">Danse</span>
               </div>
             </div>
@@ -78,19 +78,19 @@ export default function PlanningPage() {
             </h3>
             <ol className="space-y-3 text-sm text-dark-muted">
               <li className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-white">1</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">1</span>
                 <span>Selectionnez le jour qui vous interesse dans les onglets ci-dessus.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-white">2</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">2</span>
                 <span>Cliquez sur le creneau de votre choix pour voir les details et la disponibilite.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-white">3</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">3</span>
                 <span>Remplissez le formulaire d'inscription avec vos coordonnees.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-white">4</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">4</span>
                 <span>Vous recevrez une confirmation par email. Presentez-vous 10 minutes avant le debut du cours.</span>
               </li>
             </ol>

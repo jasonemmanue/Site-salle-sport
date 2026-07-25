@@ -104,7 +104,7 @@ export default function BMICalculator() {
         <button
           onClick={handleCalculate}
           disabled={!weight || !height}
-          className="flex-1 rounded-xl gradient-primary py-3 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="flex-1 rounded-xl gradient-primary py-3 text-sm font-bold text-black transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           Calculer
         </button>
@@ -132,7 +132,7 @@ export default function BMICalculator() {
               <path
                 d="M 20 100 A 80 80 0 0 1 180 100"
                 fill="none"
-                stroke="#2a2a4a"
+                stroke="#1a1a1a"
                 strokeWidth="12"
                 strokeLinecap="round"
               />

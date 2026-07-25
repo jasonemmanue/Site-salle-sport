@@ -25,7 +25,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center gradient-primary opacity-60">
-              <svg className="h-12 w-12 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="h-12 w-12 text-black/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5" />
               </svg>
             </div>
@@ -35,7 +35,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-dark-card/80 to-transparent" />
 
           {/* Category tag */}
-          <span className="absolute left-3 top-3 rounded-full gradient-primary px-3 py-1 text-xs font-semibold text-white">
+          <span className="absolute left-3 top-3 rounded-full gradient-primary px-3 py-1 text-xs font-semibold text-black">
             Fitness
           </span>
         </div>

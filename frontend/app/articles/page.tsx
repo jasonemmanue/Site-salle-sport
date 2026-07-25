@@ -102,7 +102,7 @@ export default function ArticlesPage() {
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="text-gradient">Blog Fitness & Bien-etre</span>
@@ -125,7 +125,7 @@ export default function ArticlesPage() {
               }}
               className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
-                  ? "gradient-primary text-white shadow-lg shadow-primary/30"
+                  ? "gradient-primary text-black shadow-lg shadow-white/10"
                   : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
               }`}
             >
@@ -148,7 +148,7 @@ export default function ArticlesPage() {
                   </svg>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-dark-card/80 hidden sm:block" />
-                <span className="absolute left-4 top-4 rounded-full gradient-primary px-4 py-1.5 text-xs font-bold text-white">
+                <span className="absolute left-4 top-4 rounded-full gradient-primary px-4 py-1.5 text-xs font-bold text-black">
                   A la une
                 </span>
               </div>

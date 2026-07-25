@@ -50,7 +50,7 @@ export default function Pagination({
             onClick={() => onPageChange(page)}
             className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
               page === currentPage
-                ? "gradient-primary text-white shadow-lg shadow-primary/30"
+                ? "gradient-primary text-black shadow-lg shadow-white/10"
                 : "border border-dark-border bg-dark-card text-white hover:bg-dark-lighter"
             }`}
             aria-current={page === currentPage ? "page" : undefined}

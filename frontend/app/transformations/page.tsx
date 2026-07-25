@@ -87,7 +87,7 @@ export default function TransformationsPage() {
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="text-gradient">Transformations & Resultats</span>
@@ -149,11 +149,11 @@ export default function TransformationsPage() {
                 </div>
                 <div className="relative aspect-square bg-dark-card overflow-hidden">
                   <div className="flex h-full w-full items-center justify-center gradient-primary opacity-80">
-                    <svg className="h-12 w-12 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <svg className="h-12 w-12 text-black/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
                     </svg>
                   </div>
-                  <span className="absolute bottom-2 left-2 rounded-full gradient-primary px-2.5 py-0.5 text-[10px] font-bold text-white uppercase">
+                  <span className="absolute bottom-2 left-2 rounded-full gradient-primary px-2.5 py-0.5 text-[10px] font-bold text-black uppercase">
                     Apres
                   </span>
                 </div>
@@ -180,15 +180,15 @@ export default function TransformationsPage() {
         <div className="relative overflow-hidden rounded-2xl gradient-primary p-8 sm:p-12 text-center">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
           <div className="relative">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-black">
               Commencez votre transformation
             </h3>
-            <p className="mt-3 text-white/80 max-w-xl mx-auto">
+            <p className="mt-3 text-black/70 max-w-xl mx-auto">
               Rejoignez nos 200+ membres qui ont deja atteint leurs objectifs. Votre parcours commence des aujourd&apos;hui.
             </p>
             <Link
               href="/abonnements"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-bold text-primary transition-all hover:bg-white/90 hover:shadow-lg"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:bg-black/90 hover:shadow-lg"
             >
               Voir nos abonnements
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

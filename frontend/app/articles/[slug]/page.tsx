@@ -122,7 +122,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.2),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%)]" />
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <Link
             href="/articles"
@@ -133,7 +133,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             </svg>
             Retour au blog
           </Link>
-          <span className="mb-4 inline-block rounded-full gradient-primary px-4 py-1.5 text-xs font-bold text-white">
+          <span className="mb-4 inline-block rounded-full gradient-primary px-4 py-1.5 text-xs font-bold text-black">
             {category}
           </span>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -141,7 +141,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           </h1>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-dark-muted">
             <span className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full gradient-primary text-xs font-bold text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">
                 {author.charAt(0)}
               </span>
               {author}
@@ -226,7 +226,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           <aside className="w-full lg:w-80 shrink-0 space-y-6">
             {/* Author card */}
             <div className="glass rounded-2xl p-6 text-center">
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full gradient-primary text-2xl font-bold text-white">
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full gradient-primary text-2xl font-bold text-black">
                 {author.charAt(0)}
               </div>
               <h4 className="text-lg font-bold text-white">{author}</h4>

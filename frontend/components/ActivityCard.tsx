@@ -6,11 +6,11 @@ interface ActivityCardProps {
 }
 
 const categoryColors: Record<ActivityCategory, string> = {
-  force: 'bg-red-600',
-  cardio: 'bg-orange-500',
-  flexibility: 'bg-emerald-500',
-  martial_arts: 'bg-violet-600',
-  dance: 'bg-pink-500',
+  force: 'bg-white',
+  cardio: 'bg-white/80',
+  flexibility: 'bg-white/60',
+  martial_arts: 'bg-white/70',
+  dance: 'bg-white/90',
 };
 
 const categoryLabels: Record<ActivityCategory, string> = {
@@ -41,14 +41,14 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           style={{
             background: `linear-gradient(135deg, ${
               activity.category === 'force'
-                ? '#991b1b, #7f1d1d'
+                ? '#1a1a1a, #111111'
                 : activity.category === 'cardio'
-                ? '#9a3412, #7c2d12'
+                ? '#1f1f1f, #0f0f0f'
                 : activity.category === 'flexibility'
-                ? '#065f46, #064e3b'
+                ? '#181818, #0d0d0d'
                 : activity.category === 'martial_arts'
-                ? '#5b21b6, #4c1d95'
-                : '#9d174d, #831843'
+                ? '#1c1c1c, #0e0e0e'
+                : '#171717, #0b0b0b'
             })`,
           }}
         />
@@ -57,7 +57,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
 
         {/* Category badge */}
         <span
-          className={`absolute top-3 left-3 ${categoryColors[activity.category]} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white`}
+          className={`absolute top-3 left-3 ${categoryColors[activity.category]} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-black`}
         >
           {categoryLabels[activity.category]}
         </span>

@@ -149,7 +149,7 @@ export default function AbonnementsPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 40%, rgba(225,29,72,0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(249,115,22,0.1) 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 60%, #0a0a0a 100%)',
+              'radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(255,255,255,0.03) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)',
           }}
         />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
@@ -276,7 +276,7 @@ export default function AbonnementsPage() {
             </p>
             <Link
               href="/contact"
-              className="mt-8 inline-flex items-center gap-2 gradient-primary px-10 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-white transition-transform hover:scale-105"
+              className="mt-8 inline-flex items-center gap-2 gradient-primary px-10 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-black transition-transform hover:scale-105"
             >
               Demander un devis
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

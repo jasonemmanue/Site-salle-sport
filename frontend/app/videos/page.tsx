@@ -98,11 +98,11 @@ const mockVideos: Video[] = [
 ];
 
 const categoryGradients: Record<string, string> = {
-  Musculation: "from-primary/80 to-red-700/60",
-  Cardio: "from-accent/80 to-yellow-600/60",
-  Yoga: "from-emerald-500/80 to-teal-600/60",
-  HIIT: "from-red-600/80 to-pink-600/60",
-  Stretching: "from-secondary/80 to-indigo-600/60",
+  Musculation: "from-white/20 to-white/5",
+  Cardio: "from-white/15 to-white/5",
+  Yoga: "from-white/10 to-white/5",
+  HIIT: "from-white/15 to-white/10",
+  Stretching: "from-white/10 to-white/5",
 };
 
 function PlayButton() {
@@ -133,7 +133,7 @@ export default function VideosPage() {
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="text-gradient">Videos d&apos;Entrainement</span>
@@ -153,7 +153,7 @@ export default function VideosPage() {
               onClick={() => setActiveCategory(cat)}
               className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
-                  ? "gradient-primary text-white shadow-lg shadow-primary/30"
+                  ? "gradient-primary text-black shadow-lg shadow-white/10"
                   : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
               }`}
             >

@@ -112,7 +112,7 @@ export default function AvisPage() {
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 gradient-hero opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="text-gradient">Avis de nos Membres</span>
@@ -188,7 +188,7 @@ export default function AvisPage() {
             </p>
             <button
               onClick={() => setSubmitted(false)}
-              className="rounded-xl gradient-primary px-6 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-105"
+              className="rounded-xl gradient-primary px-6 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-105"
             >
               Laisser un autre avis
             </button>
@@ -244,7 +244,7 @@ export default function AvisPage() {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full rounded-xl gradient-primary py-3 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02]"
+              className="w-full rounded-xl gradient-primary py-3 text-sm font-bold text-black transition-all hover:shadow-lg hover:shadow-white/10 hover:scale-[1.02]"
             >
               Publier mon avis
             </button>

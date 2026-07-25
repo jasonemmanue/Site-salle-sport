@@ -20,7 +20,7 @@ export default function SubscriptionCard({
     >
       {/* Popular badge */}
       {popular && (
-        <div className="gradient-primary text-center py-2 text-xs font-bold uppercase tracking-widest text-white">
+        <div className="gradient-primary text-center py-2 text-xs font-bold uppercase tracking-widest text-black">
           Populaire
         </div>
       )}
@@ -66,7 +66,7 @@ export default function SubscriptionCard({
           href="/contact"
           className={`mt-8 block text-center py-3.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${
             popular
-              ? 'gradient-primary text-white hover:scale-105 animate-pulse-glow'
+              ? 'gradient-primary text-black hover:scale-105 animate-pulse-glow'
               : 'border-2 border-white/20 text-white hover:border-primary hover:text-primary'
           }`}
         >

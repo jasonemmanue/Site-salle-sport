@@ -68,13 +68,13 @@ export default function Hero() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 20% 50%, rgba(225,29,72,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.1) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(249,115,22,0.08) 0%, transparent 50%), linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+              'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
           }}
         />
         {/* Decorative floating elements */}
-        <div className="absolute top-1/4 left-10 w-2 h-2 bg-primary rounded-full opacity-40 animate-float" />
-        <div className="absolute top-1/3 right-20 w-3 h-3 bg-secondary rounded-full opacity-30 animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-accent rounded-full opacity-30 animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/4 left-10 w-2 h-2 bg-white rounded-full opacity-20 animate-float" />
+        <div className="absolute top-1/3 right-20 w-3 h-3 bg-white rounded-full opacity-15 animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-white rounded-full opacity-10 animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Content */}
@@ -100,7 +100,7 @@ export default function Hero() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/abonnements"
-              className="gradient-primary px-8 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-white transition-transform hover:scale-105 animate-pulse-glow"
+              className="gradient-primary px-8 py-4 rounded-lg text-base font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
             >
               Commencer maintenant
             </Link>

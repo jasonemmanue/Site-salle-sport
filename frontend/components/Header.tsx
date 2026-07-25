@@ -42,7 +42,7 @@ export default function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1 text-2xl font-black tracking-wider">
-            FITNESS<span className="text-primary">PRO</span>
+            <span className="text-white">FITNESS</span><span className="text-white/60">PRO</span>
           </Link>
 
           {/* Desktop nav */}
@@ -70,7 +70,7 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <Link
               href="/abonnements"
-              className="hidden sm:inline-flex gradient-primary px-6 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-transform hover:scale-105 animate-pulse-glow"
+              className="hidden sm:inline-flex gradient-primary px-6 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
             >
               S&apos;inscrire
             </Link>
@@ -130,7 +130,7 @@ export default function Header() {
           })}
           <Link
             href="/abonnements"
-            className="block mt-4 gradient-primary text-center px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-white"
+            className="block mt-4 gradient-primary text-center px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-black"
           >
             S&apos;inscrire
           </Link>

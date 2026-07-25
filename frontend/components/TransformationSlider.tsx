@@ -77,13 +77,13 @@ export default function TransformationSlider({
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center gradient-primary opacity-80">
-                        <svg className="h-16 w-16 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                        <svg className="h-16 w-16 text-black/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
                         </svg>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <span className="absolute bottom-3 left-3 rounded-full gradient-primary px-3 py-1 text-xs font-semibold text-white">
+                    <span className="absolute bottom-3 left-3 rounded-full gradient-primary px-3 py-1 text-xs font-semibold text-black">
                       APRES
                     </span>
                   </div>

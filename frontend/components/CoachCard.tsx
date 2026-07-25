@@ -13,11 +13,11 @@ export default function CoachCard({ coach }: CoachCardProps) {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(circle at 50% 40%, #1a1a2e 0%, #0a0a0a 100%)',
+              'radial-gradient(circle at 50% 40%, #0a0a0a 0%, #000000 100%)',
           }}
         />
         {/* Avatar circle */}
-        <div className="relative w-32 h-32 rounded-full gradient-primary flex items-center justify-center text-4xl font-black text-white select-none">
+        <div className="relative w-32 h-32 rounded-full gradient-primary flex items-center justify-center text-4xl font-black text-black select-none">
           {coach.name
             .split(' ')
             .map((n) => n[0])
