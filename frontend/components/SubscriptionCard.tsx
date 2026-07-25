@@ -32,12 +32,12 @@ export default function SubscriptionCard({
         </h3>
 
         {/* Price */}
-        <div className="mt-4 flex items-baseline gap-1">
-          <span className={`text-5xl font-black ${popular ? 'text-gradient' : 'text-white'}`}>
-            {subscription.price}
+        <div className="mt-4 flex items-baseline gap-2">
+          <span className={`text-4xl font-black ${popular ? 'text-gradient' : 'text-white'}`}>
+            {subscription.price.toLocaleString('fr-FR')}
           </span>
           <span className="text-dark-muted text-sm">
-            EUR / {subscription.duration_months === 1 ? 'mois' : `${subscription.duration_months} mois`}
+            FCFA{subscription.duration_months === 1 ? ' / mois' : subscription.duration_months === 0 ? '' : ` / ${subscription.duration_months} mois`}
           </span>
         </div>
 

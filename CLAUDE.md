@@ -28,6 +28,58 @@ Le site permet au grand public de découvrir les activités, consulter le planni
 
 ---
 
+## Identité Visuelle & Design System
+
+### Palette — Noir & Blanc (monochrome)
+
+Le site utilise une identité visuelle **noir et blanc** correspondant aux couleurs de la salle de sport. Toutes les couleurs sont définies dans `frontend/app/globals.css` via `@theme`.
+
+| Token CSS | Valeur hex | Usage |
+|-----------|-----------|-------|
+| `--color-primary` | `#ffffff` | Texte principal sur fond sombre, éléments d'accent |
+| `--color-primary-light` | `#e5e5e5` | Variante douce du blanc |
+| `--color-secondary` | `#d4d4d4` | Texte secondaire, icônes |
+| `--color-secondary-light` | `#a3a3a3` | Texte tertiaire |
+| `--color-accent` | `#a3a3a3` | Étoiles, éléments d'emphase subtile |
+| `--color-dark` | `#000000` | Background principal |
+| `--color-dark-card` | `#0a0a0a` | Cards, sections alternées |
+| `--color-dark-lighter` | `#111111` | Fond plus clair (placeholders) |
+| `--color-dark-border` | `#1a1a1a` | Bordures |
+| `--color-dark-muted` | `#737373` | Texte discret, descriptions |
+| `--color-success` | `#22c55e` | Succès, validations, places disponibles |
+| `--color-warning` | `#f59e0b` | Avertissements, places limitées |
+| `--color-error` | `#ef4444` | Erreurs, complet |
+
+### Classes utilitaires custom
+
+| Classe | Effet |
+|--------|-------|
+| `.gradient-primary` | Fond `linear-gradient(135deg, #fff, #a3a3a3)` + `color: #000` auto |
+| `.gradient-hero` | Fond hero sombre avec transparence |
+| `.glass` | Fond semi-transparent + blur + bordure subtile |
+| `.text-gradient` | Texte dégradé blanc → gris |
+
+### Règles pour les ajouts futurs
+
+1. **Pas de couleurs vives** (rouge, bleu, orange, etc.) sauf pour les couleurs fonctionnelles (`success`, `warning`, `error`)
+2. **Boutons CTA** : utiliser `gradient-primary` avec `text-black` (jamais `text-white` car le fond est blanc)
+3. **Backgrounds hero** : `radial-gradient` avec `rgba(255,255,255,0.03-0.06)` sur fond `#000000 → #0a0a0a`
+4. **Badges/dots** : `bg-white` avec opacités variables (`bg-white/60`, `bg-white/80`) pour différencier les catégories
+5. **Hover states** : `hover:border-primary/30` ou `hover:border-primary/40` (subtil halo blanc)
+6. **Shadows** : `shadow-white/10` au lieu de `shadow-primary/30` sur les éléments actifs
+
+### Tarification
+
+| Formule | Prix | Type |
+|---------|------|------|
+| Inscription | 12 000 FCFA | Paiement unique |
+| Abonnement Mensuel | 10 000 FCFA | Mensuel récurrent |
+
+- Devise : **FCFA** (Franc CFA) — jamais EUR ou USD
+- Format nombre : `12 000` (espace comme séparateur de milliers, format français)
+
+---
+
 ## Architecture des dossiers
 
 ```

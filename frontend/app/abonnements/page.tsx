@@ -11,67 +11,51 @@ import type { Subscription } from '@/lib/types';
 const mockSubscriptions: Subscription[] = [
   {
     id: '1',
-    name: 'Basic',
-    price: 29,
-    duration_months: 1,
+    name: 'Inscription',
+    price: 12000,
+    duration_months: 0,
     features: [
-      'Acces salle de musculation',
-      'Vestiaires et douches',
-      'Horaires : 8h - 20h',
-      'Application mobile',
+      'Frais d\'inscription unique',
+      'Bilan sportif initial offert',
+      'Carte membre personnalisee',
+      'Visite guidee de la salle',
+      'Seance decouverte avec un coach',
     ],
     is_active: true,
     order: 1,
   },
   {
     id: '2',
-    name: 'Premium',
-    price: 49,
+    name: 'Abonnement Mensuel',
+    price: 10000,
     duration_months: 1,
     features: [
       'Acces illimite 7j/7',
       'Tous les cours collectifs',
+      'Vestiaires et douches',
       'Programme personnalise',
       'Suivi nutritionnel',
-      'Casier personnel',
+      'Parking gratuit',
     ],
     is_active: true,
     order: 2,
-  },
-  {
-    id: '3',
-    name: 'Elite',
-    price: 79,
-    duration_months: 1,
-    features: [
-      'Tout le Premium inclus',
-      'Coach personnel dedie',
-      'Acces espace VIP & sauna',
-      'Seances de cryotherapie',
-      'Bilan corporel mensuel',
-      'Invite gratuit 2x / mois',
-    ],
-    is_active: true,
-    order: 3,
   },
 ];
 
 /* ──────────────────────── Comparison Table ──────────────────────── */
 
 const comparisonFeatures = [
-  { label: 'Acces musculation', basic: true, premium: true, elite: true },
-  { label: 'Vestiaires & douches', basic: true, premium: true, elite: true },
-  { label: 'Application mobile', basic: true, premium: true, elite: true },
-  { label: 'Cours collectifs', basic: false, premium: true, elite: true },
-  { label: 'Acces 7j/7 illimite', basic: false, premium: true, elite: true },
-  { label: 'Programme personnalise', basic: false, premium: true, elite: true },
-  { label: 'Suivi nutritionnel', basic: false, premium: true, elite: true },
-  { label: 'Casier personnel', basic: false, premium: true, elite: true },
-  { label: 'Coach personnel dedie', basic: false, premium: false, elite: true },
-  { label: 'Espace VIP & sauna', basic: false, premium: false, elite: true },
-  { label: 'Cryotherapie', basic: false, premium: false, elite: true },
-  { label: 'Bilan corporel mensuel', basic: false, premium: false, elite: true },
-  { label: 'Invite gratuit', basic: false, premium: false, elite: true },
+  { label: 'Frais d\'inscription', inscription: true, abonnement: false },
+  { label: 'Bilan sportif initial', inscription: true, abonnement: false },
+  { label: 'Carte membre', inscription: true, abonnement: false },
+  { label: 'Seance decouverte', inscription: true, abonnement: false },
+  { label: 'Acces salle illimite 7j/7', inscription: false, abonnement: true },
+  { label: 'Cours collectifs inclus', inscription: false, abonnement: true },
+  { label: 'Vestiaires & douches', inscription: false, abonnement: true },
+  { label: 'Programme personnalise', inscription: false, abonnement: true },
+  { label: 'Suivi nutritionnel', inscription: false, abonnement: true },
+  { label: 'Parking gratuit', inscription: false, abonnement: true },
+  { label: 'Application mobile', inscription: false, abonnement: true },
 ];
 
 /* ──────────────────────── FAQ ──────────────────────── */
@@ -168,12 +152,12 @@ export default function AbonnementsPage() {
       {/* ── Subscription Cards ── */}
       <section className="py-16 bg-dark">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {mockSubscriptions.map((sub) => (
               <SubscriptionCard
                 key={sub.id}
                 subscription={sub}
-                popular={sub.name === 'Premium'}
+                popular={sub.name === 'Abonnement Mensuel'}
               />
             ))}
           </div>
@@ -195,11 +179,10 @@ export default function AbonnementsPage() {
                   <th className="py-4 px-4 text-left text-sm font-semibold text-dark-muted uppercase tracking-wider">
                     Fonctionnalite
                   </th>
-                  <th className="py-4 px-4 text-center text-sm font-semibold text-white">Basic</th>
+                  <th className="py-4 px-4 text-center text-sm font-semibold text-white">Inscription</th>
                   <th className="py-4 px-4 text-center">
-                    <span className="text-sm font-semibold text-gradient">Premium</span>
+                    <span className="text-sm font-semibold text-gradient">Abonnement</span>
                   </th>
-                  <th className="py-4 px-4 text-center text-sm font-semibold text-white">Elite</th>
                 </tr>
               </thead>
               <tbody>
@@ -207,7 +190,7 @@ export default function AbonnementsPage() {
                   <tr key={feature.label} className="border-b border-dark-border/50 hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 text-sm text-dark-muted">{feature.label}</td>
                     <td className="py-4 px-4 text-center">
-                      {feature.basic ? (
+                      {feature.inscription ? (
                         <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -216,16 +199,7 @@ export default function AbonnementsPage() {
                       )}
                     </td>
                     <td className="py-4 px-4 text-center">
-                      {feature.premium ? (
-                        <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <span className="text-dark-border">—</span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      {feature.elite ? (
+                      {feature.abonnement ? (
                         <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -237,10 +211,9 @@ export default function AbonnementsPage() {
                 ))}
                 {/* Price row */}
                 <tr className="border-t-2 border-dark-border">
-                  <td className="py-6 px-4 text-sm font-bold text-white uppercase">Prix / mois</td>
-                  <td className="py-6 px-4 text-center text-2xl font-black text-white">29<span className="text-sm text-dark-muted"> EUR</span></td>
-                  <td className="py-6 px-4 text-center text-2xl font-black text-gradient">49<span className="text-sm text-dark-muted"> EUR</span></td>
-                  <td className="py-6 px-4 text-center text-2xl font-black text-white">79<span className="text-sm text-dark-muted"> EUR</span></td>
+                  <td className="py-6 px-4 text-sm font-bold text-white uppercase">Tarif</td>
+                  <td className="py-6 px-4 text-center text-xl font-black text-white">12 000<span className="text-sm text-dark-muted"> FCFA</span></td>
+                  <td className="py-6 px-4 text-center text-xl font-black text-gradient">10 000<span className="text-sm text-dark-muted"> FCFA/mois</span></td>
                 </tr>
               </tbody>
             </table>

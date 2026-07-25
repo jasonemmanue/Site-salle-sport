@@ -97,48 +97,33 @@ const mockActivities: Activity[] = [
 const mockSubscriptions: Subscription[] = [
   {
     id: '1',
-    name: 'Basic',
-    price: 29,
-    duration_months: 1,
+    name: 'Inscription',
+    price: 12000,
+    duration_months: 0,
     features: [
-      'Acces salle de musculation',
-      'Vestiaires et douches',
-      'Horaires : 8h - 20h',
-      'Application mobile',
+      'Frais d\'inscription unique',
+      'Bilan sportif initial',
+      'Carte membre personnalisee',
+      'Visite guidee de la salle',
+      'Seance decouverte offerte',
     ],
     is_active: true,
     order: 1,
   },
   {
     id: '2',
-    name: 'Premium',
-    price: 49,
+    name: 'Abonnement Mensuel',
+    price: 10000,
     duration_months: 1,
     features: [
       'Acces illimite 7j/7',
       'Tous les cours collectifs',
-      'Programme personnalise',
-      'Suivi nutritionnel',
-      'Casier personnel',
+      'Vestiaires et douches',
+      'Suivi personnalise',
+      'Parking gratuit',
     ],
     is_active: true,
     order: 2,
-  },
-  {
-    id: '3',
-    name: 'Elite',
-    price: 79,
-    duration_months: 1,
-    features: [
-      'Tout le Premium inclus',
-      'Coach personnel dedie',
-      'Acces espace VIP',
-      'Seances de cryotherapie',
-      'Bilan corporel mensuel',
-      'Invite gratuit 2x / mois',
-    ],
-    is_active: true,
-    order: 3,
   },
 ];
 
@@ -362,12 +347,12 @@ export default function HomePage() {
             subtitle="Choisissez l'abonnement qui correspond a vos ambitions."
             accent
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {mockSubscriptions.map((sub) => (
               <SubscriptionCard
                 key={sub.id}
                 subscription={sub}
-                popular={sub.name === 'Premium'}
+                popular={sub.name === 'Abonnement Mensuel'}
               />
             ))}
           </div>
