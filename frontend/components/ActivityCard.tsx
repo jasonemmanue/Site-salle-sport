@@ -37,7 +37,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       {/* Image placeholder with gradient */}
       <div className="relative h-52 overflow-hidden">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 card-gradient"
           style={{
             background: `linear-gradient(135deg, ${
               activity.category === 'force'

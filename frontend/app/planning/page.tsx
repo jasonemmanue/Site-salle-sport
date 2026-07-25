@@ -12,7 +12,7 @@ export default function PlanningPage() {
       {/* ── Hero Banner ── */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hero-gradient"
           style={{
             background:
               'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)',

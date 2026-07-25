@@ -80,7 +80,7 @@ export default function CoachsPage() {
       {/* ── Hero Banner ── */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hero-gradient"
           style={{
             background:
               'radial-gradient(ellipse at 40% 50%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(255,255,255,0.03) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)',

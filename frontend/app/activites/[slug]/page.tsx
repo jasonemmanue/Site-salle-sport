@@ -178,7 +178,7 @@ export default async function ActivityDetailPage({
       {/* ── Hero Banner ── */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hero-gradient"
           style={{
             background: `radial-gradient(ellipse at 40% 50%, ${categoryGradients[activity.category] || categoryGradients.force} 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)`,
           }}

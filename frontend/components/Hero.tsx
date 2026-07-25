@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface CounterProps {
@@ -62,19 +63,23 @@ export default function Hero() {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background: layered CSS gradients simulating gym atmosphere */}
+      {/* Background: gym photo + dark overlay */}
       <div className="absolute inset-0">
+        <Image
+          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80"
+          alt="Salle de sport moderne avec equipements"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/70" />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hero-gradient"
           style={{
             background:
-              'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
+              'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%), linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.5) 100%)',
           }}
         />
-        {/* Decorative floating elements */}
-        <div className="absolute top-1/4 left-10 w-2 h-2 bg-white rounded-full opacity-20 animate-float" />
-        <div className="absolute top-1/3 right-20 w-3 h-3 bg-white rounded-full opacity-15 animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-white rounded-full opacity-10 animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Content */}

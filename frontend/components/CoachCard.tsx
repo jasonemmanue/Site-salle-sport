@@ -10,7 +10,7 @@ export default function CoachCard({ coach }: CoachCardProps) {
       {/* Photo placeholder */}
       <div className="relative h-72 overflow-hidden flex items-center justify-center">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 card-gradient"
           style={{
             background:
               'radial-gradient(circle at 50% 40%, #0a0a0a 0%, #000000 100%)',

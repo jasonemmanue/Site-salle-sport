@@ -436,7 +436,7 @@ export default function HomePage() {
       <section className="relative py-24 overflow-hidden">
         {/* Background gradient */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hero-gradient"
           style={{
             background:
               'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 60%), linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
