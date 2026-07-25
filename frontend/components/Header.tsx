@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
@@ -66,8 +67,10 @@ export default function Header() {
             })}
           </nav>
 
-          {/* CTA + hamburger */}
-          <div className="flex items-center gap-4">
+          {/* CTA + theme toggle + hamburger */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+
             <Link
               href="/abonnements"
               className="hidden sm:inline-flex gradient-primary px-6 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
