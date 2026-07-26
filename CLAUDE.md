@@ -52,21 +52,50 @@ Le site utilise une identité visuelle **noir et blanc** correspondant aux coule
 
 ### Classes utilitaires custom
 
-| Classe | Effet |
-|--------|-------|
-| `.gradient-primary` | Fond `linear-gradient(135deg, #fff, #a3a3a3)` + `color: #000` auto |
-| `.gradient-hero` | Fond hero sombre avec transparence |
-| `.glass` | Fond semi-transparent + blur + bordure subtile |
-| `.text-gradient` | Texte dégradé blanc → gris |
+| Classe | Dark mode | Light mode |
+|--------|-----------|------------|
+| `.gradient-primary` | `linear-gradient(135deg, #fff, #a3a3a3)` + `color: #000` | `linear-gradient(135deg, #111, #404040)` + `color: #fff` |
+| `.gradient-hero` | Overlay sombre avec transparence | Overlay clair avec transparence |
+| `.hero-overlay` | `rgba(0,0,0, 0.6-0.8)` sur image hero | `rgba(255,255,255, 0.65-0.85)` sur image hero |
+| `.hero-gradient` | Radial-gradient sombre (pages sans image) | Radial-gradient clair `#f5f5f5` |
+| `.card-gradient` | Gradient sombre `#1a1a1a` | Gradient clair `#f0f0f0` |
+| `.glass` | Fond `rgba(10,10,10,0.8)` + blur + bordure blanche subtile | Fond `rgba(255,255,255,0.85)` + blur + bordure noire subtile |
+| `.text-gradient` | Dégradé blanc vers gris | Dégradé noir vers gris foncé |
+
+### Mode Clair / Sombre
+
+Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`. Le thème par défaut est **sombre**.
+
+**Mécanisme :**
+- `ThemeToggle.tsx` : bouton soleil (dark) / lune (light) dans le header
+- Anti-flash script dans `<head>` de `layout.tsx` lit `localStorage('theme')` avant le premier paint
+- Toutes les surcharges light mode sont dans `globals.css` via `[data-theme="light"]`
+
+**Surcharges CSS automatiques en light mode :**
+- Variables CSS (`--color-dark`, `--color-primary`, etc.) inversées
+- `.text-white` devient `color: #0a0a0a` (+ variantes `/80`, `/60`, `/40`, `/30`, `/20`)
+- `.bg-white` devient `background: #111` (éléments décoratifs : dots, badges)
+- `.border-l-white` devient `border-left-color: #111`
+- `.bg-dark`, `.bg-dark-card`, `.bg-dark-lighter` deviennent `#f5f5f5`, `#fff`, `#f0f0f0`
+- `.gradient-primary .text-black` devient `color: #fff` (boutons CTA)
+- Le footer reste toujours en mode sombre (identité de marque)
+
+**Image Hero :**
+- Le hero principal utilise une image Unsplash (`images.unsplash.com`) via Next.js `Image` avec `fill` + `object-cover`
+- L'overlay `.hero-overlay` s'adapte au thème (sombre ou clair semi-transparent)
+- Config `next.config.ts` : `images.remotePatterns` autorise `images.unsplash.com`
 
 ### Règles pour les ajouts futurs
 
 1. **Pas de couleurs vives** (rouge, bleu, orange, etc.) sauf pour les couleurs fonctionnelles (`success`, `warning`, `error`)
-2. **Boutons CTA** : utiliser `gradient-primary` avec `text-black` (jamais `text-white` car le fond est blanc)
-3. **Backgrounds hero** : `radial-gradient` avec `rgba(255,255,255,0.03-0.06)` sur fond `#000000 → #0a0a0a`
-4. **Badges/dots** : `bg-white` avec opacités variables (`bg-white/60`, `bg-white/80`) pour différencier les catégories
-5. **Hover states** : `hover:border-primary/30` ou `hover:border-primary/40` (subtil halo blanc)
-6. **Shadows** : `shadow-white/10` au lieu de `shadow-primary/30` sur les éléments actifs
+2. **Boutons CTA** : utiliser `gradient-primary` avec `text-black` — le CSS gère automatiquement `text-white` en light mode
+3. **Backgrounds hero avec image** : utiliser `.hero-overlay` sur un `<div>` au-dessus de l'image
+4. **Backgrounds hero sans image** : ajouter la classe `.hero-gradient` sur le `<div>` avec le `style={{background:...}}` inline
+5. **Cards avec fond inline** : ajouter la classe `.card-gradient` sur le `<div>` avec le style inline
+6. **Badges/dots** : `bg-white` avec opacités variables (`bg-white/60`, `bg-white/80`) — automatiquement inversé en light mode
+7. **Hover states** : `hover:border-primary/30` ou `hover:border-primary/40` (subtil halo)
+8. **Shadows** : `shadow-white/10` au lieu de `shadow-primary/30` sur les éléments actifs
+9. **Ne jamais hardcoder** de couleurs inline sans ajouter une classe CSS pour le light mode override
 
 ### Tarification
 
