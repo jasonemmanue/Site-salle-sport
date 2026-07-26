@@ -72,14 +72,7 @@ export default function Hero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/70" />
-        <div
-          className="absolute inset-0 hero-gradient"
-          style={{
-            background:
-              'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%), linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.5) 100%)',
-          }}
-        />
+        <div className="absolute inset-0 hero-overlay" />
       </div>
 
       {/* Content */}
