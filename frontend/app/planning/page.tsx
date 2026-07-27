@@ -2,7 +2,7 @@ import ScheduleGrid from '@/components/ScheduleGrid';
 import SectionTitle from '@/components/SectionTitle';
 
 export const metadata = {
-  title: 'Planning | FitnessPro',
+  title: 'Planning | Eslie Sport',
   description: 'Consultez le planning hebdomadaire de nos cours collectifs et reservez votre creneau.',
 };
 

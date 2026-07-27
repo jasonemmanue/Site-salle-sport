@@ -79,7 +79,7 @@ const defaultArticleData = {
     author_id: "coach-1",
   },
   category: "Fitness",
-  author: "Coach FitnessPro",
+  author: "Coach Eslie Sport",
   content: `
 ## Bienvenue sur notre blog
 
@@ -230,7 +230,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
                 {author.charAt(0)}
               </div>
               <h4 className="text-lg font-bold text-white">{author}</h4>
-              <p className="mt-1 text-sm text-dark-muted">Coach certifie FitnessPro</p>
+              <p className="mt-1 text-sm text-dark-muted">Coach certifie Eslie Sport</p>
             </div>
 
             {/* Related articles */}

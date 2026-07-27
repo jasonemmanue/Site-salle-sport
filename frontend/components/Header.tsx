@@ -43,7 +43,7 @@ export default function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1 text-2xl font-black tracking-wider">
-            <span className="text-white">FITNESS</span><span className="text-white/60">PRO</span>
+            <span className="text-white">ESLIE</span><span className="text-white/60">SPORT</span>
           </Link>
 
           {/* Desktop nav */}

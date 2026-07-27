@@ -169,7 +169,7 @@ def seed():
             ("Alexandre Faure", 5, "Meilleure salle de la region ! Les coachs sont attentifs et l'ambiance au top."),
             ("Nadia Benali", 5, "Je cherchais une salle avec du yoga de qualite et j'ai trouve bien plus. Exceptionnel."),
             ("Pierre Lambert", 4, "Super salle, tres bien equipee. Les cours de HIIT sont intenses. Seul bemol : du monde aux heures de pointe."),
-            ("Marie Blanc", 5, "Apres ma grossesse, FitnessPro m'a aidee a retrouver la forme. Programme adapte et bienveillant."),
+            ("Marie Blanc", 5, "Apres ma grossesse, Eslie Sport m'a aidee a retrouver la forme. Programme adapte et bienveillant."),
             ("Thomas Petit", 5, "De debutant a 3 seances/semaine. Le CrossFit avec Marc a transforme mon physique."),
             ("Amina Diallo", 4, "J'ai gagne en muscle et en assurance. Les cours collectifs sont top pour la motivation."),
         ]
@@ -191,7 +191,7 @@ def seed():
         # Transformations
         transformations_data = [
             ("Julien Moreau", "En 6 mois, j'ai perdu 15 kg et gagne en confiance.", "6 mois"),
-            ("Marie Blanc", "Apres ma grossesse, FitnessPro m'a aidee a retrouver la forme.", "8 mois"),
+            ("Marie Blanc", "Apres ma grossesse, Eslie Sport m'a aidee a retrouver la forme.", "8 mois"),
             ("Thomas Petit", "De debutant a 3 seances/semaine. Mon physique et mon mental ont change.", "1 an"),
             ("Amina Diallo", "J'ai gagne en muscle et en assurance grace aux cours collectifs.", "4 mois"),
         ]
@@ -213,10 +213,10 @@ def seed():
 
         # Settings
         settings_data = [
-            ("gym_name", "FitnessPro"),
-            ("gym_address", "123 Rue du Sport, 75001 Paris"),
-            ("gym_phone", "+33 1 23 45 67 89"),
-            ("gym_email", "contact@fitnesspro.fr"),
+            ("gym_name", "Eslie Sport"),
+            ("gym_address", "Abidjan, Cote d'Ivoire"),
+            ("gym_phone", "05 45 07 98 50"),
+            ("gym_email", "contact@esliesport.com"),
         ]
         for key, value in settings_data:
             db.add(Setting(id=str(uuid4()), key=key, value=value))

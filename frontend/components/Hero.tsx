@@ -49,10 +49,10 @@ function AnimatedCounter({ end, suffix, label, delay }: CounterProps) {
 }
 
 const stats = [
-  { end: 500, suffix: '+', label: 'Membres', delay: 0 },
-  { end: 50, suffix: '+', label: 'Cours / Semaine', delay: 200 },
-  { end: 15, suffix: '', label: 'Coachs', delay: 400 },
-  { end: 10, suffix: ' ans', label: "d'Experience", delay: 600 },
+  { end: 200, suffix: '+', label: 'Membres', delay: 0 },
+  { end: 15, suffix: '+', label: 'Cours / Semaine', delay: 200 },
+  { end: 5, suffix: '', label: 'Coachs', delay: 400 },
+  { end: 7, suffix: 'j/7', label: 'Ouvert', delay: 600 },
 ];
 
 export default function Hero() {
@@ -79,18 +79,18 @@ export default function Hero() {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-20">
         <div className="animate-fade-in-up">
           <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-primary font-semibold mb-6">
-            Bienvenue chez FitnessPro
+            Bienvenue chez Eslie Sport
           </p>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase leading-[0.95]">
-            <span className="text-gradient">Depassez</span>
+            <span className="text-gradient">Parce que le corps</span>
             <br />
-            <span className="text-white">Vos Limites</span>
+            <span className="text-white">a besoin de sport</span>
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-dark-muted max-w-2xl mx-auto leading-relaxed">
-            Equipements haut de gamme, coachs certifies et programmes
-            personnalises. Rejoignez la communaute FitnessPro et transformez
+            Equipements de qualite, coachs passionnes et programmes
+            personnalises. Rejoignez la communaute Eslie Sport et transformez
             votre vie.
           </p>
 

@@ -12,9 +12,8 @@ const quickLinks = [
 ];
 
 const hours = [
-  { days: 'Lundi - Vendredi', time: '6h - 22h' },
-  { days: 'Samedi', time: '8h - 20h' },
-  { days: 'Dimanche', time: '9h - 18h' },
+  { days: 'Lundi - Samedi', time: '6h - 21h' },
+  { days: 'Dimanche', time: '6h - 21h (acces libre)' },
 ];
 
 export default function Footer() {
@@ -28,11 +27,11 @@ export default function Footer() {
           {/* About */}
           <div>
             <Link href="/" className="text-2xl font-black tracking-wider">
-              <span className="text-white">FITNESS</span><span className="text-white/60">PRO</span>
+              <span className="text-white">ESLIE</span><span className="text-white/60">SPORT</span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-dark-muted">
-              Votre salle de sport premium. Des equipements de pointe,
-              des coachs certifies et une communaute motivante pour vous
+              Parce que le corps a besoin de sport. Des equipements de qualite,
+              des coachs passionnes et une communaute motivante pour vous
               accompagner vers vos objectifs.
             </p>
             {/* Social icons */}
@@ -98,9 +97,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider mb-6">Contact</h3>
             <ul className="space-y-3 text-sm text-dark-muted">
-              <li>123 Rue du Sport, 75001 Paris</li>
-              <li>+33 1 23 45 67 89</li>
-              <li>contact@fitnesspro.fr</li>
+              <li>Abidjan, Cote d&apos;Ivoire</li>
+              <li>05 45 07 98 50</li>
+              <li>contact@esliesport.com</li>
             </ul>
 
             <div className="mt-6">
@@ -127,7 +126,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-dark-border text-center text-sm text-dark-muted">
-          &copy; {new Date().getFullYear()} FitnessPro. Tous droits reserves.
+          &copy; {new Date().getFullYear()} Eslie Sport. Tous droits reserves.
         </div>
       </div>
     </footer>

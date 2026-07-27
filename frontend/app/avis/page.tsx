@@ -50,7 +50,7 @@ const mockReviews: Review[] = [
     id: "6",
     author_name: "Alexandre T.",
     rating: 5,
-    comment: "En tant qu'ancien sportif de haut niveau, je suis tres exigeant. FitnessPro repond a toutes mes attentes : materiel pro, coaching de qualite et ambiance top.",
+    comment: "En tant qu'ancien sportif de haut niveau, je suis tres exigeant. Eslie Sport repond a toutes mes attentes : materiel pro, coaching de qualite et ambiance top.",
     is_approved: true,
     created_at: "2026-05-15T10:00:00Z",
   },
@@ -118,7 +118,7 @@ export default function AvisPage() {
             <span className="text-gradient">Avis de nos Membres</span>
           </h1>
           <p className="mt-4 text-lg text-dark-muted max-w-2xl mx-auto">
-            Decouvrez ce que nos membres pensent de leur experience chez FitnessPro.
+            Decouvrez ce que nos membres pensent de leur experience chez Eslie Sport.
           </p>
         </div>
       </section>
@@ -171,7 +171,7 @@ export default function AvisPage() {
       <section className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 pb-20">
         <SectionTitle
           title="Laisser un avis"
-          subtitle="Partagez votre experience avec la communaute FitnessPro"
+          subtitle="Partagez votre experience avec la communaute Eslie Sport"
           accent
         />
 

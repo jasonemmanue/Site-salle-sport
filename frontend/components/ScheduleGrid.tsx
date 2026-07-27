@@ -30,82 +30,71 @@ const CATEGORY_LABELS: Record<string, string> = {
   dance: "Danse",
 };
 
-// Mock data
+// Mock data — Eslie Sport
 const MOCK_ACTIVITIES: Activity[] = [
-  { id: "1", name: "Musculation", slug: "musculation", description: "", category: "force", level: "all", duration_minutes: 60, max_capacity: 20, image_url: "", is_active: true, order: 1 },
-  { id: "2", name: "HIIT", slug: "hiit", description: "", category: "cardio", level: "intermediate", duration_minutes: 45, max_capacity: 15, image_url: "", is_active: true, order: 2 },
-  { id: "3", name: "Yoga", slug: "yoga", description: "", category: "flexibility", level: "beginner", duration_minutes: 60, max_capacity: 12, image_url: "", is_active: true, order: 3 },
-  { id: "4", name: "Boxe", slug: "boxe", description: "", category: "martial_arts", level: "all", duration_minutes: 60, max_capacity: 16, image_url: "", is_active: true, order: 4 },
-  { id: "5", name: "Zumba", slug: "zumba", description: "", category: "dance", level: "beginner", duration_minutes: 45, max_capacity: 25, image_url: "", is_active: true, order: 5 },
-  { id: "6", name: "CrossFit", slug: "crossfit", description: "", category: "force", level: "advanced", duration_minutes: 60, max_capacity: 12, image_url: "", is_active: true, order: 6 },
-  { id: "7", name: "Pilates", slug: "pilates", description: "", category: "flexibility", level: "all", duration_minutes: 50, max_capacity: 15, image_url: "", is_active: true, order: 7 },
-  { id: "8", name: "Spinning", slug: "spinning", description: "", category: "cardio", level: "intermediate", duration_minutes: 45, max_capacity: 20, image_url: "", is_active: true, order: 8 },
+  { id: "1", name: "Musculation", slug: "musculation", description: "", category: "force", level: "all", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 1 },
+  { id: "2", name: "Fitness", slug: "fitness", description: "", category: "cardio", level: "all", duration_minutes: 60, max_capacity: 15, image_url: "", is_active: true, order: 2 },
+  { id: "3", name: "Zumba", slug: "zumba", description: "", category: "dance", level: "beginner", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 3 },
+  { id: "4", name: "Kick Boxing", slug: "kick-boxing", description: "", category: "martial_arts", level: "all", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 4 },
+  { id: "5", name: "Wushu", slug: "wushu", description: "", category: "martial_arts", level: "all", duration_minutes: 60, max_capacity: 15, image_url: "", is_active: true, order: 5 },
 ];
 
 const MOCK_COACHES: Coach[] = [
-  { id: "1", name: "Marc Dupont", photo_url: "", certifications: [], specialties: [], bio: "", is_active: true, order: 1 },
-  { id: "2", name: "Sophie Martin", photo_url: "", certifications: [], specialties: [], bio: "", is_active: true, order: 2 },
-  { id: "3", name: "Lucas Bernard", photo_url: "", certifications: [], specialties: [], bio: "", is_active: true, order: 3 },
+  { id: "1", name: "Coach Toussaint", photo_url: "", certifications: [], specialties: ["Musculation"], bio: "", is_active: true, order: 1 },
+  { id: "2", name: "Coach Adonis", photo_url: "", certifications: [], specialties: ["Zumba"], bio: "", is_active: true, order: 2 },
+  { id: "3", name: "Coach David", photo_url: "", certifications: [], specialties: ["Kick Boxing"], bio: "", is_active: true, order: 3 },
+  { id: "4", name: "Coach Leo", photo_url: "", certifications: [], specialties: ["Fitness"], bio: "", is_active: true, order: 4 },
+  { id: "5", name: "Maitre Kabore", photo_url: "", certifications: [], specialties: ["Wushu"], bio: "", is_active: true, order: 5 },
 ];
 
 const SCHEDULE_PATTERN: { activityIdx: number; coachIdx: number; time: string; enrolled: number }[][] = [
-  // Lundi
+  // Lundi — Musculation (Toussaint 06-21h) + Fitness (Leo 21-22h)
   [
-    { activityIdx: 0, coachIdx: 0, time: "07:00", enrolled: 14 },
-    { activityIdx: 1, coachIdx: 2, time: "09:00", enrolled: 12 },
-    { activityIdx: 2, coachIdx: 1, time: "10:30", enrolled: 8 },
-    { activityIdx: 3, coachIdx: 2, time: "12:00", enrolled: 10 },
-    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 11 },
-    { activityIdx: 4, coachIdx: 1, time: "19:00", enrolled: 20 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 8 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
+    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 12 },
+    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 11 },
   ],
-  // Mardi
+  // Mardi — Musculation (Toussaint 06-21h)
   [
-    { activityIdx: 7, coachIdx: 2, time: "07:00", enrolled: 16 },
-    { activityIdx: 6, coachIdx: 1, time: "09:30", enrolled: 9 },
-    { activityIdx: 0, coachIdx: 0, time: "12:00", enrolled: 15 },
-    { activityIdx: 1, coachIdx: 2, time: "17:30", enrolled: 13 },
-    { activityIdx: 3, coachIdx: 0, time: "18:30", enrolled: 14 },
-    { activityIdx: 2, coachIdx: 1, time: "19:30", enrolled: 10 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 7 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 9 },
+    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 13 },
   ],
-  // Mercredi
+  // Mercredi — Musculation + Wushu (Kabore 15-16h) + Kick Boxing (David 16h) + Fitness (Leo 21-22h)
   [
-    { activityIdx: 5, coachIdx: 0, time: "07:00", enrolled: 10 },
-    { activityIdx: 4, coachIdx: 1, time: "09:00", enrolled: 18 },
-    { activityIdx: 7, coachIdx: 2, time: "10:30", enrolled: 17 },
-    { activityIdx: 0, coachIdx: 0, time: "14:00", enrolled: 12 },
-    { activityIdx: 2, coachIdx: 1, time: "17:30", enrolled: 7 },
-    { activityIdx: 1, coachIdx: 2, time: "19:00", enrolled: 14 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 6 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
+    { activityIdx: 4, coachIdx: 4, time: "15:00", enrolled: 8 },
+    { activityIdx: 3, coachIdx: 2, time: "16:00", enrolled: 12 },
+    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 10 },
   ],
-  // Jeudi
+  // Jeudi — Musculation + Zumba (Adonis 18h)
   [
-    { activityIdx: 3, coachIdx: 2, time: "07:00", enrolled: 11 },
-    { activityIdx: 6, coachIdx: 1, time: "09:30", enrolled: 13 },
-    { activityIdx: 0, coachIdx: 0, time: "12:00", enrolled: 18 },
-    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 12 },
-    { activityIdx: 4, coachIdx: 1, time: "18:30", enrolled: 22 },
-    { activityIdx: 7, coachIdx: 2, time: "19:30", enrolled: 15 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 8 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 11 },
+    { activityIdx: 0, coachIdx: 0, time: "14:00", enrolled: 9 },
+    { activityIdx: 2, coachIdx: 1, time: "18:00", enrolled: 14 },
   ],
-  // Vendredi
+  // Vendredi — Musculation + Fitness (Leo 21-22h)
   [
-    { activityIdx: 1, coachIdx: 2, time: "07:00", enrolled: 10 },
-    { activityIdx: 2, coachIdx: 1, time: "09:00", enrolled: 11 },
-    { activityIdx: 0, coachIdx: 0, time: "10:30", enrolled: 16 },
-    { activityIdx: 3, coachIdx: 2, time: "14:00", enrolled: 13 },
-    { activityIdx: 5, coachIdx: 0, time: "17:30", enrolled: 12 },
-    { activityIdx: 4, coachIdx: 1, time: "19:00", enrolled: 25 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 7 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
+    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 13 },
+    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 12 },
   ],
-  // Samedi
+  // Samedi — Musculation + Wushu (Kabore 15-16h) + Kick Boxing (David 16h)
   [
-    { activityIdx: 0, coachIdx: 0, time: "09:00", enrolled: 17 },
-    { activityIdx: 7, coachIdx: 2, time: "10:30", enrolled: 14 },
-    { activityIdx: 2, coachIdx: 1, time: "14:00", enrolled: 9 },
-    { activityIdx: 4, coachIdx: 1, time: "16:00", enrolled: 21 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 5 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 11 },
+    { activityIdx: 4, coachIdx: 4, time: "15:00", enrolled: 9 },
+    { activityIdx: 3, coachIdx: 2, time: "16:00", enrolled: 13 },
   ],
-  // Dimanche
+  // Dimanche — Acces libre 6h-21h (Musculation libre)
   [
-    { activityIdx: 2, coachIdx: 1, time: "09:30", enrolled: 10 },
-    { activityIdx: 6, coachIdx: 1, time: "11:00", enrolled: 12 },
-    { activityIdx: 7, coachIdx: 2, time: "16:00", enrolled: 8 },
+    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 4 },
+    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 6 },
+    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 8 },
   ],
 ];
 

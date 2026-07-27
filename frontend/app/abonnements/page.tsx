@@ -12,7 +12,7 @@ const mockSubscriptions: Subscription[] = [
   {
     id: '1',
     name: 'Inscription',
-    price: 12000,
+    price: 5000,
     duration_months: 0,
     features: [
       'Frais d\'inscription unique',
@@ -27,7 +27,7 @@ const mockSubscriptions: Subscription[] = [
   {
     id: '2',
     name: 'Abonnement Mensuel',
-    price: 10000,
+    price: 25000,
     duration_months: 1,
     features: [
       'Acces illimite 7j/7',
@@ -212,8 +212,8 @@ export default function AbonnementsPage() {
                 {/* Price row */}
                 <tr className="border-t-2 border-dark-border">
                   <td className="py-6 px-4 text-sm font-bold text-white uppercase">Tarif</td>
-                  <td className="py-6 px-4 text-center text-xl font-black text-white">12 000<span className="text-sm text-dark-muted"> FCFA</span></td>
-                  <td className="py-6 px-4 text-center text-xl font-black text-gradient">10 000<span className="text-sm text-dark-muted"> FCFA/mois</span></td>
+                  <td className="py-6 px-4 text-center text-xl font-black text-white">5 000<span className="text-sm text-dark-muted"> FCFA</span></td>
+                  <td className="py-6 px-4 text-center text-xl font-black text-gradient">25 000<span className="text-sm text-dark-muted"> FCFA/mois</span></td>
                 </tr>
               </tbody>
             </table>

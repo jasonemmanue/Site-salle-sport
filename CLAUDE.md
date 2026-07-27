@@ -101,11 +101,11 @@ Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`
 
 | Formule | Prix | Type |
 |---------|------|------|
-| Inscription | 12 000 FCFA | Paiement unique |
-| Abonnement Mensuel | 10 000 FCFA | Mensuel récurrent |
+| Inscription | 5 000 FCFA | Paiement unique |
+| Abonnement Mensuel | 25 000 FCFA | Mensuel récurrent |
 
 - Devise : **FCFA** (Franc CFA) — jamais EUR ou USD
-- Format nombre : `12 000` (espace comme séparateur de milliers, format français)
+- Format nombre : `25 000` (espace comme séparateur de milliers, format français)
 
 ---
 

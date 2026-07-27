@@ -11,9 +11,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FitnessPro | Salle de Sport Premium",
+  title: "Eslie Sport | Parce que le corps a besoin de sport",
   description:
-    "Salle de sport premium avec cours collectifs, coaching personnalise, equipements haut de gamme. Rejoignez FitnessPro et depassez vos limites.",
+    "Salle de sport a Abidjan avec cours collectifs, coaching personnalise et equipements de qualite. Rejoignez Eslie Sport et depassez vos limites.",
   keywords: [
     "salle de sport",
     "fitness",
