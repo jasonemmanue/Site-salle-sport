@@ -9,7 +9,7 @@ from app.services import activity_service
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=PaginatedResponse[ActivityResponse])
 def list_activities(
     category: str | None = Query(None),
     level: str | None = Query(None),
