@@ -1,7 +1,9 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { login as apiLogin } from './api';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import { login as apiLogin, apiFetch } from './api';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface User {
   id: string;
@@ -30,10 +32,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearRefreshTimer = () => {
+    if (refreshTimer.current) {
+      clearTimeout(refreshTimer.current);
+      refreshTimer.current = null;
+    }
+  };
+
+  const scheduleRefresh = useCallback((accessToken: string) => {
+    clearRefreshTimer();
+    try {
+      const payload = JSON.parse(atob(accessToken.split('.')[1]));
+      const expiresIn = (payload.exp * 1000) - Date.now();
+      const refreshAt = Math.max(expiresIn - 2 * 60 * 1000, 30_000);
+      refreshTimer.current = setTimeout(async () => {
+        const rt = localStorage.getItem('admin_refresh_token');
+        if (!rt) return;
+        try {
+          const res = await fetch(`${API_URL}/api/v1/auth/refresh?refresh_token=${encodeURIComponent(rt)}`, { method: 'POST' });
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          localStorage.setItem('admin_token', data.access_token);
+          localStorage.setItem('admin_refresh_token', data.refresh_token);
+          setToken(data.access_token);
+          scheduleRefresh(data.access_token);
+        } catch {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_refresh_token');
+          setUser(null);
+          setToken(null);
+        }
+      }, refreshAt);
+    } catch { /* invalid token format */ }
+  }, []);
 
   const fetchProfile = useCallback(async (t: string) => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8010';
       const res = await fetch(`${API_URL}/api/v1/auth/profile`, {
         headers: { Authorization: `Bearer ${t}` },
       });
@@ -44,12 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setUser(data);
       setToken(t);
+      scheduleRefresh(t);
     } catch {
       localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_refresh_token');
       setUser(null);
       setToken(null);
     }
-  }, []);
+  }, [scheduleRefresh]);
 
   useEffect(() => {
     const t = localStorage.getItem('admin_token');
@@ -58,16 +96,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       setLoading(false);
     }
+    return clearRefreshTimer;
   }, [fetchProfile]);
 
   const loginFn = async (email: string, password: string) => {
     const data = await apiLogin(email, password);
     localStorage.setItem('admin_token', data.access_token);
+    localStorage.setItem('admin_refresh_token', data.refresh_token);
     await fetchProfile(data.access_token);
   };
 
   const logout = () => {
+    clearRefreshTimer();
     localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_refresh_token');
     setUser(null);
     setToken(null);
   };

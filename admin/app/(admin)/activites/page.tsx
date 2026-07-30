@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import FileUpload from '@/components/FileUpload';
 import type { Activity, PaginatedResponse } from '@/lib/types';
 
 const categories = ['force', 'cardio', 'flexibility', 'martial_arts', 'dance'];
@@ -113,10 +114,7 @@ export default function ActivitesPage() {
               <label className="block text-sm text-secondary mb-1">Capacite max</label>
               <input type="number" className="input-field" value={form.max_capacity} onChange={(e) => setForm({ ...form, max_capacity: +e.target.value })} />
             </div>
-            <div>
-              <label className="block text-sm text-secondary mb-1">URL image</label>
-              <input className="input-field" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-            </div>
+            <FileUpload value={form.image_url} onChange={(url) => setForm({ ...form, image_url: url })} label="Image" />
             <div>
               <label className="block text-sm text-secondary mb-1">Ordre</label>
               <input type="number" className="input-field" value={form.order} onChange={(e) => setForm({ ...form, order: +e.target.value })} />

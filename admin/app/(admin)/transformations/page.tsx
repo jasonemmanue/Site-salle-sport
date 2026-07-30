@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import FileUpload from '@/components/FileUpload';
 import type { Transformation } from '@/lib/types';
 
 const emptyForm = { member_name: '', before_image_url: '', after_image_url: '', testimonial: '', duration_text: '', is_featured: false, is_published: true };
@@ -79,14 +80,8 @@ export default function TransformationsPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-secondary mb-1">Image avant (URL)</label>
-              <input className="input-field" value={form.before_image_url} onChange={(e) => setForm({ ...form, before_image_url: e.target.value })} required />
-            </div>
-            <div>
-              <label className="block text-sm text-secondary mb-1">Image apres (URL)</label>
-              <input className="input-field" value={form.after_image_url} onChange={(e) => setForm({ ...form, after_image_url: e.target.value })} required />
-            </div>
+            <FileUpload value={form.before_image_url} onChange={(url) => setForm({ ...form, before_image_url: url })} label="Image avant" />
+            <FileUpload value={form.after_image_url} onChange={(url) => setForm({ ...form, after_image_url: url })} label="Image apres" />
           </div>
           <div>
             <label className="block text-sm text-secondary mb-1">Temoignage</label>

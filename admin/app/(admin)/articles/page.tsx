@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import RichEditor from '@/components/RichEditor';
+import FileUpload from '@/components/FileUpload';
 import type { Article, PaginatedResponse } from '@/lib/types';
 
 const emptyForm = { title: '', slug: '', excerpt: '', content: '', cover_image_url: '', status: 'draft' };
@@ -88,13 +90,10 @@ export default function ArticlesPage() {
           </div>
           <div>
             <label className="block text-sm text-secondary mb-1">Contenu</label>
-            <textarea className="input-field h-40" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+            <RichEditor value={form.content} onChange={(val) => setForm({ ...form, content: val })} />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-secondary mb-1">Image couverture (URL)</label>
-              <input className="input-field" value={form.cover_image_url} onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })} />
-            </div>
+            <FileUpload value={form.cover_image_url} onChange={(url) => setForm({ ...form, cover_image_url: url })} label="Image de couverture" />
             <div>
               <label className="block text-sm text-secondary mb-1">Statut</label>
               <select className="input-field" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>

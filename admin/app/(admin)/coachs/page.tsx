@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import FileUpload from '@/components/FileUpload';
 import type { Coach } from '@/lib/types';
 
 const emptyForm = { name: '', photo_url: '', certifications: '', specialties: '', bio: '', is_active: true, order: 0 };
@@ -73,10 +74,7 @@ export default function CoachsPage() {
               <label className="block text-sm text-secondary mb-1">Nom</label>
               <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             </div>
-            <div>
-              <label className="block text-sm text-secondary mb-1">URL photo</label>
-              <input className="input-field" value={form.photo_url} onChange={(e) => setForm({ ...form, photo_url: e.target.value })} />
-            </div>
+            <FileUpload value={form.photo_url} onChange={(url) => setForm({ ...form, photo_url: url })} label="Photo" />
           </div>
           <div>
             <label className="block text-sm text-secondary mb-1">Bio</label>

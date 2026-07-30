@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import FileUpload from '@/components/FileUpload';
 import type { Equipment } from '@/lib/types';
 
 const zones = ['musculation', 'cardio', 'stretching', 'functional', 'locker'];
@@ -89,10 +90,7 @@ export default function EquipementsPage() {
             <label className="block text-sm text-secondary mb-1">Description</label>
             <textarea className="input-field h-20" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
-          <div>
-            <label className="block text-sm text-secondary mb-1">URL image</label>
-            <input className="input-field" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-          </div>
+          <FileUpload value={form.image_url} onChange={(url) => setForm({ ...form, image_url: url })} label="Image" />
           <label className="flex items-center gap-2 text-sm text-secondary">
             <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="accent-primary" /> Actif
           </label>

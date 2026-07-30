@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import FileUpload from '@/components/FileUpload';
 import type { Video } from '@/lib/types';
 
 const emptyForm = { title: '', description: '', video_url: '', thumbnail_url: '', category: 'entrainement', is_published: true, order: 0 };
@@ -86,10 +87,7 @@ export default function VideosPage() {
               <label className="block text-sm text-secondary mb-1">URL video</label>
               <input className="input-field" value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} required />
             </div>
-            <div>
-              <label className="block text-sm text-secondary mb-1">URL miniature</label>
-              <input className="input-field" value={form.thumbnail_url} onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })} />
-            </div>
+            <FileUpload value={form.thumbnail_url} onChange={(url) => setForm({ ...form, thumbnail_url: url })} label="Miniature" />
           </div>
           <label className="flex items-center gap-2 text-sm text-secondary">
             <input type="checkbox" checked={form.is_published} onChange={(e) => setForm({ ...form, is_published: e.target.checked })} className="accent-primary" /> Publie
