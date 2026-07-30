@@ -121,9 +121,25 @@ salle-de-sport/
 │   ├── styles/        # Tailwind config, CSS global
 │   └── ...
 ├── admin/             # Next.js — Dashboard administration
-│   ├── app/           # Pages admin (dashboard, CRUD, planning)
-│   ├── components/    # Composants admin (tables, modals, éditeur planning)
-│   ├── lib/           # API client admin, auth
+│   ├── app/
+│   │   ├── login/     # Page de connexion
+│   │   ├── (admin)/   # Layout protégé avec Sidebar
+│   │   │   ├── dashboard/        # Stats + graphiques tendances
+│   │   │   ├── activites/        # CRUD activités
+│   │   │   ├── planning/         # Éditeur drag & drop + vue liste
+│   │   │   ├── abonnements/      # CRUD formules
+│   │   │   ├── coachs/           # CRUD coachs
+│   │   │   ├── articles/         # CRUD articles + RichEditor
+│   │   │   ├── videos/           # CRUD vidéos
+│   │   │   ├── transformations/  # CRUD avant/après
+│   │   │   ├── equipements/      # CRUD équipements par zone
+│   │   │   ├── avis/             # Modération avis
+│   │   │   ├── contacts/         # Messages reçus
+│   │   │   └── parametres/       # Paramètres salle
+│   │   ├── globals.css
+│   │   └── layout.tsx
+│   ├── components/    # DataTable, Modal, Sidebar, StatCard, FileUpload, RichEditor, Chart
+│   ├── lib/           # api.ts (apiFetch, login), auth.tsx (AuthProvider, token refresh), types.ts
 │   └── ...
 ├── backend/           # FastAPI — API REST
 │   ├── app/
@@ -327,6 +343,108 @@ ADMIN_PASSWORD=changeme
 - Configurer domaine personnalisé + Cloudflare DNS
 - Migrations + seed en production
 - Tests complets en production
+
+---
+
+## État d'avancement
+
+### PHASE 1 — BACKEND API ✅
+
+| Élément | Statut | Notes |
+|---------|--------|-------|
+| main.py + CORS | ✅ | CORS origins : localhost:3000, 3001, 3003 |
+| Config (pydantic-settings) | ✅ | `.env` override, defaults dev |
+| Security (JWT + bcrypt) | ✅ | Access 30min, Refresh 7j, HS256 |
+| Modèles SQLAlchemy | ✅ | 13 tables (users, activities, coaches, schedule_slots, enrollments, subscriptions, articles, videos, transformations, equipment, reviews, contacts, settings) |
+| Schemas Pydantic | ✅ | Create/Update/Response pour chaque modèle |
+| Services métier | ✅ | auth, activity, schedule, enrollment, subscription, coach, article, video, transformation, equipment, review, media, contact, stats |
+| Routes API v1 | ✅ | Toutes les routes documentées dans Phase 1 |
+| Alembic migration initiale | ✅ | `091934929730_initial.py` |
+| Seed script | ✅ | Admin + données exemples |
+| Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
+| Dockerfile | ✅ | |
+
+### PHASE 2 — FRONTEND PUBLIC ✅
+
+| Élément | Statut | Notes |
+|---------|--------|-------|
+| Header, Footer, Hero | ✅ | Navbar + ThemeToggle + CTA |
+| Mode clair/sombre | ✅ | `data-theme` sur `<html>`, anti-flash script |
+| Image hero Unsplash | ✅ | Next.js Image + overlay adaptatif |
+| Logo | ✅ | `frontend/public/logo.png` |
+
+### PHASE 3 — ADMIN DASHBOARD ✅
+
+| Élément | Statut | Notes |
+|---------|--------|-------|
+| Auth JWT + refresh auto | ✅ | Renouvellement 2min avant expiration |
+| Login page | ✅ | Email + mot de passe, vérification rôle admin |
+| Sidebar navigation | ✅ | 12 entrées (Dashboard → Paramètres) |
+| Dashboard + graphiques | ✅ | 8 StatCards + 4 graphiques (LineChart, BarChart) |
+| Activités CRUD | ✅ | DataTable + Modal + FileUpload |
+| Planning drag & drop | ✅ | Grille 7j×15h, glisser-déposer, double-clic ajout, toggle grille/liste |
+| Abonnements CRUD | ✅ | Prix FCFA, avantages multi-lignes |
+| Coachs CRUD | ✅ | Photo FileUpload, certifications/spécialités multi-lignes |
+| Articles CRUD | ✅ | RichEditor pour contenu, FileUpload pour couverture |
+| Vidéos CRUD | ✅ | URL vidéo + miniature FileUpload |
+| Transformations CRUD | ✅ | FileUpload avant/après, mise en avant |
+| Équipements CRUD | ✅ | Par zone, FileUpload image |
+| Avis modération | ✅ | Approuver/Supprimer, étoiles, badge statut |
+| Contacts | ✅ | Lecture + marquer lu, indicateur non-lu |
+| Paramètres | ✅ | 8 clés (nom salle, téléphone, email, adresse, horaires, réseaux sociaux) |
+
+### PHASE 4 — DOCKER ✅
+
+| Élément | Statut | Notes |
+|---------|--------|-------|
+| docker-compose.yml | ✅ | db, redis, api, frontend, admin |
+| Dockerfiles | ✅ | Backend + Admin |
+
+### PHASE 5 — DÉPLOIEMENT ❌ (non commencé)
+
+---
+
+## Composants Admin — Référence
+
+### Composants réutilisables (`admin/components/`)
+
+| Composant | Fichier | Description |
+|-----------|---------|-------------|
+| `DataTable` | `DataTable.tsx` | Table avec colonnes configurables, renderers custom, boutons Modifier/Supprimer |
+| `Modal` | `Modal.tsx` | Modale plein écran, backdrop blur, scrollable, prop `wide` pour formulaires larges |
+| `StatCard` | `StatCard.tsx` | Carte statistique avec icône emoji, label, valeur, couleur optionnelle |
+| `FileUpload` | `FileUpload.tsx` | Upload drag & drop + preview image + URL manuelle, appel `POST /api/v1/upload/` |
+| `RichEditor` | `RichEditor.tsx` | Éditeur WYSIWYG contentEditable, toolbar : gras, italique, souligné, listes, H2/H3, liens, suppression format |
+| `Chart` | `Chart.tsx` | `BarChart` et `LineChart` en SVG pur, couleur/suffix configurables |
+| `Sidebar` | `Sidebar.tsx` | Navigation latérale fixe, lien actif, bouton déconnexion |
+
+### Classes CSS Admin (`admin/app/globals.css`)
+
+| Classe | Usage |
+|--------|-------|
+| `.btn-primary` | Bouton principal (bg doré/jaune) |
+| `.btn-secondary` | Bouton secondaire (fond sombre, bordure) |
+| `.btn-danger` | Bouton suppression (rouge) |
+| `.input-field` | Champ de formulaire (fond sombre, bordure, focus doré) |
+| `.card` | Carte conteneur (fond sombre, bordure, coins arrondis) |
+| `.table-header` | En-tête de colonne DataTable |
+| `.table-cell` | Cellule DataTable |
+
+### Authentification Admin
+
+- **Login** : `POST /api/v1/auth/login` avec `OAuth2PasswordRequestForm` (form-urlencoded, `username` + `password`)
+- **Token** : stocké dans `localStorage('admin_token')`, refresh dans `localStorage('admin_refresh_token')`
+- **Refresh auto** : `scheduleRefresh()` programme un renouvellement 2 minutes avant l'expiration du token (décodage JWT côté client)
+- **Vérification rôle** : `fetchProfile()` vérifie `role === 'admin'`, sinon déconnexion
+- **URL API** : `NEXT_PUBLIC_API_URL` ou `http://localhost:8000`
+
+### Planning — Fonctionnalités drag & drop
+
+- **Vue grille** : 7 colonnes (jours) × 15 lignes (6h–20h), créneaux positionnés par heure
+- **Glisser-déposer** : déplacer un créneau vers un autre jour/heure met à jour via `PUT /api/v1/schedule/{id}`
+- **Double-clic** : ouvrir le formulaire de création pré-rempli avec le jour/heure cliqué
+- **Vue liste** : affichage classique par jour avec boutons Modifier/Supprimer
+- **Couleurs** : bordure gauche colorée selon la catégorie d'activité (force=blanc, cardio=gris, etc.)
 
 ---
 
