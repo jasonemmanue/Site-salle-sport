@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #0F1724;
+  color: #E2E8F0;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-dark font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-700 transition-colors;
+  }
+  .btn-secondary {
+    @apply bg-dark-lighter text-secondary border border-dark-border px-4 py-2 rounded-lg hover:bg-dark-border transition-colors;
+  }
+  .input-field {
+    @apply w-full bg-dark-lighter border border-dark-border rounded-lg px-4 py-2.5 text-white placeholder:text-dark-muted focus:outline-none focus:border-primary transition-colors;
+  }
+  .card {
+    @apply bg-dark-card border border-dark-border rounded-xl p-6;
+  }
+  .table-header {
+    @apply text-left text-xs font-semibold uppercase tracking-wider text-dark-muted px-4 py-3;
+  }
+  .table-cell {
+    @apply px-4 py-3 text-sm text-secondary;
+  }
+}
+
+::selection {
+  background: rgba(255, 214, 0, 0.3);
+  color: #fff;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0F1724; }
+::-webkit-scrollbar-thumb { background: #2D3A4A; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #FFD600; }

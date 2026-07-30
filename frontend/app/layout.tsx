@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     "coaching",
     "cours collectifs",
   ],
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

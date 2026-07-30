@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str = "changeme"
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_SIZE_MB: int = 5
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3003"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

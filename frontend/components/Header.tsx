@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 
@@ -26,7 +27,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
@@ -42,8 +42,11 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1 text-2xl font-black tracking-wider">
-            <span className="text-white">ESLIE</span><span className="text-white/60">SPORT</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Eslie Sport" width={44} height={44} className="rounded-full" />
+            <span className="text-xl font-black tracking-wider">
+              <span className="text-accent">ESLIE</span><span className="text-secondary"> SPORT</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}
@@ -57,8 +60,8 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm font-semibold uppercase tracking-wide transition-colors hover:text-primary ${
-                    isActive ? 'text-primary' : 'text-white/80'
+                  className={`text-sm font-semibold uppercase tracking-wide transition-colors hover:text-accent ${
+                    isActive ? 'text-accent' : 'text-secondary'
                   }`}
                 >
                   {link.label}
@@ -73,7 +76,7 @@ export default function Header() {
 
             <Link
               href="/abonnements"
-              className="hidden sm:inline-flex gradient-primary px-6 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-105 animate-pulse-glow"
+              className="hidden sm:inline-flex gradient-primary px-6 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider text-dark transition-transform hover:scale-105 animate-pulse-glow"
             >
               S&apos;inscrire
             </Link>
@@ -86,17 +89,17 @@ export default function Header() {
               aria-label="Menu"
             >
               <span
-                className={`block h-0.5 w-6 bg-white transition-all duration-300 ${
+                className={`block h-0.5 w-6 bg-secondary transition-all duration-300 ${
                   mobileOpen ? 'rotate-45 translate-y-2' : ''
                 }`}
               />
               <span
-                className={`block h-0.5 w-6 bg-white transition-all duration-300 ${
+                className={`block h-0.5 w-6 bg-secondary transition-all duration-300 ${
                   mobileOpen ? 'opacity-0' : ''
                 }`}
               />
               <span
-                className={`block h-0.5 w-6 bg-white transition-all duration-300 ${
+                className={`block h-0.5 w-6 bg-secondary transition-all duration-300 ${
                   mobileOpen ? '-rotate-45 -translate-y-2' : ''
                 }`}
               />
@@ -111,7 +114,7 @@ export default function Header() {
           mobileOpen ? 'max-h-screen' : 'max-h-0'
         }`}
       >
-        <nav className="glass border-t border-white/10 px-4 py-6 space-y-1">
+        <nav className="glass border-t border-accent/10 px-4 py-6 space-y-1">
           {navLinks.map((link) => {
             const isActive =
               link.href === '/'
@@ -123,8 +126,8 @@ export default function Header() {
                 href={link.href}
                 className={`block rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wide transition-colors ${
                   isActive
-                    ? 'bg-primary/20 text-primary'
-                    : 'text-white/80 hover:bg-white/5 hover:text-primary'
+                    ? 'bg-accent/15 text-accent'
+                    : 'text-secondary hover:bg-accent/5 hover:text-accent'
                 }`}
               >
                 {link.label}
@@ -133,7 +136,7 @@ export default function Header() {
           })}
           <Link
             href="/abonnements"
-            className="block mt-4 gradient-primary text-center px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-black"
+            className="block mt-4 gradient-primary text-center px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider text-dark"
           >
             S&apos;inscrire
           </Link>
