@@ -97,15 +97,44 @@ Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`
 8. **Shadows** : `shadow-white/10` au lieu de `shadow-primary/30` sur les éléments actifs
 9. **Ne jamais hardcoder** de couleurs inline sans ajouter une classe CSS pour le light mode override
 
-### Tarification
+### Tarification — Grille tarifaire ESLIE SPORT
 
 | Formule | Prix | Type |
 |---------|------|------|
-| Inscription | 5 000 FCFA | Paiement unique |
-| Abonnement Mensuel | 25 000 FCFA | Mensuel récurrent |
+| Séance individuelle / collective | 3 000 FCFA | Paiement unique |
+| Inscription mensuelle | 5 000 FCFA | Paiement unique |
+| Mensualité | 30 000 FCFA | Mensuel récurrent |
+| Kung-Fu Wushu — Inscription | 10 000 FCFA | Paiement unique |
+| Kung-Fu Wushu — Mensuel | 10 000 FCFA | Mensuel récurrent |
+| Kung-Fu Wushu — Tenue de sport | 20 000 FCFA | Paiement unique |
 
 - Devise : **FCFA** (Franc CFA) — jamais EUR ou USD
-- Format nombre : `25 000` (espace comme séparateur de milliers, format français)
+- Format nombre : `30 000` (espace comme séparateur de milliers, format français)
+- Contact : **+225 0545079850**
+- Localisation : **Blaukauss, Abidjan, Côte d'Ivoire**
+
+### Planning hebdomadaire réel
+
+| Jour | Activité | Horaires | Coach |
+|------|----------|----------|-------|
+| Tous les jours | Musculation | 07h - 20h | Toussaint |
+| Lundi | Séance collective | 20h30 - 22h | Léo |
+| Mardi | Séance collective | 18h - 19h39 | David |
+| Mercredi | Séance collective | 20h30 - 22h | Léo |
+| Mercredi | Kung-Fu Wushu | 14h - 15h30 | — |
+| Jeudi | Séance collective | 18h30 - 20h30 | Adonis |
+| Vendredi | Séance collective | 20h30 - 22h | Léo |
+| Samedi | Séance collective | 7h - 9h | David |
+| Samedi | Kung-Fu Wushu | 10h - 11h30 | — |
+
+### Coachs
+
+| Nom | Spécialité | Jours |
+|-----|-----------|-------|
+| Toussaint | Musculation | Tous les jours |
+| Léo | Séances collectives | Lundi, Mercredi, Vendredi |
+| David | Séances collectives | Mardi, Samedi |
+| Adonis | Séances collectives | Jeudi |
 
 ---
 
