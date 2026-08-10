@@ -7,7 +7,7 @@ interface BarChartProps {
   suffix?: string;
 }
 
-export function BarChart({ data, title, color = '#ffffff', suffix = '' }: BarChartProps) {
+export function BarChart({ data, title, color = '#0F1724', suffix = '' }: BarChartProps) {
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <div className="card">
@@ -32,7 +32,7 @@ interface LineChartProps {
   suffix?: string;
 }
 
-export function LineChart({ data, title, color = '#ffffff', suffix = '' }: LineChartProps) {
+export function LineChart({ data, title, color = '#0F1724', suffix = '' }: LineChartProps) {
   if (data.length < 2) return null;
   const max = Math.max(...data.map((d) => d.value), 1);
   const min = Math.min(...data.map((d) => d.value));
@@ -64,8 +64,8 @@ export function LineChart({ data, title, color = '#ffffff', suffix = '' }: LineC
         {points.map((p, i) => (
           <g key={i}>
             <circle cx={p.x} cy={p.y} r="3" fill={color} />
-            <text x={p.x} y={h + 18} textAnchor="middle" className="text-[10px]" fill="#737373">{data[i].label}</text>
-            <text x={p.x} y={p.y - 8} textAnchor="middle" className="text-[9px]" fill="#a3a3a3">{data[i].value}{suffix}</text>
+            <text x={p.x} y={h + 18} textAnchor="middle" className="text-[10px]" fill="#64748B">{data[i].label}</text>
+            <text x={p.x} y={p.y - 8} textAnchor="middle" className="text-[9px]" fill="#475569">{data[i].value}{suffix}</text>
           </g>
         ))}
       </svg>

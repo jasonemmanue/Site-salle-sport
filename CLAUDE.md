@@ -424,6 +424,7 @@ ADMIN_PASSWORD=changeme
 | Avis modération | ✅ | Approuver/Supprimer, étoiles, badge statut |
 | Contacts | ✅ | Lecture + marquer lu, indicateur non-lu |
 | Paramètres | ✅ | 8 clés (nom salle, téléphone, email, adresse, horaires, réseaux sociaux) |
+| Thème bi-chrome | ✅ | Contenu en clair via `.admin-content`, Sidebar et `/login` sombres |
 
 ### PHASE 4 — DOCKER ✅
 
@@ -490,6 +491,51 @@ docker compose up -d --no-deps --force-recreate frontend admin
 | `.card` | Carte conteneur (fond sombre, bordure, coins arrondis) |
 | `.table-header` | En-tête de colonne DataTable |
 | `.table-cell` | Cellule DataTable |
+| `.admin-content` | **Conteneur du contenu en thème clair** (voir ci-dessous) |
+
+### Thème de l'admin — contenu clair, sidebar sombre
+
+L'admin est **bi-chrome** : la Sidebar reste bleu nuit (identité de marque),
+le contenu des pages est en **thème clair**.
+
+La bascule tient en une classe `.admin-content` posée sur le `<main>` de
+`app/(admin)/layout.tsx`. La Sidebar étant un **frère** du `<main>` et non un
+descendant, elle n'est jamais atteinte par ces règles — pas de `:not()` ni
+d'exception à maintenir. La page `/login` est hors du groupe `(admin)` : elle
+reste entièrement sombre.
+
+Les 12 pages continuent d'utiliser les classes du thème sombre
+(`text-white`, `text-secondary`, `bg-dark-card`…) ; `globals.css` réinterprète
+leur rendu à l'intérieur de `.admin-content`. **Aucune page n'a été modifiée**,
+et ajouter une page ne demande aucun traitement particulier.
+
+| Classe d'origine | Rendu dans `.admin-content` | Contraste sur blanc |
+|------------------|-----------------------------|---------------------|
+| `text-white` | `#0F1724` | 16,9:1 |
+| `text-secondary` | `#475569` | 7,5:1 |
+| `text-dark-muted` | `#64748B` | 4,8:1 |
+| `text-primary` | `#8A6D0A` | 4,9:1 |
+| `bg-dark-card` | `#FFFFFF` | — |
+| `bg-dark-lighter` | `#F1F5F9` | — |
+| `border-dark-border` | `#E2E8F0` | — |
+| `bg-white` / `text-black` | inversés en `#0F1724` / `#FFFFFF` | — |
+
+⚠️ **Le doré `#FFD600` ne fait que 1,4:1 sur blanc.** En texte sur fond clair,
+utiliser `#8A6D0A`. Le doré reste inchangé en **fond** (`bg-primary` des boutons
+CTA, où le texte `#0F1724` donne 11,2:1).
+
+⚠️ **Piège Tailwind `@apply`.** `@apply` recopie *toutes* les règles qui ciblent
+l'utilitaire, y compris les surcharges `.admin-content`, en substituant le
+sélecteur. `.btn-danger { @apply … text-white }` génère donc aussi
+`.admin-content .btn-danger { color: #0F1724 }` — du navy sur rouge (3,3:1).
+D'où le rattrapage explicite en fin de `globals.css`. **Toute nouvelle classe
+`@layer components` qui `@apply` un utilitaire surchargé demande la même
+vigilance.**
+
+⚠️ **Graphiques** : `Chart.tsx` dessine en SVG avec une couleur passée en prop.
+La valeur par défaut est `#0F1724`. Ne jamais passer `#ffffff` — invisible sur
+le fond clair. Palette utilisée par le dashboard : `#0F1724`, `#16A34A`,
+`#64748B`, `#B8960A`.
 
 ### Authentification Admin
 

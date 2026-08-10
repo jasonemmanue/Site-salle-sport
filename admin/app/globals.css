@@ -31,6 +31,81 @@ body {
   }
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Thème clair du CONTENU admin.
+
+   Portée : uniquement `.admin-content` (le <main> de app/(admin)/layout.tsx).
+   La Sidebar est un frère du <main>, elle n'est donc jamais touchée et
+   conserve son fond bleu nuit. La page /login non plus (hors du groupe).
+
+   Les pages admin utilisent les classes Tailwind du thème sombre
+   (text-white, text-secondary, bg-dark-card…). Plutôt que de les réécrire
+   dans les 12 pages, on redéfinit leur rendu à l'intérieur de ce conteneur.
+   ────────────────────────────────────────────────────────────── */
+
+.admin-content {
+  background: #F1F5F9;
+  color: #0F1724;
+}
+
+/* Surfaces */
+.admin-content .card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 1px 2px rgba(15, 23, 36, 0.05);
+}
+.admin-content .bg-dark-card { background-color: #FFFFFF; }
+.admin-content .bg-dark-lighter { background-color: #F1F5F9; }
+.admin-content .bg-dark-lighter\/50 { background-color: #F8FAFC; }
+.admin-content .bg-dark { background-color: #F8FAFC; }
+.admin-content .bg-dark-border { background-color: #E2E8F0; }
+
+/* Bordures */
+.admin-content .border-dark-border { border-color: #E2E8F0; }
+
+/* Texte — les tokens sombres deviennent des gris ardoise lisibles.
+   Ratios sur fond blanc : #0F1724 16,9:1 · #475569 7,5:1 · #64748B 4,8:1 */
+.admin-content .text-white { color: #0F1724; }
+.admin-content .text-secondary { color: #475569; }
+.admin-content .text-dark-muted { color: #64748B; }
+
+/* Le doré #FFD600 ne fait que 1,4:1 sur blanc : version assombrie à 4,9:1.
+   N'affecte que la couleur du texte, pas `bg-primary` (boutons CTA). */
+.admin-content .text-primary { color: #8A6D0A; }
+
+/* Champs de formulaire */
+.admin-content .input-field {
+  background-color: #FFFFFF;
+  border-color: #CBD5E1;
+  color: #0F1724;
+}
+.admin-content .input-field::placeholder { color: #94A3B8; }
+
+/* Bouton secondaire */
+.admin-content .btn-secondary {
+  background-color: #FFFFFF;
+  border-color: #CBD5E1;
+  color: #334155;
+}
+.admin-content .btn-secondary:hover { background-color: #E2E8F0; }
+
+/* Tableaux */
+.admin-content .table-header { color: #64748B; }
+.admin-content .table-cell { color: #334155; }
+
+/* Inversion des éléments pensés pour le fond sombre (bascule Grille/Liste
+   du planning : `bg-white text-black` devient sombre-sur-clair). */
+.admin-content .bg-white { background-color: #0F1724; }
+.admin-content .text-black { color: #FFFFFF; }
+
+/* Rattrapage d'un effet de bord de Tailwind : `@apply` recopie TOUTES les
+   règles qui ciblent l'utilitaire, y compris les surcharges ci-dessus, en
+   substituant le sélecteur. `.btn-danger { @apply ... text-white }` génère
+   donc aussi `.admin-content .btn-danger { color: #0F1724 }`, ce qui mettrait
+   du navy sur le rouge (3,3:1). On restaure le blanc (4,8:1).
+   Même vigilance pour toute future classe @apply-ant un utilitaire surchargé. */
+.admin-content .btn-danger { color: #FFFFFF; }
+
 ::selection {
   background: rgba(255, 214, 0, 0.3);
   color: #fff;

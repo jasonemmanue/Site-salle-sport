@@ -67,10 +67,10 @@ export default function DashboardPage() {
 
           {trends && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <LineChart data={trends.enrollments_by_day} title="Inscriptions par jour" color="#ffffff" />
-              <LineChart data={trends.revenue_by_month} title="Revenus mensuels (x1000 FCFA)" color="#22c55e" suffix="k" />
-              <BarChart data={trends.top_activities} title="Activites les plus populaires" color="#a3a3a3" />
-              <BarChart data={trends.fill_rate_by_day} title="Taux de remplissage par jour (%)" color="#ffffff" suffix="%" />
+              <LineChart data={trends.enrollments_by_day} title="Inscriptions par jour" color="#0F1724" />
+              <LineChart data={trends.revenue_by_month} title="Revenus mensuels (x1000 FCFA)" color="#16A34A" suffix="k" />
+              <BarChart data={trends.top_activities} title="Activites les plus populaires" color="#64748B" />
+              <BarChart data={trends.fill_rate_by_day} title="Taux de remplissage par jour (%)" color="#B8960A" suffix="%" />
             </div>
           )}
         </>

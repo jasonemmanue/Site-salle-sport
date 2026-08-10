@@ -120,8 +120,10 @@ export default function PlanningPage() {
   const getCoachName = (id: string) => coaches.find((c) => c.id === id)?.name || '...';
   const getActivityColor = (id: string) => {
     const cat = activities.find((a) => a.id === id)?.category;
-    const colors: Record<string, string> = { force: '#ffffff', cardio: '#a3a3a3', flexibility: '#737373', martial_arts: '#d4d4d4', dance: '#e5e5e5' };
-    return colors[cat || ''] || '#ffffff';
+    // Teintes sombres : ces couleurs servent de bordure sur les cartes du
+    // contenu admin, qui est en thème clair (cf. .admin-content).
+    const colors: Record<string, string> = { force: '#0F1724', cardio: '#B8960A', flexibility: '#64748B', martial_arts: '#334155', dance: '#94A3B8' };
+    return colors[cat || ''] || '#0F1724';
   };
 
   const getSlotAt = (day: number, hour: number) =>
