@@ -401,6 +401,7 @@ ADMIN_PASSWORD=changeme
 | Mode clair/sombre | ✅ | `data-theme` sur `<html>`, anti-flash script |
 | Image hero Unsplash | ✅ | Next.js Image + overlay adaptatif |
 | Logo | ✅ | `frontend/public/logo.png` |
+| Favicon / icônes | ✅ | Généré depuis le logo (badge rogné, coins transparents) via les conventions de fichiers Next.js : `app/favicon.ico` (16/32/48/64), `app/icon.png` (512), `app/apple-icon.png` (180, fond bleu nuit). Identique côté `admin/app/`. Ne pas déclarer `metadata.icons` : les fichiers ont priorité. |
 
 ### PHASE 3 — ADMIN DASHBOARD ✅
 

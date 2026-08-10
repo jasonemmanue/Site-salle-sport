@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata: Metadata = {
   title: 'Eslie Sport Admin',
   description: 'Dashboard administrateur Eslie Sport',
-  icons: { icon: '/logo.png' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
