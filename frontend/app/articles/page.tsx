@@ -126,7 +126,7 @@ export default function ArticlesPage() {
               className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
                   ? "gradient-primary text-black shadow-lg shadow-white/10"
-                  : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
+                  : "border border-dark-border bg-dark-card text-secondary-light hover:border-primary/60 hover:bg-dark-lighter hover:text-white"
               }`}
             >
               {cat}

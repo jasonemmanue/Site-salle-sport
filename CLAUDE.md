@@ -30,22 +30,22 @@ Le site permet au grand public de découvrir les activités, consulter le planni
 
 ## Identité Visuelle & Design System
 
-### Palette — Noir & Blanc (monochrome)
+### Palette — Bleu nuit & Doré
 
-Le site utilise une identité visuelle **noir et blanc** correspondant aux couleurs de la salle de sport. Toutes les couleurs sont définies dans `frontend/app/globals.css` via `@theme`.
+Le site reprend les couleurs du logo ESLIE SPORT : fond **bleu nuit**, accent **doré**. Toutes les couleurs sont définies dans `frontend/app/globals.css` via `@theme`.
 
 | Token CSS | Valeur hex | Usage |
 |-----------|-----------|-------|
-| `--color-primary` | `#ffffff` | Texte principal sur fond sombre, éléments d'accent |
-| `--color-primary-light` | `#e5e5e5` | Variante douce du blanc |
-| `--color-secondary` | `#d4d4d4` | Texte secondaire, icônes |
-| `--color-secondary-light` | `#a3a3a3` | Texte tertiaire |
-| `--color-accent` | `#a3a3a3` | Étoiles, éléments d'emphase subtile |
-| `--color-dark` | `#000000` | Background principal |
-| `--color-dark-card` | `#0a0a0a` | Cards, sections alternées |
-| `--color-dark-lighter` | `#111111` | Fond plus clair (placeholders) |
-| `--color-dark-border` | `#1a1a1a` | Bordures |
-| `--color-dark-muted` | `#737373` | Texte discret, descriptions |
+| `--color-primary` | `#FFD600` | Doré : CTA, accents, titres en emphase |
+| `--color-primary-light` | `#FFE44D` | Variante claire du doré |
+| `--color-secondary` | `#A8B2C1` | Texte secondaire (gris bleuté) |
+| `--color-secondary-light` | `#C5CDD8` | Texte tertiaire lisible sur fond sombre |
+| `--color-accent` | `#FFD600` | Étoiles, emphase |
+| `--color-dark` | `#0F1724` | Background principal |
+| `--color-dark-card` | `#1A2332` | Cards, sections alternées |
+| `--color-dark-lighter` | `#1E293B` | Fond plus clair (placeholders, hover) |
+| `--color-dark-border` | `#2D3A4A` | Bordures |
+| `--color-dark-muted` | `#8896A8` | Texte discret — **contraste 5,2:1 sur `--color-dark-card`** |
 | `--color-success` | `#22c55e` | Succès, validations, places disponibles |
 | `--color-warning` | `#f59e0b` | Avertissements, places limitées |
 | `--color-error` | `#ef4444` | Erreurs, complet |
@@ -54,13 +54,14 @@ Le site utilise une identité visuelle **noir et blanc** correspondant aux coule
 
 | Classe | Dark mode | Light mode |
 |--------|-----------|------------|
-| `.gradient-primary` | `linear-gradient(135deg, #fff, #a3a3a3)` + `color: #000` | `linear-gradient(135deg, #111, #404040)` + `color: #fff` |
+| `.gradient-primary` | `linear-gradient(135deg, #FFD600, #FFB800)` + `color: #0F1724` | identique (le doré reste doré dans les deux thèmes) |
 | `.gradient-hero` | Overlay sombre avec transparence | Overlay clair avec transparence |
 | `.hero-overlay` | `rgba(0,0,0, 0.6-0.8)` sur image hero | `rgba(255,255,255, 0.65-0.85)` sur image hero |
 | `.hero-gradient` | Radial-gradient sombre (pages sans image) | Radial-gradient clair `#f5f5f5` |
 | `.card-gradient` | Gradient sombre `#1a1a1a` | Gradient clair `#f0f0f0` |
-| `.glass` | Fond `rgba(10,10,10,0.8)` + blur + bordure blanche subtile | Fond `rgba(255,255,255,0.85)` + blur + bordure noire subtile |
-| `.text-gradient` | Dégradé blanc vers gris | Dégradé noir vers gris foncé |
+| `.glass` | Fond `rgba(26,35,50,0.85)` + blur + bordure dorée à 8 % | Fond clair + blur |
+| `.text-gradient` | Dégradé doré `#FFD600` vers gris bleuté `#A8B2C1` | idem |
+| `.watermark` | Filigrane `logo.png` centré, opacité 0.03 | idem |
 
 ### Mode Clair / Sombre
 
@@ -87,8 +88,8 @@ Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`
 
 ### Règles pour les ajouts futurs
 
-1. **Pas de couleurs vives** (rouge, bleu, orange, etc.) sauf pour les couleurs fonctionnelles (`success`, `warning`, `error`)
-2. **Boutons CTA** : utiliser `gradient-primary` avec `text-black` — le CSS gère automatiquement `text-white` en light mode
+1. **Une seule couleur d'accent** : le doré `--color-primary`. Pas de rouge/bleu/orange hors couleurs fonctionnelles (`success`, `warning`, `error`)
+2. **Boutons CTA** : utiliser `gradient-primary` avec `text-black` — le CSS force `color: #0F1724` dans les deux thèmes
 3. **Backgrounds hero avec image** : utiliser `.hero-overlay` sur un `<div>` au-dessus de l'image
 4. **Backgrounds hero sans image** : ajouter la classe `.hero-gradient` sur le `<div>` avec le `style={{background:...}}` inline
 5. **Cards avec fond inline** : ajouter la classe `.card-gradient` sur le `<div>` avec le style inline
@@ -96,6 +97,7 @@ Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`
 7. **Hover states** : `hover:border-primary/30` ou `hover:border-primary/40` (subtil halo)
 8. **Shadows** : `shadow-white/10` au lieu de `shadow-primary/30` sur les éléments actifs
 9. **Ne jamais hardcoder** de couleurs inline sans ajouter une classe CSS pour le light mode override
+10. **Contraste du texte sur fond sombre** : `text-dark-muted` (`#8896A8`) tombe à 5,2:1 sur `--color-dark-card` — acceptable pour du texte d'appoint, trop faible pour un élément cliquable. Pour un libellé interactif (filtres, onglets, liens), utiliser `text-secondary-light` (`#C5CDD8`, ~9,8:1). Voir les pilules de filtre de `app/articles/page.tsx`.
 
 ### Tarification — Grille tarifaire ESLIE SPORT
 
@@ -427,8 +429,37 @@ ADMIN_PASSWORD=changeme
 
 | Élément | Statut | Notes |
 |---------|--------|-------|
-| docker-compose.yml | ✅ | db, redis, api, frontend, admin |
-| Dockerfiles | ✅ | Backend + Admin |
+| docker-compose.yml | ✅ | db, redis, api, frontend, admin — ports hôte décalés (voir § Ports) |
+| Dockerfiles | ✅ | Backend, Frontend, Admin (multi-stage, `output: standalone`, user non-root) |
+| `.dockerignore` | ✅ | Frontend + Admin — évite de copier le `node_modules` Windows de l'hôte |
+| Variables `NEXT_PUBLIC_*` | ✅ | Passées en `build.args` (voir ci-dessous) |
+
+#### ⚠️ Variables `NEXT_PUBLIC_*` et Docker
+
+Next.js **fige les `NEXT_PUBLIC_*` dans le bundle au moment du `npm run build`**,
+pas au démarrage du conteneur. Les déclarer uniquement dans `environment:` de
+`docker-compose.yml` **n'a aucun effet** sur le code exécuté par le navigateur.
+
+Elles doivent donc passer par `build.args` → `ARG` → `ENV` **avant** le
+`RUN npm run build` du Dockerfile. C'est en place pour `frontend` et `admin`.
+
+`NEXT_PUBLIC_API_URL` doit valoir l'URL de l'API **telle que le navigateur la
+voit** : `http://localhost:8010`. Ne pas y mettre `/api/v1` — le code l'ajoute
+(`fetchApi` construit `${BASE}/api/v1${endpoint}`).
+
+Conséquence pratique : **changer cette valeur impose un rebuild d'image**, un
+simple redémarrage de conteneur ne suffit pas.
+
+#### Recréer les conteneurs après un rebuild
+
+`docker compose up -d` ne recrée pas un conteneur dont seule l'image a changé si
+celui-ci tournait déjà. Après un `build`, forcer la recréation :
+
+```bash
+docker compose up -d --no-deps --force-recreate frontend admin
+```
+
+`--no-deps` évite de redémarrer `db`, `redis` et `api`.
 
 ### PHASE 5 — DÉPLOIEMENT ❌ (non commencé)
 
@@ -493,9 +524,19 @@ ADMIN_PASSWORD=changeme
 
 ---
 
-## Ports par défaut
-- Frontend : 3000
-- Admin : 3001
-- API : 8000
-- PostgreSQL : 5432
-- Redis : 6379
+## Ports
+
+Plusieurs projets tournent en parallèle sur la même machine ; les ports hôte de
+`docker-compose.yml` sont décalés pour éviter les collisions. **Le port 8000 est
+occupé par un autre projet (`salon-coiffure`)** — ne jamais y pointer.
+
+| Service | Port hôte (Docker) | Port interne | Dev local (hors Docker) |
+|---------|--------------------|--------------|--------------------------|
+| Frontend | 3000 | 3000 | 3000 |
+| Admin | **3003** | 3001 | 3001 |
+| API | **8010** | 8000 | 8000 |
+| PostgreSQL | **5600** | 5432 | — |
+| Redis | **6381** | 6379 | — |
+
+Le CORS du backend autorise `localhost:3000`, `:3001` et `:3003`
+(`backend/app/core/config.py`).
