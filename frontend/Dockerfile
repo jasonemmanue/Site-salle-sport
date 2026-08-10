@@ -7,6 +7,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Next.js fige les NEXT_PUBLIC_* dans le bundle au build : cette valeur doit
+# etre l'URL de l'API telle que le NAVIGATEUR la voit, pas le nom de service.
+ARG NEXT_PUBLIC_API_URL=http://localhost:8010
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
