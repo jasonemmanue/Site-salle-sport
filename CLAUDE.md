@@ -256,7 +256,7 @@ Créer `backend/app/models/models.py` :
 - `contact.py` : POST (public)
 - `upload.py` : POST multipart (auth)
 - `settings.py` : GET/PUT (auth)
-- `stats.py` : GET dashboard stats (auth)
+- `stats.py` : GET `/stats/` (9 indicateurs) et GET `/stats/trends` (4 séries) — auth admin
 
 #### Étape 1.6 : Migrations & Seed
 - Configurer Alembic
@@ -412,7 +412,7 @@ ADMIN_PASSWORD=changeme
 | Auth JWT + refresh auto | ✅ | Renouvellement 2min avant expiration |
 | Login page | ✅ | Email + mot de passe, vérification rôle admin |
 | Sidebar navigation | ✅ | 12 entrées (Dashboard → Paramètres) |
-| Dashboard + graphiques | ✅ | 8 StatCards + 4 graphiques (LineChart, BarChart) |
+| Dashboard + graphiques | ✅ | 8 StatCards (`/stats/`) + 4 graphiques (`/stats/trends`) — plus aucune donnée factice |
 | Activités CRUD | ✅ | DataTable + Modal + FileUpload |
 | Planning drag & drop | ✅ | Grille 7j×15h, glisser-déposer, double-clic ajout, toggle grille/liste |
 | Abonnements CRUD | ✅ | Prix FCFA, avantages multi-lignes |
@@ -536,6 +536,35 @@ vigilance.**
 La valeur par défaut est `#0F1724`. Ne jamais passer `#ffffff` — invisible sur
 le fond clair. Palette utilisée par le dashboard : `#0F1724`, `#16A34A`,
 `#64748B`, `#B8960A`.
+
+### Statistiques du tableau de bord
+
+Deux routes, toutes deux réservées à l'admin.
+
+`GET /stats/` renvoie 9 indicateurs instantanés : `total_members`,
+`active_subscriptions`, `today_enrollments`, `total_activities`,
+`total_coaches`, `unread_contacts`, `pending_reviews`, `fill_rate`,
+`monthly_revenue`. Les noms doivent rester alignés avec l'interface
+`DashboardStats` de `admin/lib/types.ts` — un écart se traduit par des cartes
+vides, sans erreur visible.
+
+`GET /stats/trends` renvoie 4 séries de points `{label, value}` : inscriptions
+et taux de remplissage sur la **semaine en cours** (lundi → dimanche), revenu
+sur les **6 derniers mois**, et les **5 activités** les plus suivies.
+
+⚠️ **Le revenu par mois est une estimation.** Il n'existe pas de table de
+paiements : aucun historique de transactions n'est disponible. La série
+reconstitue le revenu récurrent tel qu'il se présentait à la fin de chaque
+mois, en sommant le prix des formules des membres actifs inscrits à cette date.
+Les résiliations passées n'étant pas traçables, **la courbe ne peut que
+croître**. Une table de paiements serait nécessaire pour un revenu réel.
+
+⚠️ Le palmarès des activités utilise des **jointures externes** : une activité
+sans aucune inscription reste présente avec la valeur 0. Sans cela, un
+catalogue neuf produirait un graphique vide.
+
+⚠️ L'API renvoie des **FCFA bruts** ; c'est le dashboard qui divise par 1000
+pour son axe « x1000 FCFA ».
 
 ### Authentification Admin
 

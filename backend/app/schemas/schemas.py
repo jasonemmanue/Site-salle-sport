@@ -398,6 +398,18 @@ class DashboardStats(BaseModel):
     monthly_revenue: float
 
 
+class TrendPoint(BaseModel):
+    label: str
+    value: float
+
+
+class DashboardTrends(BaseModel):
+    enrollments_by_day: list[TrendPoint]
+    revenue_by_month: list[TrendPoint]
+    top_activities: list[TrendPoint]
+    fill_rate_by_day: list[TrendPoint]
+
+
 class PaginatedResponse(BaseModel, Generic[T]):
     items: list[T]
     total: int

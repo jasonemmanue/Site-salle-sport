@@ -22,28 +22,11 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!token) return;
     apiFetch<DashboardStats>('/api/v1/stats/', { token }).then(setStats).catch(() => {});
+    // Pas de repli sur des valeurs factices : si l'appel echoue, les graphiques
+    // ne s'affichent pas plutot que de montrer des chiffres inventes.
     apiFetch<TrendData>('/api/v1/stats/trends', { token })
       .then(setTrends)
-      .catch(() => {
-        setTrends({
-          enrollments_by_day: [
-            { label: 'Lun', value: 12 }, { label: 'Mar', value: 18 }, { label: 'Mer', value: 22 },
-            { label: 'Jeu', value: 15 }, { label: 'Ven', value: 25 }, { label: 'Sam', value: 30 }, { label: 'Dim', value: 8 },
-          ],
-          revenue_by_month: [
-            { label: 'Jan', value: 450 }, { label: 'Fev', value: 520 }, { label: 'Mar', value: 600 },
-            { label: 'Avr', value: 580 }, { label: 'Mai', value: 700 }, { label: 'Jun', value: 750 },
-          ],
-          top_activities: [
-            { label: 'Musculation', value: 45 }, { label: 'Cardio', value: 38 }, { label: 'Yoga', value: 28 },
-            { label: 'Boxing', value: 22 }, { label: 'Danse', value: 15 },
-          ],
-          fill_rate_by_day: [
-            { label: 'Lun', value: 72 }, { label: 'Mar', value: 65 }, { label: 'Mer', value: 85 },
-            { label: 'Jeu', value: 60 }, { label: 'Ven', value: 90 }, { label: 'Sam', value: 95 }, { label: 'Dim', value: 40 },
-          ],
-        });
-      });
+      .catch(() => setTrends(null));
   }, [token]);
 
   return (
@@ -68,7 +51,13 @@ export default function DashboardPage() {
           {trends && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <LineChart data={trends.enrollments_by_day} title="Inscriptions par jour" color="#0F1724" />
-              <LineChart data={trends.revenue_by_month} title="Revenus mensuels (x1000 FCFA)" color="#16A34A" suffix="k" />
+              {/* L'API renvoie des FCFA bruts ; le graphique les affiche en milliers. */}
+              <LineChart
+                data={trends.revenue_by_month.map((p) => ({ ...p, value: Math.round(p.value / 1000) }))}
+                title="Revenus mensuels (x1000 FCFA)"
+                color="#16A34A"
+                suffix="k"
+              />
               <BarChart data={trends.top_activities} title="Activites les plus populaires" color="#64748B" />
               <BarChart data={trends.fill_rate_by_day} title="Taux de remplissage par jour (%)" color="#B8960A" suffix="%" />
             </div>
