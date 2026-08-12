@@ -9,7 +9,7 @@ from app.services import article_service
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=PaginatedResponse[ArticleResponse])
 def list_articles(
     status_filter: str | None = Query(None, alias="status"),
     page: int = Query(1, ge=1),

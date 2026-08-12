@@ -387,8 +387,13 @@ class SettingResponse(BaseModel):
 
 
 class DashboardStats(BaseModel):
-    active_members: int
+    total_members: int
+    active_subscriptions: int
     today_enrollments: int
+    total_activities: int
+    total_coaches: int
+    unread_contacts: int
+    pending_reviews: int
     fill_rate: float
     monthly_revenue: float
 

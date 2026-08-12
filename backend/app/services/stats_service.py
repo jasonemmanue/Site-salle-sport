@@ -3,11 +3,29 @@ from datetime import date, datetime, timezone
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.models import Enrollment, ScheduleSlot, Subscription, User
+from app.models.models import (
+    Activity,
+    Coach,
+    Contact,
+    Enrollment,
+    Review,
+    ScheduleSlot,
+    Subscription,
+    User,
+)
 
 
 def get_dashboard_stats(db: Session) -> dict:
-    active_members = db.query(User).filter(User.is_active == True, User.role == "member").count()
+    total_members = db.query(User).filter(User.role == "member").count()
+    active_subscriptions = (
+        db.query(User)
+        .filter(User.is_active == True, User.subscription_id.isnot(None))
+        .count()
+    )
+    total_activities = db.query(Activity).filter(Activity.is_active == True).count()
+    total_coaches = db.query(Coach).filter(Coach.is_active == True).count()
+    unread_contacts = db.query(Contact).filter(Contact.is_read == False).count()
+    pending_reviews = db.query(Review).filter(Review.is_approved == False).count()
 
     today = date.today()
     today_enrollments = (
@@ -59,8 +77,13 @@ def get_dashboard_stats(db: Session) -> dict:
     monthly_revenue = float(active_subs) if active_subs else 0.0
 
     return {
-        "active_members": active_members,
+        "total_members": total_members,
+        "active_subscriptions": active_subscriptions,
         "today_enrollments": today_enrollments,
+        "total_activities": total_activities,
+        "total_coaches": total_coaches,
+        "unread_contacts": unread_contacts,
+        "pending_reviews": pending_reviews,
         "fill_rate": fill_rate,
         "monthly_revenue": monthly_revenue,
     }

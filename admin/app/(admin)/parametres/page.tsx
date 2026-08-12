@@ -43,11 +43,15 @@ export default function ParametresPage() {
     setSaving(true);
     setSaved(false);
     try {
-      await apiFetch('/api/v1/settings/', {
-        method: 'PUT',
-        token: token!,
-        body: JSON.stringify(Object.entries(settings).map(([key, value]) => ({ key, value }))),
-      });
+      // PUT /settings/ met a jour UNE cle par appel : envoyer le tableau complet
+      // renvoyait un 422 et aucun parametre n'etait enregistre.
+      for (const [key, value] of Object.entries(settings)) {
+        await apiFetch('/api/v1/settings/', {
+          method: 'PUT',
+          token: token!,
+          body: JSON.stringify({ key, value }),
+        });
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
