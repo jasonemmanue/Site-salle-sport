@@ -50,7 +50,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
             {navLinks.map((link) => {
               const isActive =
                 link.href === '/'
@@ -71,7 +71,10 @@ export default function Header() {
           </nav>
 
           {/* CTA + theme toggle + hamburger */}
-          <div className="flex items-center gap-3">
+          {/* ml-* : ecarte ce groupe de la nav. Applique a partir de lg
+              seulement, et compense par gap-6 sur la nav pour ne pas
+              deborder entre 1024 et 1280px. */}
+          <div className="flex items-center gap-3 sm:gap-4 lg:ml-8 xl:ml-12">
             <ThemeToggle />
 
             <Link
