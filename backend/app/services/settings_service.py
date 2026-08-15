@@ -4,9 +4,27 @@ from sqlalchemy.orm import Session
 
 from app.models.models import Setting
 
+# Cles exposees sans authentification au site public. Liste blanche explicite :
+# la table `settings` est un fourre-tout cle/valeur, une nouvelle cle ne doit pas
+# devenir publique par simple effet de bord.
+PUBLIC_SETTING_KEYS = (
+    "gym_name",
+    "phone",
+    "email",
+    "address",
+    "opening_hours",
+    "facebook_url",
+    "instagram_url",
+    "youtube_url",
+)
+
 
 def get_settings(db: Session) -> list[Setting]:
     return db.query(Setting).all()
+
+
+def get_public_settings(db: Session) -> list[Setting]:
+    return db.query(Setting).filter(Setting.key.in_(PUBLIC_SETTING_KEYS)).all()
 
 
 def get_setting_by_key(db: Session, key: str) -> Setting | None:

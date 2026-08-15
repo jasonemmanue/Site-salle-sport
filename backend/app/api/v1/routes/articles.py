@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_admin_user, get_db
+from app.core.dependencies import get_admin_user, get_db, get_optional_user
 from app.models.models import User
 from app.schemas.schemas import ArticleCreate, ArticleResponse, ArticleUpdate, PaginatedResponse
 from app.services import article_service
@@ -15,8 +15,19 @@ def list_articles(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ):
-    filter_status = status_filter if status_filter else "published"
+    """
+    Liste les articles.
+
+    Visiteur anonyme : uniquement les articles publies, quel que soit le `status`
+    demande — sans ce garde-fou, `?status=draft` exposerait les brouillons.
+    Admin authentifie : `status` est respecte, et son absence renvoie tout
+    (publies + brouillons), ce dont la liste de l'admin a besoin.
+    """
+    is_admin = user is not None and user.role == "admin"
+    filter_status = status_filter if is_admin else "published"
+
     items, total = article_service.get_articles(db, status=filter_status, page=page, limit=limit)
     pages = (total + limit - 1) // limit if limit > 0 else 0
     return PaginatedResponse(items=items, total=total, page=page, pages=pages)

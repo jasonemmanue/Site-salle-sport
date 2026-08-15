@@ -14,6 +14,9 @@ engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 security_scheme = HTTPBearer()
+# auto_error=False : l'absence d'en-tete Authorization ne doit pas lever 401,
+# elle signifie simplement "visiteur anonyme".
+optional_security_scheme = HTTPBearer(auto_error=False)
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -56,6 +59,31 @@ def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin access required",
         )
     return current_user
+
+
+def get_optional_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_security_scheme),
+    db: Session = Depends(get_db),
+) -> User | None:
+    """
+    Identifie l'appelant si un jeton valide est fourni, sinon renvoie None.
+
+    Sert aux routes a double lecture : un visiteur anonyme ne voit que le contenu
+    publie, un admin authentifie voit aussi ses brouillons — sur la meme URL.
+    Un jeton invalide est traite comme une absence de jeton, pas comme une erreur.
+    """
+    if credentials is None:
+        return None
+    payload = verify_token(credentials.credentials)
+    if payload is None:
+        return None
+    user_id = payload.get("sub")
+    if user_id is None:
+        return None
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None or not user.is_active:
+        return None
+    return user
 
 
 def get_redis() -> redis.Redis:
