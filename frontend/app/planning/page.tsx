@@ -1,12 +1,14 @@
 import ScheduleGrid from '@/components/ScheduleGrid';
-import SectionTitle from '@/components/SectionTitle';
+import { getSchedule, safe } from '@/lib/api';
 
 export const metadata = {
   title: 'Planning | Eslie Sport',
   description: 'Consultez le planning hebdomadaire de nos cours collectifs et reservez votre creneau.',
 };
 
-export default function PlanningPage() {
+export default async function PlanningPage() {
+  const slots = await safe(getSchedule(), []);
+
   return (
     <>
       {/* ── Hero Banner ── */}
@@ -65,7 +67,7 @@ export default function PlanningPage() {
 
           {/* Grid */}
           <div className="glass rounded-2xl p-6 sm:p-8">
-            <ScheduleGrid />
+            <ScheduleGrid slots={slots} />
           </div>
 
           {/* Info box */}
@@ -91,7 +93,7 @@ export default function PlanningPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gradient-primary text-xs font-bold text-black">4</span>
-                <span>Vous recevrez une confirmation par email. Presentez-vous 10 minutes avant le debut du cours.</span>
+                <span>Votre inscription s'affiche immediatement. Presentez-vous 10 minutes avant le debut du cours.</span>
               </li>
             </ol>
           </div>

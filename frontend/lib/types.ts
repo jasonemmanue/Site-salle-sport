@@ -3,6 +3,13 @@ export type ActivityLevel = 'beginner' | 'intermediate' | 'advanced' | 'all';
 export type EnrollmentStatus = 'enrolled' | 'waitlisted' | 'cancelled';
 export type ArticleStatus = 'draft' | 'published';
 export type EquipmentZone = 'musculation' | 'cardio' | 'stretching' | 'functional' | 'locker';
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/*
+ * Les champs marques `| null` le sont cote backend (`str | None` dans
+ * schemas.py). Les typer non-nullables ici masquait la realite tant que les
+ * pages tournaient sur des mocks toujours remplis.
+ */
 
 export interface Activity {
   id: string;
@@ -13,7 +20,7 @@ export interface Activity {
   level: ActivityLevel;
   duration_minutes: number;
   max_capacity: number;
-  image_url: string;
+  image_url: string | null;
   is_active: boolean;
   order: number;
 }
@@ -21,10 +28,10 @@ export interface Activity {
 export interface Coach {
   id: string;
   name: string;
-  photo_url: string;
+  photo_url: string | null;
   certifications: string[];
   specialties: string[];
-  bio: string;
+  bio: string | null;
   is_active: boolean;
   order: number;
 }
@@ -33,17 +40,26 @@ export interface ScheduleSlot {
   id: string;
   activity_id: string;
   coach_id: string;
-  activity?: Activity;
-  coach?: Coach;
-  day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  activity: Activity | null;
+  coach: Coach | null;
+  day_of_week: DayOfWeek;
   start_time: string;
   end_time: string;
   is_recurring: boolean;
-  specific_date?: string;
-  max_capacity_override?: number;
+  specific_date: string | null;
+  max_capacity_override: number | null;
   is_active: boolean;
-  enrolled_count?: number;
 }
+
+/** Reponse de GET /enrollments/slot/{id}/availability */
+export interface SlotAvailability {
+  enrolled_count: number;
+  max_capacity: number;
+  available: number;
+}
+
+/** Reponse de GET /schedule/weekly : creneaux groupes par jour (0 = lundi). */
+export type WeeklySchedule = Partial<Record<`${DayOfWeek}`, ScheduleSlot[]>>;
 
 export interface Enrollment {
   id: string;
@@ -64,6 +80,7 @@ export interface Subscription {
   features: string[];
   is_active: boolean;
   order: number;
+  created_at: string;
 }
 
 export interface Article {
@@ -71,19 +88,20 @@ export interface Article {
   title: string;
   slug: string;
   content: string;
-  excerpt: string;
-  cover_image_url: string;
+  excerpt: string | null;
+  cover_image_url: string | null;
   status: ArticleStatus;
-  published_at: string;
+  published_at: string | null;
   author_id: string;
+  created_at: string;
 }
 
 export interface Video {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   video_url: string;
-  thumbnail_url: string;
+  thumbnail_url: string | null;
   category: string;
   is_published: boolean;
   order: number;
@@ -93,10 +111,10 @@ export interface Video {
 export interface Transformation {
   id: string;
   member_name: string;
-  before_image_url: string;
-  after_image_url: string;
-  testimonial: string;
-  duration_text: string;
+  before_image_url: string | null;
+  after_image_url: string | null;
+  testimonial: string | null;
+  duration_text: string | null;
   is_featured: boolean;
   is_published: boolean;
   created_at: string;
@@ -105,9 +123,9 @@ export interface Transformation {
 export interface Equipment {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   zone: EquipmentZone;
-  image_url: string;
+  image_url: string | null;
   quantity: number;
   is_active: boolean;
 }
@@ -116,29 +134,15 @@ export interface Review {
   id: string;
   author_name: string;
   rating: number;
-  comment: string;
+  comment: string | null;
   is_approved: boolean;
   created_at: string;
 }
 
-export interface Contact {
-  id?: string;
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-}
-
-export interface DashboardStats {
-  active_members: number;
-  today_enrollments: number;
-  fill_rate: number;
-  monthly_revenue: number;
-}
-
-export interface ScheduleView {
-  [day: number]: ScheduleSlot[];
+export interface Setting {
+  id: string;
+  key: string;
+  value: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -148,15 +152,32 @@ export interface PaginatedResponse<T> {
   pages: number;
 }
 
+/* ===== Corps des formulaires publics ===== */
+
 export interface EnrollmentFormData {
   user_name: string;
   user_email: string;
   user_phone: string;
   slot_id: string;
+  /** Format ISO `YYYY-MM-DD` — le backend attend un `date` Pydantic. */
   specific_date: string;
 }
 
-// ===== Component Props =====
+export interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+export interface ReviewFormData {
+  author_name: string;
+  rating: number;
+  comment: string;
+}
+
+/* ===== Component Props ===== */
 
 export interface CapacityBadgeProps {
   current: number;
@@ -185,8 +206,10 @@ export interface ReviewCardProps {
 
 export interface EnrollmentFormProps {
   slot: ScheduleSlot;
+  /** Date `YYYY-MM-DD` de la seance visee, resolue depuis le jour recurrent. */
+  specificDate: string;
   onClose: () => void;
-  onSubmit: (data: EnrollmentFormData) => void;
+  onSuccess: (status: EnrollmentStatus) => void;
 }
 
 export interface TransformationSliderProps {

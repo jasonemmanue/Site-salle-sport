@@ -1,3 +1,4 @@
+import { mediaUrl } from '@/lib/api';
 import type { Coach } from '@/lib/types';
 
 interface CoachCardProps {
@@ -7,7 +8,7 @@ interface CoachCardProps {
 export default function CoachCard({ coach }: CoachCardProps) {
   return (
     <div className="group relative rounded-xl overflow-hidden bg-dark-card border border-dark-border transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10">
-      {/* Photo placeholder */}
+      {/* Photo du coach, ou initiales si l'admin n'en a pas televerse */}
       <div className="relative h-72 overflow-hidden flex items-center justify-center">
         <div
           className="absolute inset-0 card-gradient"
@@ -16,22 +17,31 @@ export default function CoachCard({ coach }: CoachCardProps) {
               'radial-gradient(circle at 50% 40%, #0a0a0a 0%, #000000 100%)',
           }}
         />
-        {/* Avatar circle */}
-        <div className="relative w-32 h-32 rounded-full gradient-primary flex items-center justify-center text-4xl font-black text-black select-none">
-          {coach.name
-            .split(' ')
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)}
-        </div>
+        {coach.photo_url ? (
+          <img
+            src={mediaUrl(coach.photo_url)}
+            alt={coach.name}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="relative w-32 h-32 rounded-full gradient-primary flex items-center justify-center text-4xl font-black text-black select-none">
+            {coach.name
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)}
+          </div>
+        )}
 
         {/* Hover overlay with bio */}
-        <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="text-sm text-white/90 text-center leading-relaxed line-clamp-6">
-            {coach.bio}
-          </p>
-        </div>
+        {coach.bio && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="text-sm text-white/90 text-center leading-relaxed line-clamp-6">
+              {coach.bio}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Info */}

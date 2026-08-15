@@ -55,6 +55,9 @@ services:
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8010}
+      # Le rendu serveur s'execute dans le conteneur : il joint l'API par son nom
+      # de service, pas par localhost. Variable de runtime, pas de rebuild requis.
+      API_INTERNAL_URL: http://api:8000
     ports:
       - "3000:3000"
     depends_on:

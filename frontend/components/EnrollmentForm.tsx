@@ -1,20 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import type { EnrollmentFormProps, EnrollmentFormData } from "@/lib/types";
+import { enrollInClass } from "@/lib/api";
+import type { EnrollmentFormProps, EnrollmentFormData, EnrollmentStatus } from "@/lib/types";
 
 type FormErrors = Partial<Record<keyof EnrollmentFormData, string>>;
 
-export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFormProps) {
+export default function EnrollmentForm({
+  slot,
+  specificDate,
+  onClose,
+  onSuccess,
+}: EnrollmentFormProps) {
   const [formData, setFormData] = useState<EnrollmentFormData>({
     user_name: "",
     user_email: "",
     user_phone: "",
     slot_id: slot.id,
-    specific_date: new Date().toISOString().split("T")[0],
+    specific_date: specificDate,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [resultStatus, setResultStatus] = useState<EnrollmentStatus>("enrolled");
 
   function validate(): boolean {
     const errs: FormErrors = {};
@@ -46,9 +53,12 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
     setStatus("loading");
 
     try {
-      await new Promise((r) => setTimeout(r, 1200));
-      onSubmit(formData);
+      const enrollment = await enrollInClass(formData);
+      // Le backend bascule en liste d'attente quand le cours est plein : c'est
+      // sa reponse qui fait foi, pas la capacite affichee au clic.
+      setResultStatus(enrollment.status);
       setStatus("success");
+      onSuccess(enrollment.status);
     } catch {
       setStatus("error");
     }
@@ -66,14 +76,28 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div className="glass w-full max-w-md rounded-2xl p-8 text-center animate-fade-in-up">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
-            <svg className="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div
+            className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
+              resultStatus === "waitlisted" ? "bg-warning/20" : "bg-success/20"
+            }`}
+          >
+            <svg
+              className={`h-8 w-8 ${resultStatus === "waitlisted" ? "text-warning" : "text-success"}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="mb-2 text-xl font-bold text-white">Inscription confirmee !</h3>
+          <h3 className="mb-2 text-xl font-bold text-white">
+            {resultStatus === "waitlisted" ? "Inscrit en liste d'attente" : "Inscription confirmee !"}
+          </h3>
           <p className="mb-6 text-sm text-dark-muted">
-            Vous recevrez un email de confirmation sous peu.
+            {resultStatus === "waitlisted"
+              ? "Le cours est complet. Vous serez contacte des qu'une place se libere."
+              : "Votre place est reservee. Presentez-vous 10 minutes avant le debut du cours."}
           </p>
           <button
             onClick={onClose}
@@ -163,7 +187,7 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
               type="tel"
               value={formData.user_phone}
               onChange={(e) => handleChange("user_phone", e.target.value)}
-              placeholder="06 12 34 56 78"
+              placeholder="+225 07 00 00 00 00"
               className={`w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm text-white placeholder-dark-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary ${
                 errors.user_phone ? "border-error" : "border-dark-border"
               }`}
@@ -180,6 +204,14 @@ export default function EnrollmentForm({ slot, onClose, onSubmit }: EnrollmentFo
             </p>
             <p className="text-sm font-semibold text-white">
               {slot.activity?.name || "Cours"} — {slot.start_time} a {slot.end_time}
+            </p>
+            <p className="text-xs text-dark-muted mt-0.5">
+              Seance du{" "}
+              {new Date(`${specificDate}T00:00:00`).toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
             </p>
             {slot.coach && (
               <p className="text-xs text-dark-muted mt-0.5">Coach : {slot.coach.name}</p>

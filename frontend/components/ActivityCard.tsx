@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { mediaUrl } from '@/lib/api';
 import type { Activity, ActivityCategory } from '@/lib/types';
 
 interface ActivityCardProps {
@@ -34,7 +35,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       href={`/activites/${activity.slug}`}
       className="group relative block rounded-xl overflow-hidden bg-dark-card border border-dark-border transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
     >
-      {/* Image placeholder with gradient */}
+      {/* Image de l'activite, ou degrade de repli si l'admin n'en a pas televerse */}
       <div className="relative h-52 overflow-hidden">
         <div
           className="absolute inset-0 card-gradient"
@@ -52,6 +53,13 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
             })`,
           }}
         />
+        {activity.image_url && (
+          <img
+            src={mediaUrl(activity.image_url)}
+            alt={activity.name}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        )}
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 

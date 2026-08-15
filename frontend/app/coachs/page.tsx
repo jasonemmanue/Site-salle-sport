@@ -1,70 +1,17 @@
 import SectionTitle from '@/components/SectionTitle';
 import CoachCard from '@/components/CoachCard';
-import type { Coach } from '@/lib/types';
+import { getCoaches, safe } from '@/lib/api';
 
 export const metadata = {
   title: 'Nos Coachs | Eslie Sport',
   description: 'Decouvrez notre equipe de coachs certifies et passionnes, prets a vous accompagner vers vos objectifs.',
 };
 
-/* ──────────────────────── Mock Data ──────────────────────── */
-
-const mockCoaches: Coach[] = [
-  {
-    id: '1',
-    name: 'Coach Toussaint',
-    photo_url: '',
-    certifications: ['Coach Musculation'],
-    specialties: ['Musculation'],
-    bio: 'Coach Toussaint est le pilier de la salle. Present tous les jours de 6h a 21h, il accompagne chaque membre dans ses objectifs de musculation avec une methode rigoureuse et bienveillante.',
-    is_active: true,
-    order: 1,
-  },
-  {
-    id: '2',
-    name: 'Coach Adonis',
-    photo_url: '',
-    certifications: ['Instructeur Zumba Certifie'],
-    specialties: ['Zumba', 'Danse'],
-    bio: 'Coach Adonis anime les cours de Zumba chaque jeudi a 18h. Son energie communicative et ses choregraphies entrainantes font de chaque seance un moment de plaisir et de depassement.',
-    is_active: true,
-    order: 2,
-  },
-  {
-    id: '3',
-    name: 'Coach David',
-    photo_url: '',
-    certifications: ['Coach Kick Boxing'],
-    specialties: ['Kick Boxing', 'Sports de combat'],
-    bio: 'Coach David enseigne le kick boxing les mercredis et samedis a 16h. Sa maitrise technique et son experience en competition font de lui un formateur exigeant et inspire.',
-    is_active: true,
-    order: 3,
-  },
-  {
-    id: '4',
-    name: 'Coach Leo',
-    photo_url: '',
-    certifications: ['Coach Fitness'],
-    specialties: ['Fitness', 'Cardio'],
-    bio: 'Coach Leo propose des seances de fitness dynamiques les lundis, mercredis et vendredis de 21h a 22h. Son approche moderne et variee convient a tous les niveaux.',
-    is_active: true,
-    order: 4,
-  },
-  {
-    id: '5',
-    name: 'Maitre Kabore',
-    photo_url: '',
-    certifications: ['Maitre de Wushu'],
-    specialties: ['Wushu', 'Arts martiaux'],
-    bio: 'Maitre Kabore enseigne le Wushu, art martial chinois traditionnel, les mercredis et samedis de 15h a 16h. Discipline, souplesse et maitrise de soi sont au coeur de sa pedagogie.',
-    is_active: true,
-    order: 5,
-  },
-];
-
 /* ──────────────────────── Page ──────────────────────── */
 
-export default function CoachsPage() {
+export default async function CoachsPage() {
+  const coaches = await safe(getCoaches(), []);
+
   return (
     <>
       {/* ── Hero Banner ── */}
@@ -92,11 +39,19 @@ export default function CoachsPage() {
       {/* ── Coaches Grid ── */}
       <section className="py-16 bg-dark">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockCoaches.map((coach) => (
-              <CoachCard key={coach.id} coach={coach} />
-            ))}
-          </div>
+          {coaches.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {coaches.map((coach) => (
+                <CoachCard key={coach.id} coach={coach} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dark-border bg-dark-card p-16 text-center">
+              <p className="text-dark-muted text-lg">
+                La presentation de notre equipe arrive tres bientot.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

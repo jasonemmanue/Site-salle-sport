@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { Contact } from "@/lib/types";
+import { submitContact } from "@/lib/api";
+import type { ContactFormData } from "@/lib/types";
 
 const SUBJECT_OPTIONS = [
   "Informations generales",
@@ -12,10 +13,10 @@ const SUBJECT_OPTIONS = [
   "Autre",
 ];
 
-type FormErrors = Partial<Record<keyof Contact, string>>;
+type FormErrors = Partial<Record<keyof ContactFormData, string>>;
 
 export default function ContactForm() {
-  const [formData, setFormData] = useState<Contact>({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     phone: "",
@@ -57,8 +58,13 @@ export default function ContactForm() {
     setStatus("loading");
 
     try {
-      // Will be replaced with actual API call
-      await new Promise((r) => setTimeout(r, 1500));
+      await submitContact({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        subject: formData.subject,
+        message: formData.message.trim(),
+      });
       setStatus("success");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch {
@@ -66,7 +72,7 @@ export default function ContactForm() {
     }
   }
 
-  function handleChange(field: keyof Contact, value: string) {
+  function handleChange(field: keyof ContactFormData, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));

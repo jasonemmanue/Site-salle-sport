@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { mediaUrl } from "@/lib/api";
 import type { TransformationSliderProps } from "@/lib/types";
 
 export default function TransformationSlider({
@@ -50,7 +51,7 @@ export default function TransformationSlider({
                   <div className="relative aspect-[4/5] bg-dark-card overflow-hidden">
                     {t.before_image_url ? (
                       <img
-                        src={t.before_image_url}
+                        src={mediaUrl(t.before_image_url)}
                         alt={`${t.member_name} - Avant`}
                         className="h-full w-full object-cover"
                       />
@@ -71,7 +72,7 @@ export default function TransformationSlider({
                   <div className="relative aspect-[4/5] bg-dark-card overflow-hidden">
                     {t.after_image_url ? (
                       <img
-                        src={t.after_image_url}
+                        src={mediaUrl(t.after_image_url)}
                         alt={`${t.member_name} - Apres`}
                         className="h-full w-full object-cover"
                       />

@@ -147,7 +147,8 @@ salle-de-sport/
 ├── frontend/          # Next.js — Site public
 │   ├── app/           # Pages : accueil, activités, planning, abonnements, coachs, blog, vidéos, contact
 │   ├── components/    # Composants React réutilisables
-│   ├── lib/           # API client, types, utilitaires
+│   │   └── views/     # Parties client des pages (filtres, recherche, formulaires)
+│   ├── lib/           # api.ts (fetch + mediaUrl + safe), types.ts, sanitize.ts
 │   ├── public/        # Assets statiques
 │   ├── styles/        # Tailwind config, CSS global
 │   └── ...
@@ -404,6 +405,82 @@ ADMIN_PASSWORD=changeme
 | Image hero Unsplash | ✅ | Next.js Image + overlay adaptatif |
 | Logo | ✅ | `frontend/public/logo.png` |
 | Favicon / icônes | ✅ | Généré depuis le logo (badge rogné, coins transparents) via les conventions de fichiers Next.js : `app/favicon.ico` (16/32/48/64), `app/icon.png` (512), `app/apple-icon.png` (180, fond bleu nuit). Identique côté `admin/app/`. Ne pas déclarer `metadata.icons` : les fichiers ont priorité. |
+| **Branchement API** | ✅ | **Les 13 pages consomment l'API. Plus aucune donnée factice.** Voir § Branchement du site public. |
+| Formulaires publics | ✅ | Contact → `POST /contact/`, inscription cours → `POST /enrollments/`, avis → `POST /reviews/` |
+
+### Branchement du site public sur l'API
+
+Les pages publiques tournaient sur des tableaux `mock*` codés en dur, et les
+formulaires simulaient l'envoi avec un `setTimeout`. Tout passe désormais par
+`frontend/lib/api.ts`.
+
+#### Architecture retenue
+
+Les pages sont des **composants serveur** qui appellent l'API et passent les
+données en props ; seule l'interactivité (filtres, recherche, lecteur vidéo,
+formulaires) vit dans des composants client sous `components/views/`. Le HTML
+est donc rendu avec le contenu réel — indispensable pour le référencement.
+
+| Page | Source |
+|------|--------|
+| `/` | activités, planning, formules, coachs, transformations, avis, articles |
+| `/activites`, `/activites/[slug]` | `/activities/` + créneaux filtrés par activité |
+| `/planning` | `/schedule/` + places restantes par créneau |
+| `/abonnements` | `/subscriptions/` — comparatif généré depuis les formules réelles |
+| `/coachs`, `/equipements` | `/coaches/`, `/equipment/` |
+| `/articles`, `/articles/[slug]` | `/articles/` (publiés uniquement) |
+| `/videos`, `/transformations`, `/avis` | `/videos/`, `/transformations/`, `/reviews/` |
+| `/contact`, Footer | `/settings/public` |
+
+#### ⚠️ Deux URLs d'API, deux points de vue
+
+`NEXT_PUBLIC_API_URL` est figée dans le bundle au build : c'est l'API **telle
+que le navigateur la voit** (`http://localhost:8010`). Mais le rendu serveur
+s'exécute **dans le conteneur frontend**, où `localhost:8010` ne pointe sur
+rien. D'où `API_INTERNAL_URL=http://api:8000`, variable de **runtime** (pas de
+rebuild nécessaire), déclarée dans `docker-compose.yml`.
+
+`apiRoot()` dans `lib/api.ts` choisit l'une ou l'autre selon `typeof window`.
+En dev local hors Docker, laisser `API_INTERNAL_URL` vide : `NEXT_PUBLIC_API_URL`
+sert alors aux deux côtés.
+
+#### ⚠️ Trailing slash obligatoire sur les collections
+
+Les routes de collection sont déclarées `@router.get("/")` : le chemin complet
+est donc `/api/v1/activities/` **avec** slash final. L'appeler sans slash
+déclenche un 307 — tolérable en GET, cassant en POST cross-origin (le préflight
+CORS ne suit pas la redirection). `lib/api.ts` met le slash partout ; les
+routes de détail (`/activities/{slug}`) n'en prennent pas.
+
+#### ⚠️ Images : chemins relatifs
+
+Les uploads sont stockés en `/uploads/...` (chemin relatif). `mediaUrl()` les
+préfixe par l'URL **publique** de l'API — jamais par `API_INTERNAL_URL`,
+invisible depuis le navigateur. Toute nouvelle image issue de l'admin doit
+passer par ce helper.
+
+#### ⚠️ Contenu HTML des articles
+
+Le `RichEditor` de l'admin produit du HTML (`contentEditable` → `innerHTML`),
+injecté via `dangerouslySetInnerHTML`. C'est une surface XSS stockée : le
+contenu est **systématiquement désinfecté** par `lib/sanitize.ts`
+(`isomorphic-dompurify`, liste blanche de balises). Sa mise en forme vient des
+règles `.article-content` de `globals.css`, pas de `@tailwindcss/typography`
+qui n'est pas installé.
+
+#### Dégradation si l'API est indisponible
+
+Chaque appel de page passe par `safe(promise, fallback)` : une API éteinte
+renvoie la valeur de repli et la page affiche son état « aucun contenu » au lieu
+de retourner une 500. C'est ce qui permet au `next build` de réussir sans
+backend démarré.
+
+#### Cache
+
+`fetchApi` utilise `next: { revalidate: 60 }` par défaut. Les lectures
+temps réel (places restantes) et toutes les écritures passent en
+`cache: 'no-store'`. Une modification dans l'admin apparaît donc sur le site
+public en moins d'une minute.
 
 ### PHASE 3 — ADMIN DASHBOARD ✅
 
@@ -565,6 +642,30 @@ catalogue neuf produirait un graphique vide.
 
 ⚠️ L'API renvoie des **FCFA bruts** ; c'est le dashboard qui divise par 1000
 pour son axe « x1000 FCFA ».
+
+### Routes à double lecture (anonyme / admin)
+
+`get_optional_user` (dans `core/dependencies.py`) identifie l'appelant si un
+jeton valide est fourni, et renvoie `None` sinon — sans lever de 401. Il repose
+sur un `HTTPBearer(auto_error=False)`. Un jeton invalide est traité comme une
+absence de jeton.
+
+Cela permet à une même URL de servir deux publics :
+
+| Route | Visiteur anonyme | Admin authentifié |
+|-------|------------------|-------------------|
+| `GET /articles/` | publiés uniquement, **quel que soit `?status=`** | `?status` respecté ; sans filtre, publiés **+ brouillons** |
+| `GET /settings/public` | 8 clés en liste blanche | idem |
+| `GET /settings/` | 403 | toutes les clés |
+
+⚠️ Sans le garde-fou sur `?status=`, `GET /articles/?status=draft` exposait les
+brouillons publiquement. Et symétriquement, l'admin — qui n'envoie pas de
+`status` — ne voyait jamais ses propres brouillons dans sa liste.
+
+⚠️ `GET /settings/` reste réservé à l'admin. Le site public lit
+`GET /settings/public`, dont la liste blanche est `PUBLIC_SETTING_KEYS` dans
+`settings_service.py`. **Une nouvelle clé de paramètre n'est pas publique par
+défaut** : il faut l'ajouter explicitement à cette liste.
 
 ### Authentification Admin
 

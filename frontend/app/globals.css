@@ -324,3 +324,90 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 214, 0, 0.3);
   color: #FFFFFF;
 }
+
+/* ── Contenu HTML des articles ──
+   Le RichEditor de l'admin produit du HTML brut (contentEditable). Ces regles
+   lui donnent une typographie lisible dans les deux themes, sans dependre du
+   plugin @tailwindcss/typography. Les couleurs passent par les variables du
+   theme : le mode clair est donc gere automatiquement. */
+
+.article-content {
+  color: var(--color-secondary-light);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.article-content > * + * {
+  margin-top: 1rem;
+}
+
+.article-content h2 {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-content h3 {
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.article-content h4 {
+  color: #FFFFFF;
+  font-size: 1.075rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.article-content strong,
+.article-content b {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.article-content ul,
+.article-content ol {
+  padding-left: 1.5rem;
+  margin-top: 1rem;
+}
+
+.article-content ul { list-style: disc; }
+.article-content ol { list-style: decimal; }
+
+.article-content li {
+  margin-top: 0.5rem;
+}
+
+.article-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.article-content a:hover {
+  opacity: 0.8;
+}
+
+.article-content blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--color-secondary);
+}
+
+/* En mode clair, le blanc pur des titres devient illisible sur fond clair. */
+[data-theme="light"] .article-content h3,
+[data-theme="light"] .article-content h4,
+[data-theme="light"] .article-content strong,
+[data-theme="light"] .article-content b {
+  color: #0a0a0a;
+}
+
+[data-theme="light"] .article-content a {
+  color: #8A6D0A;
+}

@@ -1,116 +1,9 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import SectionTitle from '@/components/SectionTitle';
 import ActivityCard from '@/components/ActivityCard';
-import type { Activity, ScheduleSlot, Coach } from '@/lib/types';
-
-/* ──────────────────────── Mock Data ──────────────────────── */
-
-const allActivities: Activity[] = [
-  {
-    id: '1',
-    name: 'Musculation',
-    slug: 'musculation',
-    description: 'Renforcez votre masse musculaire avec nos equipements de qualite et l\'accompagnement quotidien de Coach Toussaint. Disponible tous les jours de 6h a 21h, il vous guide dans l\'execution des mouvements et l\'optimisation de vos seances. Que vous soyez debutant ou confirme, notre espace musculation vous offre tout le necessaire pour progresser en toute securite.',
-    category: 'force',
-    level: 'all',
-    duration_minutes: 90,
-    max_capacity: 15,
-    image_url: '',
-    is_active: true,
-    order: 1,
-  },
-  {
-    id: '2',
-    name: 'Fitness',
-    slug: 'fitness',
-    description: 'Seances dynamiques pour ameliorer votre condition physique generale avec Coach Leo. Les cours ont lieu les lundis, mercredis et vendredis de 21h a 22h. Un programme complet combinant cardio, renforcement et souplesse pour un corps tonique et en pleine sante.',
-    category: 'cardio',
-    level: 'all',
-    duration_minutes: 60,
-    max_capacity: 15,
-    image_url: '',
-    is_active: true,
-    order: 2,
-  },
-  {
-    id: '3',
-    name: 'Zumba',
-    slug: 'zumba',
-    description: 'Dansez, bougez, amusez-vous ! Un cours energique sur des rythmes latinos entrainants avec Coach Adonis chaque jeudi a 18h. La Zumba combine danse et fitness pour un entrainement cardio fun et accessible a tous. Aucune experience en danse requise, juste l\'envie de bouger !',
-    category: 'dance',
-    level: 'beginner',
-    duration_minutes: 90,
-    max_capacity: 15,
-    image_url: '',
-    is_active: true,
-    order: 3,
-  },
-  {
-    id: '4',
-    name: 'Kick Boxing',
-    slug: 'kick-boxing',
-    description: 'Apprenez les techniques de kick boxing avec Coach David les mercredis et samedis a 16h. Travaillez coups de poing et coups de pied sur sacs de frappe et pattes d\'ours. Un excellent moyen de se defouler, ameliorer son endurance et developper sa confiance en soi.',
-    category: 'martial_arts',
-    level: 'all',
-    duration_minutes: 90,
-    max_capacity: 15,
-    image_url: '',
-    is_active: true,
-    order: 4,
-  },
-  {
-    id: '5',
-    name: 'Wushu',
-    slug: 'wushu',
-    description: 'Art martial chinois traditionnel avec Maitre Kabore les mercredis et samedis de 15h a 16h. Discipline, souplesse et maitrise de soi sont au programme. Le Wushu allie techniques de combat, formes artistiques et philosophie martiale pour un developpement physique et mental complet.',
-    category: 'martial_arts',
-    level: 'all',
-    duration_minutes: 60,
-    max_capacity: 15,
-    image_url: '',
-    is_active: true,
-    order: 5,
-  },
-];
-
-const mockCoaches: Coach[] = [
-  { id: '1', name: 'Coach Toussaint', photo_url: '', certifications: [], specialties: ['Musculation'], bio: '', is_active: true, order: 1 },
-  { id: '2', name: 'Coach Adonis', photo_url: '', certifications: [], specialties: ['Zumba'], bio: '', is_active: true, order: 2 },
-  { id: '3', name: 'Coach David', photo_url: '', certifications: [], specialties: ['Kick Boxing'], bio: '', is_active: true, order: 3 },
-  { id: '4', name: 'Coach Leo', photo_url: '', certifications: [], specialties: ['Fitness'], bio: '', is_active: true, order: 4 },
-  { id: '5', name: 'Maitre Kabore', photo_url: '', certifications: [], specialties: ['Wushu'], bio: '', is_active: true, order: 5 },
-];
-
-const activitySlots: Record<string, { coachId: string; days: (0 | 1 | 2 | 3 | 4 | 5 | 6)[]; startTime: string; endTime: string }[]> = {
-  '1': [{ coachId: '1', days: [0, 1, 2, 3, 4, 5, 6], startTime: '06:00', endTime: '21:00' }],
-  '2': [{ coachId: '4', days: [0, 2, 4], startTime: '21:00', endTime: '22:00' }],
-  '3': [{ coachId: '2', days: [3], startTime: '18:00', endTime: '19:30' }],
-  '4': [{ coachId: '3', days: [2, 5], startTime: '16:00', endTime: '17:30' }],
-  '5': [{ coachId: '5', days: [2, 5], startTime: '15:00', endTime: '16:00' }],
-};
-
-function getMockSlots(activityId: string): ScheduleSlot[] {
-  const config = activitySlots[activityId] || activitySlots['1'];
-  const slots: ScheduleSlot[] = [];
-  config.forEach((c) => {
-    const coach = mockCoaches.find((co) => co.id === c.coachId) || mockCoaches[0];
-    c.days.forEach((day, i) => {
-      slots.push({
-        id: `slot-${activityId}-${day}`,
-        activity_id: activityId,
-        coach_id: coach.id,
-        coach,
-        day_of_week: day,
-        start_time: c.startTime,
-        end_time: c.endTime,
-        is_recurring: true,
-        is_active: true,
-        enrolled_count: [8, 5, 11, 7, 9, 6, 10][i % 7],
-      });
-    });
-  });
-  return slots;
-}
+import { ApiError, getActivities, getActivity, getSchedule, mediaUrl, safe } from '@/lib/api';
+import type { Activity } from '@/lib/types';
 
 const categoryLabels: Record<string, string> = {
   force: 'Force',
@@ -129,7 +22,31 @@ const levelLabels: Record<string, string> = {
 
 const dayLabels = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
-/* ──────────────────────── Page ──────────────────────── */
+/**
+ * Un slug absent doit rendre un vrai 404, pas se rabattre silencieusement sur
+ * une autre activite. Les autres erreurs (API injoignable) remontent, Next.js
+ * affiche alors sa page d'erreur plutot qu'un contenu faux.
+ */
+async function loadActivity(slug: string): Promise<Activity> {
+  try {
+    return await getActivity(slug);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const activity = await safe(getActivity(slug), null);
+  if (!activity) return { title: 'Activite | Eslie Sport' };
+  return {
+    title: `${activity.name} | Eslie Sport`,
+    description: activity.description?.slice(0, 160) || `Decouvrez ${activity.name} chez Eslie Sport.`,
+  };
+}
 
 export default async function ActivityDetailPage({
   params,
@@ -137,11 +54,21 @@ export default async function ActivityDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const activity = allActivities.find((a) => a.slug === slug) || allActivities[0];
-  const slots = getMockSlots(activity.id);
-  const related = allActivities.filter((a) => a.id !== activity.id && a.category === activity.category).slice(0, 3);
+  const activity = await loadActivity(slug);
 
-  // Category gradient backgrounds
+  const [allSlots, allActivities] = await Promise.all([
+    safe(getSchedule(), []),
+    safe(getActivities(), []),
+  ]);
+
+  const slots = allSlots
+    .filter((s) => s.activity_id === activity.id)
+    .sort((a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time));
+
+  const related = allActivities
+    .filter((a) => a.id !== activity.id && a.category === activity.category)
+    .slice(0, 3);
+
   const categoryGradients: Record<string, string> = {
     force: 'rgba(255,255,255,0.05)',
     cardio: 'rgba(255,255,255,0.04)',
@@ -160,6 +87,16 @@ export default async function ActivityDetailPage({
             background: `radial-gradient(ellipse at 40% 50%, ${categoryGradients[activity.category] || categoryGradients.force} 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #0a0a0a 60%, #000000 100%)`,
           }}
         />
+        {activity.image_url && (
+          <>
+            <img
+              src={mediaUrl(activity.image_url)}
+              alt={activity.name}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 hero-overlay" />
+          </>
+        )}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="mb-8 flex items-center gap-2 text-sm text-dark-muted">
@@ -172,10 +109,10 @@ export default async function ActivityDetailPage({
 
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <span className="gradient-primary rounded-full px-4 py-1 text-xs font-bold uppercase tracking-wider text-black">
-              {categoryLabels[activity.category]}
+              {categoryLabels[activity.category] ?? activity.category}
             </span>
             <span className="border border-secondary/30 text-secondary rounded-full px-4 py-1 text-xs font-bold">
-              {levelLabels[activity.level]}
+              {levelLabels[activity.level] ?? activity.level}
             </span>
           </div>
 
@@ -192,39 +129,50 @@ export default async function ActivityDetailPage({
             {/* Main content */}
             <div className="lg:col-span-2">
               <h2 className="text-2xl font-bold text-white mb-4">A propos de cette activite</h2>
-              <p className="text-dark-muted leading-relaxed text-base">
-                {activity.description}
+              <p className="text-dark-muted leading-relaxed text-base whitespace-pre-line">
+                {activity.description || 'La description de cette activite sera bientot disponible.'}
               </p>
 
-              {/* Schedule for this activity */}
+              {/* Creneaux reels issus du planning */}
               <div className="mt-12">
                 <h2 className="text-2xl font-bold text-white mb-6">Creneaux disponibles</h2>
-                <div className="space-y-3">
-                  {slots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl border border-dark-border bg-dark-card p-4 transition-all hover:border-primary/30"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="text-center min-w-[60px]">
-                          <p className="text-lg font-bold text-white">{slot.start_time}</p>
-                          <p className="text-xs text-dark-muted">{slot.end_time}</p>
-                        </div>
-                        <div className="h-10 w-px bg-dark-border" />
-                        <div>
-                          <p className="text-sm font-semibold text-white">{dayLabels[slot.day_of_week]}</p>
-                          <p className="text-xs text-dark-muted">Coach : {slot.coach?.name || 'A definir'}</p>
-                        </div>
-                      </div>
-                      <Link
-                        href="/planning"
-                        className="mt-3 sm:mt-0 inline-flex items-center justify-center rounded-lg gradient-primary px-5 py-2 text-xs font-bold uppercase tracking-wider text-black transition-transform hover:scale-105"
+                {slots.length > 0 ? (
+                  <div className="space-y-3">
+                    {slots.map((slot) => (
+                      <div
+                        key={slot.id}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl border border-dark-border bg-dark-card p-4 transition-all hover:border-primary/30"
                       >
-                        Reserver
-                      </Link>
-                    </div>
-                  ))}
-                </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-center min-w-[60px]">
+                            <p className="text-lg font-bold text-white">{slot.start_time}</p>
+                            <p className="text-xs text-dark-muted">{slot.end_time}</p>
+                          </div>
+                          <div className="h-10 w-px bg-dark-border" />
+                          <div>
+                            <p className="text-sm font-semibold text-white">{dayLabels[slot.day_of_week]}</p>
+                            <p className="text-xs text-dark-muted">Coach : {slot.coach?.name || 'A definir'}</p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/planning"
+                          className="mt-3 sm:mt-0 inline-flex items-center justify-center rounded-lg gradient-primary px-5 py-2 text-xs font-bold uppercase tracking-wider text-black transition-transform hover:scale-105"
+                        >
+                          Reserver
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-dark-border bg-dark-card p-8 text-center">
+                    <p className="text-dark-muted">
+                      Aucun creneau n'est programme pour cette activite pour le moment.
+                    </p>
+                    <Link href="/contact" className="mt-3 inline-block text-primary font-semibold text-sm hover:underline">
+                      Contactez-nous pour en savoir plus
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -263,7 +211,7 @@ export default async function ActivityDetailPage({
                     </div>
                     <div>
                       <p className="text-xs text-dark-muted">Niveau</p>
-                      <p className="text-sm font-semibold text-white">{levelLabels[activity.level]}</p>
+                      <p className="text-sm font-semibold text-white">{levelLabels[activity.level] ?? activity.level}</p>
                     </div>
                   </li>
                   <li className="flex items-center gap-3">
@@ -274,7 +222,7 @@ export default async function ActivityDetailPage({
                     </div>
                     <div>
                       <p className="text-xs text-dark-muted">Categorie</p>
-                      <p className="text-sm font-semibold text-white">{categoryLabels[activity.category]}</p>
+                      <p className="text-sm font-semibold text-white">{categoryLabels[activity.category] ?? activity.category}</p>
                     </div>
                   </li>
                 </ul>

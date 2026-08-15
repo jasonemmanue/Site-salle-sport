@@ -1,66 +1,16 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import SectionTitle from '@/components/SectionTitle';
 import SubscriptionCard from '@/components/SubscriptionCard';
-import type { Subscription } from '@/lib/types';
+import FaqAccordion, { type FaqItem } from '@/components/views/FaqAccordion';
+import { getSubscriptions, safe } from '@/lib/api';
 
-/* ──────────────────────── Mock Data ──────────────────────── */
+export const metadata = {
+  title: 'Nos Formules | Eslie Sport',
+  description:
+    'Inscription, mensualite, formules Kung-Fu Wushu — comparez nos abonnements et choisissez celui qui vous correspond.',
+};
 
-const mockSubscriptions: Subscription[] = [
-  {
-    id: '1',
-    name: 'Inscription',
-    price: 5000,
-    duration_months: 0,
-    features: [
-      'Frais d\'inscription unique',
-      'Bilan sportif initial offert',
-      'Carte membre personnalisee',
-      'Visite guidee de la salle',
-      'Seance decouverte avec un coach',
-    ],
-    is_active: true,
-    order: 1,
-  },
-  {
-    id: '2',
-    name: 'Abonnement Mensuel',
-    price: 25000,
-    duration_months: 1,
-    features: [
-      'Acces illimite 7j/7',
-      'Tous les cours collectifs',
-      'Vestiaires et douches',
-      'Programme personnalise',
-      'Suivi nutritionnel',
-      'Parking gratuit',
-    ],
-    is_active: true,
-    order: 2,
-  },
-];
-
-/* ──────────────────────── Comparison Table ──────────────────────── */
-
-const comparisonFeatures = [
-  { label: 'Frais d\'inscription', inscription: true, abonnement: false },
-  { label: 'Bilan sportif initial', inscription: true, abonnement: false },
-  { label: 'Carte membre', inscription: true, abonnement: false },
-  { label: 'Seance decouverte', inscription: true, abonnement: false },
-  { label: 'Acces salle illimite 7j/7', inscription: false, abonnement: true },
-  { label: 'Cours collectifs inclus', inscription: false, abonnement: true },
-  { label: 'Vestiaires & douches', inscription: false, abonnement: true },
-  { label: 'Programme personnalise', inscription: false, abonnement: true },
-  { label: 'Suivi nutritionnel', inscription: false, abonnement: true },
-  { label: 'Parking gratuit', inscription: false, abonnement: true },
-  { label: 'Application mobile', inscription: false, abonnement: true },
-];
-
-/* ──────────────────────── FAQ ──────────────────────── */
-
-const faqItems = [
+const faqItems: FaqItem[] = [
   {
     question: 'Puis-je changer de formule en cours d\'abonnement ?',
     answer: 'Oui, vous pouvez upgrader votre formule a tout moment. La difference sera calculee au prorata. Le downgrade est possible a la fin de votre periode en cours.',
@@ -70,61 +20,35 @@ const faqItems = [
     answer: 'Non, tous nos abonnements sont sans engagement. Vous pouvez resilier a tout moment avec un preavis de 30 jours.',
   },
   {
-    question: 'Proposez-vous des tarifs etudiants ou seniors ?',
-    answer: 'Oui ! Nous offrons -20% sur toutes nos formules pour les etudiants (sur presentation d\'un justificatif) et les seniors de plus de 65 ans.',
+    question: 'Comment se deroule ma premiere venue ?',
+    answer: 'Presentez-vous a l\'accueil avec une piece d\'identite et une tenue de sport. Un coach vous fait visiter la salle et vous guide pour votre premiere seance.',
   },
   {
-    question: 'Comment fonctionne le cours d\'essai gratuit ?',
-    answer: 'Votre premier cours est offert, sans engagement. Il vous suffit de vous presenter a l\'accueil avec une piece d\'identite et une tenue de sport. Un coach vous guidera.',
+    question: 'Quels sont les moyens de paiement acceptes ?',
+    answer: 'Les paiements se font sur place, en especes ou par mobile money. Contactez-nous au prealable si vous souhaitez regler autrement.',
   },
   {
-    question: 'Les formules incluent-elles le parking ?',
-    answer: 'Le parking est gratuit et accessible a tous nos membres, quelle que soit la formule choisie. Nous disposons de 50 places de stationnement.',
-  },
-  {
-    question: 'Puis-je geler mon abonnement en cas de blessure ou vacances ?',
-    answer: 'Oui, vous pouvez geler votre abonnement jusqu\'a 30 jours par an (sur justificatif medical pour les periodes superieures). Contactez l\'accueil ou l\'espace membre en ligne.',
+    question: 'Puis-je geler mon abonnement en cas de blessure ?',
+    answer: 'Oui, sur presentation d\'un justificatif medical. Adressez votre demande a l\'accueil de la salle.',
   },
 ];
 
-/* ──────────────────────── Component ──────────────────────── */
+export default async function AbonnementsPage() {
+  const subscriptions = await safe(getSubscriptions(), []);
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+  // La formule mise en avant est la premiere formule recurrente (mensuelle).
+  // Sans recurrence dans le catalogue, aucune carte n'est mise en avant.
+  const popularId = subscriptions.find((s) => s.duration_months >= 1)?.id;
 
-  return (
-    <div className="border border-dark-border rounded-xl overflow-hidden transition-colors hover:border-primary/30">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-5 text-left bg-dark-card"
-      >
-        <span className="text-sm font-semibold text-white pr-4">{question}</span>
-        <svg
-          className={`w-5 h-5 text-primary shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="px-5 pb-5 text-sm text-dark-muted leading-relaxed bg-dark-card">
-          {answer}
-        </div>
-      </div>
-    </div>
-  );
-}
+  // Lignes du comparatif : union ordonnee des avantages de toutes les formules.
+  // Le tableau suit ainsi le catalogue reel, quel que soit le nombre de formules.
+  const allFeatures: string[] = [];
+  for (const sub of subscriptions) {
+    for (const feature of sub.features) {
+      if (!allFeatures.includes(feature)) allFeatures.push(feature);
+    }
+  }
 
-/* ──────────────────────── Page ──────────────────────── */
-
-export default function AbonnementsPage() {
   return (
     <>
       {/* ── Hero Banner ── */}
@@ -151,75 +75,105 @@ export default function AbonnementsPage() {
 
       {/* ── Subscription Cards ── */}
       <section className="py-16 bg-dark">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {mockSubscriptions.map((sub) => (
-              <SubscriptionCard
-                key={sub.id}
-                subscription={sub}
-                popular={sub.name === 'Abonnement Mensuel'}
-              />
-            ))}
-          </div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          {subscriptions.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {subscriptions.map((sub) => (
+                <SubscriptionCard
+                  key={sub.id}
+                  subscription={sub}
+                  popular={sub.id === popularId}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dark-border bg-dark-card p-16 text-center max-w-2xl mx-auto">
+              <p className="text-dark-muted text-lg">
+                Nos formules sont en cours de mise a jour.
+              </p>
+              <Link href="/contact" className="mt-4 inline-block text-primary font-semibold text-sm hover:underline">
+                Contactez-nous pour connaitre nos tarifs
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── Comparison Table ── */}
-      <section className="py-20 bg-dark-card">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            title="Comparaison des Formules"
-            subtitle="Retrouvez en detail ce qui est inclus dans chaque abonnement."
-          />
+      {allFeatures.length > 0 && (
+        <section className="py-20 bg-dark-card">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <SectionTitle
+              title="Comparaison des Formules"
+              subtitle="Retrouvez en detail ce qui est inclus dans chaque abonnement."
+            />
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead>
-                <tr className="border-b border-dark-border">
-                  <th className="py-4 px-4 text-left text-sm font-semibold text-dark-muted uppercase tracking-wider">
-                    Fonctionnalite
-                  </th>
-                  <th className="py-4 px-4 text-center text-sm font-semibold text-white">Inscription</th>
-                  <th className="py-4 px-4 text-center">
-                    <span className="text-sm font-semibold text-gradient">Abonnement</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonFeatures.map((feature) => (
-                  <tr key={feature.label} className="border-b border-dark-border/50 hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 text-sm text-dark-muted">{feature.label}</td>
-                    <td className="py-4 px-4 text-center">
-                      {feature.inscription ? (
-                        <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <span className="text-dark-border">—</span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      {feature.abonnement ? (
-                        <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <span className="text-dark-border">—</span>
-                      )}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[600px]">
+                <thead>
+                  <tr className="border-b border-dark-border">
+                    <th className="py-4 px-4 text-left text-sm font-semibold text-secondary-light uppercase tracking-wider">
+                      Avantage
+                    </th>
+                    {subscriptions.map((sub) => (
+                      <th key={sub.id} className="py-4 px-4 text-center">
+                        <span
+                          className={`text-sm font-semibold ${
+                            sub.id === popularId ? 'text-gradient' : 'text-white'
+                          }`}
+                        >
+                          {sub.name}
+                        </span>
+                      </th>
+                    ))}
                   </tr>
-                ))}
-                {/* Price row */}
-                <tr className="border-t-2 border-dark-border">
-                  <td className="py-6 px-4 text-sm font-bold text-white uppercase">Tarif</td>
-                  <td className="py-6 px-4 text-center text-xl font-black text-white">5 000<span className="text-sm text-dark-muted"> FCFA</span></td>
-                  <td className="py-6 px-4 text-center text-xl font-black text-gradient">25 000<span className="text-sm text-dark-muted"> FCFA/mois</span></td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {allFeatures.map((feature) => (
+                    <tr key={feature} className="border-b border-dark-border/50 hover:bg-white/[0.02] transition-colors">
+                      <td className="py-4 px-4 text-sm text-dark-muted">{feature}</td>
+                      {subscriptions.map((sub) => (
+                        <td key={sub.id} className="py-4 px-4 text-center">
+                          {sub.features.includes(feature) ? (
+                            <>
+                              <svg className="mx-auto h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              <span className="sr-only">Inclus</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-dark-border" aria-hidden="true">—</span>
+                              <span className="sr-only">Non inclus</span>
+                            </>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  {/* Price row */}
+                  <tr className="border-t-2 border-dark-border">
+                    <td className="py-6 px-4 text-sm font-bold text-white uppercase">Tarif</td>
+                    {subscriptions.map((sub) => (
+                      <td
+                        key={sub.id}
+                        className={`py-6 px-4 text-center text-xl font-black ${
+                          sub.id === popularId ? 'text-gradient' : 'text-white'
+                        }`}
+                      >
+                        {sub.price.toLocaleString('fr-FR')}
+                        <span className="text-sm text-dark-muted">
+                          {' '}FCFA{sub.duration_months === 1 ? '/mois' : sub.duration_months > 1 ? `/${sub.duration_months} mois` : ''}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FAQ ── */}
       <section className="py-20 bg-dark">
@@ -229,11 +183,7 @@ export default function AbonnementsPage() {
             subtitle="Tout ce que vous devez savoir avant de vous inscrire."
             accent
           />
-          <div className="space-y-3">
-            {faqItems.map((item) => (
-              <FAQItem key={item.question} question={item.question} answer={item.answer} />
-            ))}
-          </div>
+          <FaqAccordion items={faqItems} />
         </div>
       </section>
 

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import type { ScheduleSlot, Activity, Coach } from "@/lib/types";
+import { useCallback, useEffect, useState } from "react";
 import CapacityBadge from "./CapacityBadge";
+import EnrollmentForm from "./EnrollmentForm";
+import { getSlotAvailability, safe } from "@/lib/api";
+import type { DayOfWeek, ScheduleSlot, SlotAvailability } from "@/lib/types";
 
 const DAYS = [
   { key: 0, label: "Lun", full: "Lundi" },
@@ -30,108 +32,71 @@ const CATEGORY_LABELS: Record<string, string> = {
   dance: "Danse",
 };
 
-// Mock data — Eslie Sport
-const MOCK_ACTIVITIES: Activity[] = [
-  { id: "1", name: "Musculation", slug: "musculation", description: "", category: "force", level: "all", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 1 },
-  { id: "2", name: "Fitness", slug: "fitness", description: "", category: "cardio", level: "all", duration_minutes: 60, max_capacity: 15, image_url: "", is_active: true, order: 2 },
-  { id: "3", name: "Zumba", slug: "zumba", description: "", category: "dance", level: "beginner", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 3 },
-  { id: "4", name: "Kick Boxing", slug: "kick-boxing", description: "", category: "martial_arts", level: "all", duration_minutes: 90, max_capacity: 15, image_url: "", is_active: true, order: 4 },
-  { id: "5", name: "Wushu", slug: "wushu", description: "", category: "martial_arts", level: "all", duration_minutes: 60, max_capacity: 15, image_url: "", is_active: true, order: 5 },
-];
+/**
+ * Date de la prochaine occurrence d'un jour de la semaine, au format `YYYY-MM-DD`.
+ *
+ * Les creneaux sont recurrents (day_of_week), mais une inscription porte sur une
+ * date precise : il faut donc resoudre "mercredi" en une vraie date. Le jour
+ * courant compte comme prochaine occurrence.
+ *
+ * Convention backend : 0 = lundi (comme `date.weekday()` en Python), alors que
+ * `Date.getDay()` renvoie 0 pour dimanche — d'ou le decalage.
+ */
+function nextDateForDay(dayOfWeek: number): string {
+  const today = new Date();
+  const todayIndex = (today.getDay() + 6) % 7;
+  const delta = (dayOfWeek - todayIndex + 7) % 7;
+  const target = new Date(today);
+  target.setDate(today.getDate() + delta);
+  // Formatage local : toISOString() convertit en UTC et peut reculer d'un jour.
+  const month = String(target.getMonth() + 1).padStart(2, "0");
+  const day = String(target.getDate()).padStart(2, "0");
+  return `${target.getFullYear()}-${month}-${day}`;
+}
 
-const MOCK_COACHES: Coach[] = [
-  { id: "1", name: "Coach Toussaint", photo_url: "", certifications: [], specialties: ["Musculation"], bio: "", is_active: true, order: 1 },
-  { id: "2", name: "Coach Adonis", photo_url: "", certifications: [], specialties: ["Zumba"], bio: "", is_active: true, order: 2 },
-  { id: "3", name: "Coach David", photo_url: "", certifications: [], specialties: ["Kick Boxing"], bio: "", is_active: true, order: 3 },
-  { id: "4", name: "Coach Leo", photo_url: "", certifications: [], specialties: ["Fitness"], bio: "", is_active: true, order: 4 },
-  { id: "5", name: "Maitre Kabore", photo_url: "", certifications: [], specialties: ["Wushu"], bio: "", is_active: true, order: 5 },
-];
+export default function ScheduleGrid({ slots }: { slots: ScheduleSlot[] }) {
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(0);
+  const [availability, setAvailability] = useState<Record<string, SlotAvailability>>({});
+  const [enrollingSlot, setEnrollingSlot] = useState<ScheduleSlot | null>(null);
+  const [confirmation, setConfirmation] = useState<string | null>(null);
 
-const SCHEDULE_PATTERN: { activityIdx: number; coachIdx: number; time: string; enrolled: number }[][] = [
-  // Lundi — Musculation (Toussaint 06-21h) + Fitness (Leo 21-22h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 8 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
-    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 12 },
-    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 11 },
-  ],
-  // Mardi — Musculation (Toussaint 06-21h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 7 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 9 },
-    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 13 },
-  ],
-  // Mercredi — Musculation + Wushu (Kabore 15-16h) + Kick Boxing (David 16h) + Fitness (Leo 21-22h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 6 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
-    { activityIdx: 4, coachIdx: 4, time: "15:00", enrolled: 8 },
-    { activityIdx: 3, coachIdx: 2, time: "16:00", enrolled: 12 },
-    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 10 },
-  ],
-  // Jeudi — Musculation + Zumba (Adonis 18h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 8 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 11 },
-    { activityIdx: 0, coachIdx: 0, time: "14:00", enrolled: 9 },
-    { activityIdx: 2, coachIdx: 1, time: "18:00", enrolled: 14 },
-  ],
-  // Vendredi — Musculation + Fitness (Leo 21-22h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 7 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 10 },
-    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 13 },
-    { activityIdx: 1, coachIdx: 3, time: "21:00", enrolled: 12 },
-  ],
-  // Samedi — Musculation + Wushu (Kabore 15-16h) + Kick Boxing (David 16h)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 5 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 11 },
-    { activityIdx: 4, coachIdx: 4, time: "15:00", enrolled: 9 },
-    { activityIdx: 3, coachIdx: 2, time: "16:00", enrolled: 13 },
-  ],
-  // Dimanche — Acces libre 6h-21h (Musculation libre)
-  [
-    { activityIdx: 0, coachIdx: 0, time: "06:00", enrolled: 4 },
-    { activityIdx: 0, coachIdx: 0, time: "10:00", enrolled: 6 },
-    { activityIdx: 0, coachIdx: 0, time: "16:00", enrolled: 8 },
-  ],
-];
+  // Le jour courant est calcule apres l'hydratation : le faire pendant le rendu
+  // ferait diverger le HTML serveur et le HTML client.
+  useEffect(() => {
+    setSelectedDay(((new Date().getDay() + 6) % 7) as DayOfWeek);
+  }, []);
 
-const MOCK_SLOTS: ScheduleSlot[] = SCHEDULE_PATTERN.flatMap((daySlots, dayIndex) =>
-  daySlots.map((s, i) => {
-    const activity = MOCK_ACTIVITIES[s.activityIdx];
-    const coach = MOCK_COACHES[s.coachIdx];
-    const startHour = parseInt(s.time.split(":")[0]);
-    const endTime = `${String(startHour + 1).padStart(2, "0")}:00`;
-    return {
-      id: `${dayIndex}-${i}`,
-      activity_id: activity.id,
-      coach_id: coach.id,
-      day_of_week: dayIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-      start_time: s.time,
-      end_time: endTime,
-      is_recurring: true,
-      is_active: true,
-      activity,
-      coach,
-      enrolled_count: s.enrolled,
-    };
-  })
-);
+  const daySlots = slots
+    .filter((s) => s.day_of_week === selectedDay)
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
-export default function ScheduleGrid() {
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [clickedSlot, setClickedSlot] = useState<string | null>(null);
+  const targetDate = nextDateForDay(selectedDay);
 
-  const daySlots = MOCK_SLOTS.filter((s) => s.day_of_week === selectedDay).sort(
-    (a, b) => a.start_time.localeCompare(b.start_time)
-  );
+  const loadAvailability = useCallback(async () => {
+    if (daySlots.length === 0) return;
+    const results = await Promise.all(
+      daySlots.map(async (slot) => {
+        const data = await safe(getSlotAvailability(slot.id, targetDate), null);
+        return [slot.id, data] as const;
+      })
+    );
+    setAvailability((prev) => {
+      const next = { ...prev };
+      for (const [id, data] of results) {
+        if (data) next[id] = data;
+      }
+      return next;
+    });
+    // daySlots est derive de selectedDay : la dependance sur les ids evite une
+    // boucle de rendu tout en rechargeant quand le jour change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDay, targetDate, slots]);
 
-  function handleSlotClick(slotId: string) {
-    setClickedSlot(slotId);
-    setTimeout(() => setClickedSlot(null), 600);
-  }
+  useEffect(() => {
+    loadAvailability();
+  }, [loadAvailability]);
+
+  const dayLabel = DAYS[selectedDay].full.toLowerCase();
 
   return (
     <div>
@@ -141,10 +106,11 @@ export default function ScheduleGrid() {
           <button
             key={day.key}
             onClick={() => setSelectedDay(day.key)}
+            aria-pressed={selectedDay === day.key}
             className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
               selectedDay === day.key
                 ? "gradient-primary text-black shadow-lg shadow-white/10"
-                : "border border-dark-border bg-dark-card text-dark-muted hover:border-primary/40 hover:text-white"
+                : "border border-dark-border bg-dark-card text-secondary-light hover:border-primary/40 hover:text-white"
             }`}
           >
             <span className="sm:hidden">{day.label}</span>
@@ -175,34 +141,42 @@ export default function ScheduleGrid() {
         ))}
       </div>
 
-      {/* Slots grid */}
+      {confirmation && (
+        <div
+          role="status"
+          className="mb-4 rounded-xl border border-success/30 bg-success/10 p-4 text-sm text-success"
+        >
+          {confirmation}
+        </div>
+      )}
+
+      {/* Slots */}
       <div className="space-y-3 overflow-x-auto">
         {daySlots.length === 0 ? (
           <div className="rounded-2xl border border-dark-border bg-dark-card p-12 text-center">
-            <p className="text-dark-muted">Aucun cours programme ce jour.</p>
+            <p className="text-dark-muted">Aucun cours programme le {dayLabel}.</p>
           </div>
         ) : (
           daySlots.map((slot) => {
             const category = slot.activity?.category || "force";
-            const maxCap = slot.max_capacity_override ?? slot.activity?.max_capacity ?? 20;
-            const enrolled = slot.enrolled_count ?? 0;
-            const isClicked = clickedSlot === slot.id;
+            const slotAvailability = availability[slot.id];
+            const maxCap =
+              slotAvailability?.max_capacity ??
+              slot.max_capacity_override ??
+              slot.activity?.max_capacity ??
+              0;
+            const enrolled = slotAvailability?.enrolled_count ?? 0;
 
             return (
               <button
                 key={slot.id}
-                onClick={() => handleSlotClick(slot.id)}
-                className={`w-full rounded-xl border-l-4 p-4 text-left transition-all duration-200 hover:scale-[1.01] ${
+                onClick={() => setEnrollingSlot(slot)}
+                className={`w-full rounded-xl border-l-4 p-4 text-left transition-all duration-200 hover:scale-[1.01] border border-dark-border hover:border-primary/30 ${
                   CATEGORY_COLORS[category] || "border-l-gray-500 bg-gray-500/10"
-                } ${
-                  isClicked
-                    ? "ring-2 ring-primary shadow-lg shadow-primary/20 scale-[1.02]"
-                    : "border border-dark-border hover:border-primary/30"
                 }`}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-4">
-                    {/* Time */}
                     <div className="text-center">
                       <p className="text-lg font-bold text-white">{slot.start_time}</p>
                       <p className="text-xs text-dark-muted">{slot.end_time}</p>
@@ -210,7 +184,6 @@ export default function ScheduleGrid() {
 
                     <div className="h-10 w-px bg-dark-border" />
 
-                    {/* Activity & Coach */}
                     <div>
                       <h4 className="text-base font-bold text-white">
                         {slot.activity?.name || "Cours"}
@@ -223,7 +196,10 @@ export default function ScheduleGrid() {
                   </div>
 
                   <div className="flex items-center gap-3 sm:gap-4">
-                    <CapacityBadge current={enrolled} max={maxCap} />
+                    {/* Le badge n'apparait qu'une fois la disponibilite reelle connue */}
+                    {slotAvailability && maxCap > 0 && (
+                      <CapacityBadge current={enrolled} max={maxCap} />
+                    )}
 
                     <span className="rounded-lg bg-white/5 px-2 py-1 text-xs text-dark-muted">
                       {CATEGORY_LABELS[category] || category}
@@ -235,6 +211,22 @@ export default function ScheduleGrid() {
           })
         )}
       </div>
+
+      {enrollingSlot && (
+        <EnrollmentForm
+          slot={enrollingSlot}
+          specificDate={targetDate}
+          onClose={() => setEnrollingSlot(null)}
+          onSuccess={(status) => {
+            setConfirmation(
+              status === "waitlisted"
+                ? "Le cours est complet : vous etes inscrit sur la liste d'attente. Nous vous contacterons si une place se libere."
+                : "Votre inscription est enregistree. A tres bientot !"
+            );
+            loadAvailability();
+          }}
+        />
+      )}
     </div>
   );
 }
