@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import EnrollmentCreate, EnrollmentResponse
 from app.services import enrollment_service
@@ -17,7 +18,7 @@ def enroll(data: EnrollmentCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{enrollment_id}")
-def cancel_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
+def cancel_enrollment(enrollment_id: UUIDStr, db: Session = Depends(get_db)):
     success = enrollment_service.cancel_enrollment(db, enrollment_id)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Enrollment not found")
@@ -26,7 +27,7 @@ def cancel_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
 
 @router.get("/slot/{slot_id}", response_model=list[EnrollmentResponse])
 def get_slot_enrollments(
-    slot_id: str,
+    slot_id: UUIDStr,
     specific_date: date | None = Query(None),
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -36,7 +37,7 @@ def get_slot_enrollments(
 
 @router.get("/slot/{slot_id}/availability")
 def get_slot_availability(
-    slot_id: str,
+    slot_id: UUIDStr,
     specific_date: date | None = Query(None),
     db: Session = Depends(get_db),
 ):

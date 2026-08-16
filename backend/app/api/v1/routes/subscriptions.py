@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import SubscriptionCreate, SubscriptionResponse, SubscriptionUpdate
 from app.services import subscription_service
@@ -25,7 +26,7 @@ def create_subscription(
 
 @router.put("/{sub_id}", response_model=SubscriptionResponse)
 def update_subscription(
-    sub_id: str,
+    sub_id: UUIDStr,
     data: SubscriptionUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -38,7 +39,7 @@ def update_subscription(
 
 @router.delete("/{sub_id}")
 def delete_subscription(
-    sub_id: str,
+    sub_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

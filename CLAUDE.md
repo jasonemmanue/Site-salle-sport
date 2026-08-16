@@ -395,6 +395,8 @@ ADMIN_PASSWORD=changeme
 | Seed script | ✅ | Admin + données exemples |
 | Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
 | Dockerfile | ✅ | |
+| Recette complète des routes | ✅ | 115 cas passants — voir § Robustesse de l'API |
+| Tests automatisés (`backend/tests/`) | ❌ | Dossier vide : la recette ci-dessus n'est pas encore portée en pytest |
 
 ### PHASE 2 — FRONTEND PUBLIC ✅
 
@@ -666,6 +668,81 @@ brouillons publiquement. Et symétriquement, l'admin — qui n'envoie pas de
 `GET /settings/public`, dont la liste blanche est `PUBLIC_SETTING_KEYS` dans
 `settings_service.py`. **Une nouvelle clé de paramètre n'est pas publique par
 défaut** : il faut l'ajouter explicitement à cette liste.
+
+### Robustesse de l'API — codes d'erreur et pièges
+
+Toutes les routes ont été testées une à une (108 cas : nominal, authentification,
+identifiants inconnus, identifiants malformés, validation, CORS). Les quatre
+familles de défauts ci-dessous renvoyaient un **500** au lieu du code attendu.
+
+#### ⚠️ Les identifiants sont des colonnes `uuid` PostgreSQL
+
+Une chaîne qui n'est pas un UUID partait telle quelle dans la requête SQL et
+PostgreSQL levait `invalid input syntax for type uuid` — soit un 500 sur un
+simple `GET /coaches/nimportequoi`.
+
+Le type `UUIDStr` de **`app/core/validators.py`** valide en amont et rend un
+**422**. Il est posé sur tous les paramètres de chemin `{id}` des 11 fichiers de
+routes, et sur les clés étrangères des schémas d'entrée (`activity_id`,
+`coach_id`, `slot_id`).
+
+**Toute nouvelle route prenant un identifiant doit le typer `UUIDStr`, jamais
+`str`.**
+
+#### ⚠️ Les clés étrangères doivent être vérifiées avant l'insertion
+
+`POST /enrollments/` avec un `slot_id` inconnu, `POST`/`PUT /schedule/` avec un
+`activity_id`/`coach_id` inconnu : la `ForeignKeyViolation` remontait en 500.
+
+`enrollment_service.enroll()` et `schedule_service._check_references()`
+contrôlent désormais l'existence des références et lèvent un **404**.
+
+#### ⚠️ Les slugs sont uniques et dérivés d'un champ libre
+
+Le slug d'une activité vient de son `name`, celui d'un article de son `title`,
+et la colonne porte une contrainte `unique`. **Publier deux articles au même
+titre, ou renommer une activité vers un nom déjà pris, plantait l'admin en
+500.**
+
+`app/services/slug_service.py` centralise `slugify()` et `unique_slug()`, qui
+suffixe `-2`, `-3`… jusqu'à trouver un slug libre. Son paramètre `exclude_id`
+écarte la ligne en cours de modification : réenregistrer une activité sans
+changer son nom ne doit pas la suffixer elle-même.
+
+Les anciens `_slugify()` dupliqués dans `activity_service.py` et
+`article_service.py` ont été supprimés au profit de ce module.
+
+#### ⚠️ `subfolder` de l'upload — traversée de répertoire
+
+`POST /upload/?subfolder=../../../tmp/evil` écrivait réellement le fichier hors
+de `/app/uploads`. Le paramètre est maintenant restreint à **un seul segment**
+`[A-Za-z0-9_-]{1,64}` (`SUBFOLDER_PATTERN` dans `media_service.py`), ce qui
+interdit de fait `..`, les séparateurs de chemin et les chemins absolus.
+`delete_file()` — encore non câblée à une route — vérifie de la même façon que
+le chemin résolu reste sous `UPLOAD_DIR`.
+
+#### ⚠️ Un `null` explicite sur un champ obligatoire
+
+Les schémas `*Update` déclarent tous leurs champs `X | None = None` pour les
+rendre facultatifs. `model_dump(exclude_unset=True)` distingue bien « champ
+absent » de « champ à `null` », mais rien n'empêchait le second de partir en
+base : `PUT /activities/{id}` avec `{"name": null}` levait une violation NOT
+NULL, soit un 500. Le cas est atteignable depuis les formulaires de l'admin.
+
+`reject_null_on_required(Model, update_data)` — dans `app/core/validators.py` —
+lit la nullabilité réelle des colonnes SQLAlchemy et rend un **422**. Les huit
+services de mise à jour l'appellent avant d'affecter les champs.
+
+Mettre à `null` reste permis sur les colonnes nullables : vider la photo d'un
+coach ou la date d'un créneau ponctuel continue de fonctionner. **Tout nouveau
+service de mise à jour doit appeler ce garde-fou.**
+
+#### ⚠️ Ne jamais nommer une variable locale `status`
+
+`enrollment_service.enroll()` faisait `status = "enrolled" if …`, ce qui masque
+le module `status` importé de FastAPI **sur toute la fonction** : référencer
+`status.HTTP_404_NOT_FOUND` plus haut levait un `UnboundLocalError`. La variable
+s'appelle `statut`. Le piège vaut pour tout service qui importe `status`.
 
 ### Authentification Admin
 

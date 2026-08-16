@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import TransformationCreate, TransformationResponse, TransformationUpdate
 from app.services import transformation_service
@@ -28,7 +29,7 @@ def create_transformation(
 
 @router.put("/{t_id}", response_model=TransformationResponse)
 def update_transformation(
-    t_id: str,
+    t_id: UUIDStr,
     data: TransformationUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -41,7 +42,7 @@ def update_transformation(
 
 @router.delete("/{t_id}")
 def delete_transformation(
-    t_id: str,
+    t_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import VideoCreate, VideoResponse, VideoUpdate
 from app.services import video_service
@@ -28,7 +29,7 @@ def create_video(
 
 @router.put("/{video_id}", response_model=VideoResponse)
 def update_video(
-    video_id: str,
+    video_id: UUIDStr,
     data: VideoUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -41,7 +42,7 @@ def update_video(
 
 @router.delete("/{video_id}")
 def delete_video(
-    video_id: str,
+    video_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

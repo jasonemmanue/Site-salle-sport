@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.models import Enrollment, ScheduleSlot
@@ -33,8 +34,19 @@ def get_slot_availability(db: Session, slot_id, date=None) -> dict:
 
 
 def enroll(db: Session, data) -> Enrollment:
+    # Sans ce controle, un slot_id inconnu part en base et la violation de cle
+    # etrangere remonte en 500 au lieu du 404 attendu.
+    slot = db.query(ScheduleSlot).filter(ScheduleSlot.id == data.slot_id).first()
+    if slot is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Creneau introuvable",
+        )
+
     availability = get_slot_availability(db, data.slot_id, data.specific_date)
-    status = "enrolled" if availability["available"] > 0 else "waitlisted"
+    # Nom distinct de `status` : ce dernier est le module importe de fastapi,
+    # une variable locale du meme nom le masquerait dans toute la fonction.
+    statut = "enrolled" if availability["available"] > 0 else "waitlisted"
     enrollment = Enrollment(
         id=str(uuid4()),
         user_name=data.user_name,
@@ -42,7 +54,7 @@ def enroll(db: Session, data) -> Enrollment:
         user_phone=data.user_phone,
         slot_id=data.slot_id,
         specific_date=data.specific_date,
-        status=status,
+        status=statut,
     )
     db.add(enrollment)
     db.commit()

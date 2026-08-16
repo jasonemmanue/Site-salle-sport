@@ -1,16 +1,10 @@
-import re
-import unicodedata
 from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
+from app.core.validators import reject_null_on_required
 from app.models.models import Activity
-
-
-def _slugify(text: str) -> str:
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    text = re.sub(r"[^\w\s-]", "", text.lower().strip())
-    return re.sub(r"[-\s]+", "-", text)
+from app.services.slug_service import unique_slug
 
 
 def get_activities(
@@ -36,7 +30,7 @@ def get_activity_by_slug(db: Session, slug: str) -> Activity | None:
 
 def create_activity(db: Session, data) -> Activity:
     dump = data.model_dump()
-    dump["slug"] = _slugify(data.name)
+    dump["slug"] = unique_slug(db, Activity, data.name)
     activity = Activity(
         id=str(uuid4()),
         **dump,
@@ -52,8 +46,9 @@ def update_activity(db: Session, activity_id, data) -> Activity | None:
     if not activity:
         return None
     update_data = data.model_dump(exclude_unset=True)
+    reject_null_on_required(Activity, update_data)
     if "name" in update_data:
-        update_data["slug"] = _slugify(update_data["name"])
+        update_data["slug"] = unique_slug(db, Activity, update_data["name"], exclude_id=activity.id)
     for key, value in update_data.items():
         setattr(activity, key, value)
     db.commit()

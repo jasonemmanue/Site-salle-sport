@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import CoachCreate, CoachResponse, CoachUpdate
 from app.services import coach_service
@@ -15,7 +16,7 @@ def list_coaches(db: Session = Depends(get_db)):
 
 
 @router.get("/{coach_id}", response_model=CoachResponse)
-def get_coach(coach_id: str, db: Session = Depends(get_db)):
+def get_coach(coach_id: UUIDStr, db: Session = Depends(get_db)):
     coach = coach_service.get_coach_by_id(db, coach_id)
     if not coach:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coach not found")
@@ -33,7 +34,7 @@ def create_coach(
 
 @router.put("/{coach_id}", response_model=CoachResponse)
 def update_coach(
-    coach_id: str,
+    coach_id: UUIDStr,
     data: CoachUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -46,7 +47,7 @@ def update_coach(
 
 @router.delete("/{coach_id}")
 def delete_coach(
-    coach_id: str,
+    coach_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import ActivityCreate, ActivityResponse, ActivityUpdate, PaginatedResponse
 from app.services import activity_service
@@ -42,7 +43,7 @@ def create_activity(
 
 @router.put("/{activity_id}", response_model=ActivityResponse)
 def update_activity(
-    activity_id: str,
+    activity_id: UUIDStr,
     data: ActivityUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -55,7 +56,7 @@ def update_activity(
 
 @router.delete("/{activity_id}")
 def delete_activity(
-    activity_id: str,
+    activity_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

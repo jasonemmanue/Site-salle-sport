@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import ReviewCreate, ReviewResponse
 from app.services import review_service
@@ -29,7 +30,7 @@ def create_review(data: ReviewCreate, db: Session = Depends(get_db)):
 
 @router.put("/{review_id}/approve", response_model=ReviewResponse)
 def approve_review(
-    review_id: str,
+    review_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
@@ -41,7 +42,7 @@ def approve_review(
 
 @router.delete("/{review_id}")
 def delete_review(
-    review_id: str,
+    review_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import EquipmentCreate, EquipmentResponse, EquipmentUpdate
 from app.services import equipment_service
@@ -28,7 +29,7 @@ def create_equipment(
 
 @router.put("/{eq_id}", response_model=EquipmentResponse)
 def update_equipment(
-    eq_id: str,
+    eq_id: UUIDStr,
     data: EquipmentUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -41,7 +42,7 @@ def update_equipment(
 
 @router.delete("/{eq_id}")
 def delete_equipment(
-    eq_id: str,
+    eq_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import ScheduleSlotCreate, ScheduleSlotResponse, ScheduleSlotUpdate
 from app.services import schedule_service
@@ -35,7 +36,7 @@ def create_slot(
 
 @router.put("/{slot_id}", response_model=ScheduleSlotResponse)
 def update_slot(
-    slot_id: str,
+    slot_id: UUIDStr,
     data: ScheduleSlotUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
@@ -48,7 +49,7 @@ def update_slot(
 
 @router.delete("/{slot_id}")
 def delete_slot(
-    slot_id: str,
+    slot_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):

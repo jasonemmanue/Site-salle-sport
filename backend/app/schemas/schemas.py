@@ -3,6 +3,8 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
+from app.core.validators import UUIDStr
+
 T = TypeVar("T")
 
 
@@ -110,8 +112,8 @@ class CoachResponse(BaseModel):
 
 
 class ScheduleSlotCreate(BaseModel):
-    activity_id: str
-    coach_id: str
+    activity_id: UUIDStr
+    coach_id: UUIDStr
     day_of_week: int = Field(ge=0, le=6)
     start_time: str
     end_time: str
@@ -122,8 +124,8 @@ class ScheduleSlotCreate(BaseModel):
 
 
 class ScheduleSlotUpdate(BaseModel):
-    activity_id: str | None = None
-    coach_id: str | None = None
+    activity_id: UUIDStr | None = None
+    coach_id: UUIDStr | None = None
     day_of_week: int | None = Field(default=None, ge=0, le=6)
     start_time: str | None = None
     end_time: str | None = None
@@ -154,7 +156,7 @@ class EnrollmentCreate(BaseModel):
     user_name: str
     user_email: EmailStr
     user_phone: str
-    slot_id: str
+    slot_id: UUIDStr
     specific_date: date
 
 

@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -8,8 +9,28 @@ from app.core.config import settings
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".pdf"}
 
+# Un seul segment, lettres/chiffres/tiret/underscore. Interdit de fait `..`,
+# les separateurs de chemin et les chemins absolus.
+SUBFOLDER_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+
+def _safe_subfolder(subfolder: str) -> str:
+    """Valide le sous-dossier de destination.
+
+    `subfolder` arrive d'un parametre de requete : concatene tel quel, un
+    `../../..` fait ecrire le fichier n'importe ou sur le disque du conteneur.
+    """
+    if not SUBFOLDER_PATTERN.match(subfolder or ""):
+        raise HTTPException(
+            status_code=400,
+            detail="Sous-dossier invalide : lettres, chiffres, tiret et underscore uniquement",
+        )
+    return subfolder
+
 
 async def save_upload(file: UploadFile, subfolder: str = "images") -> str:
+    subfolder = _safe_subfolder(subfolder)
+
     ext = Path(file.filename).suffix.lower() if file.filename else ""
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail=f"Extension {ext} non autorisee")
@@ -33,8 +54,12 @@ async def save_upload(file: UploadFile, subfolder: str = "images") -> str:
 
 
 def delete_file(file_path: str) -> bool:
-    full_path = Path(settings.UPLOAD_DIR).parent / file_path.lstrip("/")
-    if full_path.exists():
-        os.remove(full_path)
+    racine = Path(settings.UPLOAD_DIR).resolve()
+    cible = (racine.parent / file_path.lstrip("/")).resolve()
+    # Un `../` dans file_path ferait sortir de l'arborescence des uploads.
+    if not cible.is_relative_to(racine):
+        raise HTTPException(status_code=400, detail="Chemin de fichier invalide")
+    if cible.exists():
+        os.remove(cible)
         return True
     return False

@@ -1,9 +1,28 @@
 from collections import defaultdict
 from uuid import uuid4
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
-from app.models.models import ScheduleSlot
+from app.core.validators import reject_null_on_required
+from app.models.models import Activity, Coach, ScheduleSlot
+
+
+def _check_references(db: Session, activity_id, coach_id) -> None:
+    """Verifie que l'activite et le coach references existent.
+
+    Sinon la violation de cle etrangere remonte en 500 au lieu d'un 404.
+    """
+    if activity_id is not None and db.query(Activity.id).filter(Activity.id == activity_id).first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activite introuvable",
+        )
+    if coach_id is not None and db.query(Coach.id).filter(Coach.id == coach_id).first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Coach introuvable",
+        )
 
 
 def _base_query(db: Session):
@@ -29,6 +48,7 @@ def get_slot_by_id(db: Session, slot_id) -> ScheduleSlot | None:
 
 
 def create_slot(db: Session, data) -> ScheduleSlot:
+    _check_references(db, data.activity_id, data.coach_id)
     slot = ScheduleSlot(id=str(uuid4()), **data.model_dump())
     db.add(slot)
     db.commit()
@@ -40,7 +60,10 @@ def update_slot(db: Session, slot_id, data) -> ScheduleSlot | None:
     slot = db.query(ScheduleSlot).filter(ScheduleSlot.id == slot_id).first()
     if not slot:
         return None
-    for key, value in data.model_dump(exclude_unset=True).items():
+    _check_references(db, data.activity_id, data.coach_id)
+    update_data = data.model_dump(exclude_unset=True)
+    reject_null_on_required(ScheduleSlot, update_data)
+    for key, value in update_data.items():
         setattr(slot, key, value)
     db.commit()
     db.refresh(slot)

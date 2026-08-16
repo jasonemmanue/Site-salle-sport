@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
+from app.core.validators import reject_null_on_required
 from app.models.models import Equipment
 
 
@@ -24,7 +25,9 @@ def update_equipment(db: Session, eq_id, data) -> Equipment | None:
     eq = db.query(Equipment).filter(Equipment.id == eq_id).first()
     if not eq:
         return None
-    for key, value in data.model_dump(exclude_unset=True).items():
+    update_data = data.model_dump(exclude_unset=True)
+    reject_null_on_required(Equipment, update_data)
+    for key, value in update_data.items():
         setattr(eq, key, value)
     db.commit()
     db.refresh(eq)

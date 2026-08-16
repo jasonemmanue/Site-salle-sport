@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_admin_user, get_db
+from app.core.validators import UUIDStr
 from app.models.models import User
 from app.schemas.schemas import ContactCreate, ContactResponse
 from app.services import contact_service
@@ -24,7 +25,7 @@ def list_contacts(
 
 @router.put("/{contact_id}/read", response_model=ContactResponse)
 def mark_contact_read(
-    contact_id: str,
+    contact_id: UUIDStr,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
