@@ -138,9 +138,29 @@ export default async function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-dark-border text-center text-sm text-dark-muted">
-          &copy; {new Date().getFullYear()} {gymName}. Tous droits reserves.
+        {/* Bottom bar — copyright a gauche, signature de l'atelier a droite.
+            Empile et centre sous 640px, sur une seule ligne au-dessus. */}
+        <div className="mt-12 border-t border-dark-border pt-8">
+          <div className="flex flex-col items-center gap-3 text-sm text-dark-muted sm:flex-row sm:justify-between sm:gap-6">
+            <p className="text-center sm:text-left">
+              &copy; {new Date().getFullYear()} {gymName}. Tous droits reserves.
+            </p>
+
+            {/* Le lien ouvre directement la fenetre de redaction Gmail, plutot
+                qu'un mailto: qui depend du client de messagerie du visiteur. */}
+            <p className="text-center sm:text-right">
+              Concu et developpe en Cote d&apos;Ivoire{' '}
+              <span className="text-dark-border" aria-hidden="true">&mdash;</span>{' '}
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=prepaxiasfe@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-secondary underline decoration-dark-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+              >
+                prepaxiasfe@gmail.com
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

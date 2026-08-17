@@ -81,6 +81,27 @@ Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`
 - `.gradient-primary .text-black` devient `color: #fff` (boutons CTA)
 - Le footer reste toujours en mode sombre (identité de marque)
 
+**⚠️ Navigation : la surcharge doit citer la classe réellement posée.**
+`[data-theme="light"] nav a` repeint *tous* les liens du header en `#334155`.
+La règle qui rend l'onglet actif ne visait que `nav a.text-primary`, alors que
+`Header.tsx` marque l'actif avec **`text-accent`** — bureau (ligne 64) comme
+menu mobile (ligne 132). La règle générique l'emportait donc et **l'onglet
+courant devenait indiscernable en mode clair**, alors qu'il ressort en doré en
+mode sombre. Les deux classes sont désormais listées.
+
+La couleur de l'actif est `#8A6D0A` (**4,9:1** sur blanc). L'ancienne valeur
+`#B8960A` ne donnait que **2,8:1** — sous le seuil de 4,5:1 pour du texte, ce
+qui aggravait le problème. Même valeur que côté admin, voir § Thème de l'admin.
+
+Le CTA « S'inscrire » du menu mobile est un `<a>` dans `<nav>` : la règle
+générique lui volait aussi sa couleur, d'où `nav a.gradient-primary { color:
+#0F1724 }` (11,2:1 sur le doré).
+
+**Règle générale** : toute surcharge d'état en mode clair doit cibler la classe
+que le composant applique vraiment. Un sélecteur qui ne correspond à rien ne
+produit aucune erreur — il laisse simplement la règle générique gagner, et le
+défaut ne se voit qu'à l'œil, dans un seul thème.
+
 **Image Hero :**
 - Le hero principal utilise une image Unsplash (`images.unsplash.com`) via Next.js `Image` avec `fill` + `object-cover`
 - L'overlay `.hero-overlay` s'adapte au thème (sombre ou clair semi-transparent)
@@ -434,6 +455,23 @@ est donc rendu avec le contenu réel — indispensable pour le référencement.
 | `/videos`, `/transformations`, `/avis` | `/videos/`, `/transformations/`, `/reviews/` |
 | `/contact`, Footer | `/settings/public` |
 
+#### Bas de page — copyright et signature de l'atelier
+
+La barre du bas porte le copyright à gauche et la signature du prestataire à
+droite : « Concu et developpe en Cote d'Ivoire — prepaxiasfe@gmail.com ». Elle
+s'empile et se centre sous 640 px.
+
+⚠️ **Le lien courriel vise Gmail, pas `mailto:`.** L'adresse pointe sur
+`https://mail.google.com/mail/?view=cm&fs=1&to=…`, qui ouvre directement la
+fenêtre de rédaction Gmail dans un nouvel onglet. Un `mailto:` classique dépend
+du client de messagerie configuré sur le poste du visiteur, et ne fait souvent
+rien sur une machine sans client installé. Contrepartie assumée : le visiteur
+doit être connecté à un compte Google, sans quoi Gmail lui demande de
+s'identifier avant d'afficher le brouillon.
+
+Il n'existe **ni page Mentions légales ni page Confidentialité** : aucun lien
+vers elles n'a été posé dans cette barre, pour ne pas produire de 404.
+
 #### ⚠️ Deux URLs d'API, deux points de vue
 
 `NEXT_PUBLIC_API_URL` est figée dans le bundle au build : c'est l'API **telle
@@ -514,6 +552,23 @@ public en moins d'une minute.
 | Dockerfiles | ✅ | Backend, Frontend, Admin (multi-stage, `output: standalone`, user non-root) |
 | `.dockerignore` | ✅ | Frontend + Admin — évite de copier le `node_modules` Windows de l'hôte |
 | Variables `NEXT_PUBLIC_*` | ✅ | Passées en `build.args` (voir ci-dessous) |
+
+#### ⚠️ Le frontend exige Node 22
+
+`frontend/Dockerfile` est sur **`node:22-alpine`**, l'admin reste sur
+`node:20-alpine`. Ce n'est pas une incohérence à corriger : le site public tire
+`isomorphic-dompurify` (désinfection du HTML des articles), donc `jsdom@30` et
+`undici@8`, qui déclarent tous deux `engines: node ^22.22.2 || ^24.15.0 ||
+>=26.0.0`. Sous Node 20, le build échoue en fin de course, à la collecte des
+pages :
+
+```
+Failed to load external module jsdom: TypeError: webidl.util.markAsUncloneable is not a function
+```
+
+L'erreur ne survient qu'après le TypeScript, soit ~4 min de build, et ne
+mentionne pas la version de Node — d'où le temps perdu à la diagnostiquer.
+L'admin n'a pas cette dépendance ; le remonter n'apporterait rien.
 
 #### ⚠️ Variables `NEXT_PUBLIC_*` et Docker
 

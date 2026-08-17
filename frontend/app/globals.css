@@ -243,9 +243,22 @@ h1, h2, h3, h4, h5, h6 {
   color: #334155;
 }
 
+/* Onglet actif et survol.
+   ⚠️ Header.tsx marque l'onglet actif avec `text-accent`, pas `text-primary` :
+   ne cibler que `.text-primary` laissait la regle generique ci-dessus repeindre
+   le lien actif en gris comme les autres, et le reperage disparaissait en mode
+   clair. Les deux classes sont donc listees.
+   `#8A6D0A` donne 4,9:1 sur blanc, la ou `#B8960A` tombait a 2,8:1. */
 [data-theme="light"] nav a:hover,
+[data-theme="light"] nav a.text-accent,
 [data-theme="light"] nav a.text-primary {
-  color: #B8960A;
+  color: #8A6D0A;
+}
+
+/* Le CTA du menu mobile est un <a> dans <nav> : la regle generique lui volait
+   sa couleur. Sur le fond dore, le navy donne 11,2:1. */
+[data-theme="light"] nav a.gradient-primary {
+  color: #0F1724;
 }
 
 /* Light mode: hamburger bars */
