@@ -1,0 +1,847 @@
+<title>Chantier ESLIE SPORT</title>
+
+<style>
+  /* ------------------------------------------------------------------
+     Palette reprise du systeme de design du projet (CLAUDE.md) :
+     bleu nuit + dore ESLIE SPORT. Le site est sombre par defaut, donc
+     :root porte la palette SOMBRE et le clair est la variante.
+     ------------------------------------------------------------------ */
+  :root {
+    --ground:        #0F1724;
+    --surface:       #1A2332;
+    --raised:        #1E293B;
+    --border:        #2D3A4A;
+    --border-soft:   #223044;
+
+    --ink:           #FFFFFF;
+    --ink-2:         #C5CDD8;
+    --ink-3:         #8896A8;
+
+    --gold:          #FFD600;
+    --gold-ink:      #FFD600;   /* dore en TEXTE : lisible sur fond sombre */
+    --gold-dim:      rgba(255, 214, 0, 0.14);
+
+    --done:          #22C55E;
+    --partial:       #F59E0B;
+    --todo:          #EF4444;
+    --done-dim:      rgba(34, 197, 94, 0.13);
+    --partial-dim:   rgba(245, 158, 11, 0.13);
+    --todo-dim:      rgba(239, 68, 68, 0.13);
+
+    --track:         rgba(255, 255, 255, 0.07);
+    --shadow:        0 1px 2px rgba(0, 0, 0, 0.4);
+
+    --display: Bahnschrift, "Avenir Next Condensed", "Roboto Condensed",
+               "Helvetica Neue", system-ui, sans-serif;
+    --body:    system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto,
+               "Helvetica Neue", sans-serif;
+    --mono:    ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas,
+               "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --ground:      #F4F6F9;
+      --surface:     #FFFFFF;
+      --raised:      #F1F5F9;
+      --border:      #E2E8F0;
+      --border-soft: #EDF1F6;
+
+      --ink:         #0F1724;
+      --ink-2:       #475569;
+      --ink-3:       #64748B;
+
+      /* Le dore ne fait que 1,4:1 sur blanc : en TEXTE il devient bronze.
+         En REMPLISSAGE (jauges, filets) il reste le dore de la marque. */
+      --gold-ink:    #8A6D0A;
+      --gold-dim:    rgba(255, 214, 0, 0.22);
+
+      --done:        #15803D;
+      --partial:     #B45309;
+      --todo:        #B91C1C;
+      --done-dim:    rgba(21, 128, 61, 0.10);
+      --partial-dim: rgba(180, 83, 9, 0.10);
+      --todo-dim:    rgba(185, 28, 28, 0.10);
+
+      --track:       rgba(15, 23, 36, 0.08);
+      --shadow:      0 1px 2px rgba(15, 23, 36, 0.06);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #F4F6F9;
+    --surface:     #FFFFFF;
+    --raised:      #F1F5F9;
+    --border:      #E2E8F0;
+    --border-soft: #EDF1F6;
+
+    --ink:         #0F1724;
+    --ink-2:       #475569;
+    --ink-3:       #64748B;
+
+    --gold-ink:    #8A6D0A;
+    --gold-dim:    rgba(255, 214, 0, 0.22);
+
+    --done:        #15803D;
+    --partial:     #B45309;
+    --todo:        #B91C1C;
+    --done-dim:    rgba(21, 128, 61, 0.10);
+    --partial-dim: rgba(180, 83, 9, 0.10);
+    --todo-dim:    rgba(185, 28, 28, 0.10);
+
+    --track:       rgba(15, 23, 36, 0.08);
+    --shadow:      0 1px 2px rgba(15, 23, 36, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink-2);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  /* ---------- Typographie ---------- */
+
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-ink);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 6vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: 0.005em;
+    line-height: 1.02;
+    text-wrap: balance;
+    color: var(--ink);
+    margin: 0.5rem 0 0;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  p { margin: 0; max-width: 68ch; }
+
+  code, .mono {
+    font-family: var(--mono);
+    font-size: 0.855em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  code {
+    background: var(--raised);
+    border: 1px solid var(--border-soft);
+    border-radius: 3px;
+    padding: 0.1em 0.36em;
+    color: var(--ink);
+    word-break: break-word;
+  }
+
+  a { color: var(--gold-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ---------- En-tete ---------- */
+
+  .masthead { border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+
+  .verdict {
+    margin-top: 1.75rem;
+    font-size: 1.075rem;
+    line-height: 1.62;
+    color: var(--ink-2);
+  }
+  .verdict strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Chiffres cles ---------- */
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .figure { background: var(--surface); padding: 1.15rem 1.25rem; }
+
+  .figure-value {
+    font-family: var(--display);
+    font-size: 2.15rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .figure-label {
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    margin-top: 0.4rem;
+    line-height: 1.35;
+  }
+
+  /* ---------- Registre des phases ---------- */
+
+  .section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .section-head { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .ledger { display: flex; flex-direction: column; gap: 0; }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    gap: 0 1.25rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .phase:last-child { border-bottom: 1px solid var(--border); }
+
+  /* Le filet vertical : sa couleur dit l'etat, la colonne entiere se lit d'un trait. */
+  .phase::before {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--rail, var(--border));
+  }
+  .phase[data-state="done"]    { --rail: var(--done); }
+  .phase[data-state="partial"] { --rail: var(--partial); }
+  .phase[data-state="todo"]    { --rail: var(--todo); }
+
+  .phase-num {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phase-body { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+
+  .phase-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.85rem;
+  }
+
+  .chip {
+    font-family: var(--display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .chip[data-state="done"]    { color: var(--done);    background: var(--done-dim); }
+  .chip[data-state="partial"] { color: var(--partial); background: var(--partial-dim); }
+  .chip[data-state="todo"]    { color: var(--todo);    background: var(--todo-dim); }
+
+  .meter {
+    height: 3px;
+    background: var(--track);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 22rem;
+  }
+  .meter-fill { height: 100%; background: var(--gold); border-radius: 2px; }
+
+  .phase-note { font-size: 0.94rem; color: var(--ink-2); }
+
+  .inventory {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.15rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--ink-3);
+  }
+
+  /* ---------- Blocs de manques ---------- */
+
+  .gaps { display: flex; flex-direction: column; gap: 1.75rem; }
+
+  .gap-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .gap-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem 0.9rem;
+    padding: 1rem 1.25rem;
+    background: var(--raised);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gap-head h3 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .gap-head .count {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gap-list { list-style: none; margin: 0; padding: 0; }
+
+  .gap-item {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .gap-item:first-child { border-top: none; }
+
+  .gap-item-title { color: var(--ink); font-weight: 600; font-size: 0.97rem; }
+  .gap-item-note  { font-size: 0.9rem; color: var(--ink-3); }
+
+  /* ---------- Tableau des corrections ---------- */
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+
+  th, td {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 0.9rem;
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: var(--display);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--raised);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  td.defect { color: var(--ink); font-weight: 600; }
+  td.scope  { color: var(--ink-3); font-family: var(--mono); font-size: 0.8rem; }
+
+  .before {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--todo);
+    font-variant-numeric: tabular-nums;
+  }
+  .after {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--done);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Pied ---------- */
+
+  .footnote {
+    border-top: 1px solid var(--border);
+    padding-top: 1.75rem;
+    font-size: 0.88rem;
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  @media (max-width: 34rem) {
+    .phase { grid-template-columns: 2.25rem 1fr; gap: 0 0.85rem; }
+    .phase::before { left: 1rem; }
+    .page { padding-top: 2.5rem; gap: 2.75rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">ESLIE SPORT &middot; Site web dynamique</p>
+    <h1>&Eacute;tat du chantier</h1>
+    <div class="meta">
+      <span>16 août 2026</span>
+      <span class="mono">feat/branchement-site-public-api</span>
+      <span class="mono">0c3f1ac</span>
+    </div>
+    <p class="verdict">
+      Les quatre premières phases sont livrées et tournent en local sous Docker :
+      l&rsquo;API, le site public et le back-office sont fonctionnels de bout en bout,
+      sans aucune donnée factice. <strong>Rien n&rsquo;est déployé</strong> — la phase 5
+      n&rsquo;a pas commencé et aucun fichier de déploiement n&rsquo;existe. Trois
+      éléments annoncés au plan n&rsquo;ont jamais été écrits : les tests
+      automatisés, la notification e-mail des messages de contact, et la génération
+      des QR codes membres.
+    </p>
+  </header>
+
+  <section class="figures" aria-label="Chiffres clés">
+    <div class="figure">
+      <div class="figure-value">58</div>
+      <div class="figure-label">routes API v1</div>
+    </div>
+    <div class="figure">
+      <div class="figure-value">115</div>
+      <div class="figure-label">cas de recette, tous verts</div>
+    </div>
+    <div class="figure">
+      <div class="figure-value">13</div>
+      <div class="figure-label">pages publiques</div>
+    </div>
+    <div class="figure">
+      <div class="figure-value">12</div>
+      <div class="figure-label">écrans d&rsquo;administration</div>
+    </div>
+    <div class="figure">
+      <div class="figure-value">5</div>
+      <div class="figure-label">services Docker</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Les cinq phases</h2>
+      <p>
+        L&rsquo;ordre est celui du plan du projet : chaque phase suppose la
+        précédente. Le filet de gauche donne la couleur de l&rsquo;état.
+      </p>
+    </div>
+
+    <div class="ledger">
+
+      <article class="phase" data-state="partial">
+        <div class="phase-num">01</div>
+        <div class="phase-body">
+          <div class="phase-title">
+            <h3>Backend API — FastAPI</h3>
+            <span class="chip" data-state="partial">Livré, avec réserves</span>
+          </div>
+          <div class="meter" role="img" aria-label="Avancement estimé : 85 %">
+            <div class="meter-fill" style="width: 85%"></div>
+          </div>
+          <p class="phase-note">
+            Modèles, schémas, services, routes, migrations et seed sont en place et
+            vérifiés route par route. Restent en dehors : le dossier de tests, vide,
+            l&rsquo;envoi SMTP des messages de contact, et
+            <code>generate_qr_code</code>, jamais écrite alors que la colonne
+            <code>users.qr_code</code> l&rsquo;attend.
+          </p>
+          <div class="inventory">
+            <span>13 tables</span>
+            <span>15 services métier</span>
+            <span>58 routes</span>
+            <span>2 migrations Alembic</span>
+            <span>0 test</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="phase" data-state="done">
+        <div class="phase-num">02</div>
+        <div class="phase-body">
+          <div class="phase-title">
+            <h3>Site public — Next.js</h3>
+            <span class="chip" data-state="done">Livré</span>
+          </div>
+          <div class="meter" role="img" aria-label="Avancement : 100 %">
+            <div class="meter-fill" style="width: 100%"></div>
+          </div>
+          <p class="phase-note">
+            Les treize pages consomment l&rsquo;API. Le rendu est fait côté serveur,
+            donc le HTML part avec le contenu réel — ce qui compte pour le
+            référencement. Si l&rsquo;API tombe, chaque page bascule sur son état
+            « aucun contenu » au lieu de renvoyer une erreur. Mode clair et sombre,
+            contenu des articles désinfecté avant affichage.
+          </p>
+          <div class="inventory">
+            <span>13 pages</span>
+            <span>18 composants</span>
+            <span>3 formulaires publics</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="phase" data-state="done">
+        <div class="phase-num">03</div>
+        <div class="phase-body">
+          <div class="phase-title">
+            <h3>Back-office — Next.js</h3>
+            <span class="chip" data-state="done">Livré</span>
+          </div>
+          <div class="meter" role="img" aria-label="Avancement : 100 %">
+            <div class="meter-fill" style="width: 100%"></div>
+          </div>
+          <p class="phase-note">
+            Douze écrans : tableau de bord chiffré, planning en glisser-déposer,
+            et le CRUD complet du contenu. Authentification par jeton avec
+            renouvellement automatique deux minutes avant expiration. Contenu en
+            thème clair, barre latérale en bleu nuit.
+          </p>
+          <div class="inventory">
+            <span>12 écrans</span>
+            <span>7 composants</span>
+            <span>8 indicateurs</span>
+            <span>4 graphiques</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="phase" data-state="done">
+        <div class="phase-num">04</div>
+        <div class="phase-body">
+          <div class="phase-title">
+            <h3>Docker — développement local</h3>
+            <span class="chip" data-state="done">Livré</span>
+          </div>
+          <div class="meter" role="img" aria-label="Avancement : 100 %">
+            <div class="meter-fill" style="width: 100%"></div>
+          </div>
+          <p class="phase-note">
+            Cinq services démarrent ensemble, ports décalés pour cohabiter avec les
+            autres projets de la machine. Images reconstruites et vérifiées ce jour.
+            À noter : <code>redis</code> tourne mais n&rsquo;est utilisé par aucune
+            route.
+          </p>
+          <div class="inventory">
+            <span>frontend&nbsp;:3000</span>
+            <span>admin&nbsp;:3003</span>
+            <span>api&nbsp;:8010</span>
+            <span>postgres&nbsp;:5600</span>
+            <span>redis&nbsp;:6381</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="phase" data-state="todo">
+        <div class="phase-num">05</div>
+        <div class="phase-body">
+          <div class="phase-title">
+            <h3>Déploiement — Railway</h3>
+            <span class="chip" data-state="todo">Non commencé</span>
+          </div>
+          <div class="meter" role="img" aria-label="Avancement : 0 %">
+            <div class="meter-fill" style="width: 0%"></div>
+          </div>
+          <p class="phase-note">
+            Aucun fichier de déploiement n&rsquo;existe : ni <code>Procfile</code>,
+            ni <code>railway.json</code>. Les secrets, le CORS et l&rsquo;URL
+            publique de l&rsquo;API sont encore réglés pour la machine de
+            développement. Le détail est dans la section suivante.
+          </p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Ce qui manque</h2>
+      <p>
+        Classé par ce que cela empêche, pas par difficulté. Le premier groupe
+        bloque une mise en ligne ; le deuxième correspond à des engagements du
+        plan restés sans code ; le troisième demande une décision de votre part
+        avant tout développement.
+      </p>
+    </div>
+
+    <div class="gaps">
+
+      <div class="gap-group">
+        <div class="gap-head">
+          <h3>Bloque la mise en production</h3>
+          <span class="count">4 points</span>
+        </div>
+        <ul class="gap-list">
+          <li class="gap-item">
+            <span class="gap-item-title">Aucun fichier de déploiement</span>
+            <span class="gap-item-note">
+              Pas de <code>Procfile</code> pour l&rsquo;API, pas de
+              <code>railway.json</code> ni <code>railway.toml</code>. Rien ne dit
+              encore à Railway comment démarrer les services.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Secrets restés aux valeurs par défaut</span>
+            <span class="gap-item-note">
+              <code>SECRET_KEY</code> vaut encore
+              <code>dev-secret-key-change-in-production</code> et le mot de passe
+              administrateur <code>changeme</code>. Les jetons d&rsquo;authentification
+              seraient forgeables par quiconque lit le dépôt.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">CORS limité à la machine locale</span>
+            <span class="gap-item-note">
+              <code>CORS_ORIGINS</code> ne contient que
+              <code>localhost:3000</code>, <code>:3001</code> et <code>:3003</code>.
+              Le domaine de production devra y être ajouté, sans quoi le navigateur
+              refusera tous les appels.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">L&rsquo;URL de l&rsquo;API est figée à la construction de l&rsquo;image</span>
+            <span class="gap-item-note">
+              <code>NEXT_PUBLIC_API_URL</code> est inscrite dans le bundle au moment
+              du build. Changer de domaine impose de reconstruire les images du site
+              et du back-office : un simple redémarrage ne suffira pas.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="gap-group">
+        <div class="gap-head">
+          <h3>Annoncé au plan, absent du code</h3>
+          <span class="count">4 points</span>
+        </div>
+        <ul class="gap-list">
+          <li class="gap-item">
+            <span class="gap-item-title">Aucun test automatisé</span>
+            <span class="gap-item-note">
+              <code>backend/tests/</code> ne contient qu&rsquo;un
+              <code>.gitkeep</code>. La recette de 115 cas qui a servi aujourd&rsquo;hui
+              existe mais vit hors du dépôt : rien ne rejouera ces vérifications
+              après une modification.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Les messages de contact ne préviennent personne</span>
+            <span class="gap-item-note">
+              <code>contact_service</code> enregistre en base et s&rsquo;arrête là.
+              Aucun envoi SMTP, et aucun réglage e-mail dans la configuration : un
+              message reçu reste invisible tant que personne n&rsquo;ouvre le
+              back-office.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Les QR codes membres ne sont jamais générés</span>
+            <span class="gap-item-note">
+              La colonne <code>users.qr_code</code> existe et porte une contrainte
+              d&rsquo;unicité, mais <code>generate_qr_code</code> n&rsquo;a pas été
+              écrite. Le champ reste vide pour tout le monde.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Redis tourne sans servir</span>
+            <span class="gap-item-note">
+              Le conteneur démarre et <code>get_redis()</code> est défini, mais aucune
+              route ne l&rsquo;appelle. Soit on lui donne un rôle — cache, sessions,
+              limitation de débit — soit on le retire de la pile.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="gap-group">
+        <div class="gap-head">
+          <h3>Demande votre décision</h3>
+          <span class="count">5 points</span>
+        </div>
+        <ul class="gap-list">
+          <li class="gap-item">
+            <span class="gap-item-title">Pas d&rsquo;espace membre sur le site public</span>
+            <span class="gap-item-note">
+              Le modèle de données prévoit tout — rôle membre, formule rattachée,
+              QR code — mais le site n&rsquo;a ni page de connexion ni compte. Les
+              inscriptions aux cours se font au nom et à l&rsquo;e-mail, sans compte.
+              Est-ce l&rsquo;usage voulu&nbsp;?
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Aucun paiement en ligne, et aucune table de paiements</span>
+            <span class="gap-item-note">
+              La page des abonnements annonce un règlement sur place, en espèces ou
+              par mobile money. Si c&rsquo;est le fonctionnement réel, il n&rsquo;y a
+              rien à faire — mais alors la courbe de revenus du tableau de bord
+              restera une estimation qui ne peut que croître, faute d&rsquo;historique
+              de transactions.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Les formulaires publics ne sont pas limités en débit</span>
+            <span class="gap-item-note">
+              <code>/contact/</code>, <code>/reviews/</code> et
+              <code>/enrollments/</code> acceptent les envois sans compte et sans
+              quota. En ligne, cette surface sera visitée par des robots.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">Une formule de test traîne en base</span>
+            <span class="gap-item-note">
+              « Formule QA 649673 » à 35&nbsp;000&nbsp;FCFA s&rsquo;affiche
+              <em>en premier</em> sur la page des abonnements. Elle est antérieure à
+              la session d&rsquo;aujourd&rsquo;hui ; je ne l&rsquo;ai pas supprimée
+              sans votre accord.
+            </span>
+          </li>
+          <li class="gap-item">
+            <span class="gap-item-title">La branche n&rsquo;est pas fusionnée</span>
+            <span class="gap-item-note">
+              <code>feat/branchement-site-public-api</code> est poussée sur GitHub
+              mais vit toujours à côté de <code>main</code>. La demande de fusion
+              reste à ouvrir.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Corrigé aujourd&rsquo;hui</h2>
+      <p>
+        Six familles de défauts trouvées en passant chaque route au banc d&rsquo;essai.
+        Toutes rendaient une erreur serveur là où un code d&rsquo;erreur clair était
+        attendu — deux d&rsquo;entre elles étaient atteignables depuis le back-office.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Défaut</th>
+            <th scope="col">Portée</th>
+            <th scope="col">Avant</th>
+            <th scope="col">Après</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="defect">Identifiant qui n&rsquo;est pas un UUID</td>
+            <td class="scope">11 fichiers de routes</td>
+            <td><span class="before">500</span></td>
+            <td><span class="after">422</span></td>
+          </tr>
+          <tr>
+            <td class="defect">Référence vers une ligne inexistante</td>
+            <td class="scope">inscriptions, planning</td>
+            <td><span class="before">500</span></td>
+            <td><span class="after">404</span></td>
+          </tr>
+          <tr>
+            <td class="defect">Deux activités de même nom, deux articles de même titre</td>
+            <td class="scope">activités, articles</td>
+            <td><span class="before">500</span></td>
+            <td><span class="after">slug suffixé</span></td>
+          </tr>
+          <tr>
+            <td class="defect">Champ obligatoire vidé depuis un formulaire</td>
+            <td class="scope">8 services</td>
+            <td><span class="before">500</span></td>
+            <td><span class="after">422</span></td>
+          </tr>
+          <tr>
+            <td class="defect">Fichier écrit hors du dossier des envois</td>
+            <td class="scope">media_service</td>
+            <td><span class="before">écriture arbitraire</span></td>
+            <td><span class="after">400</span></td>
+          </tr>
+          <tr>
+            <td class="defect">Variable locale masquant un module importé</td>
+            <td class="scope">enrollment_service</td>
+            <td><span class="before">UnboundLocalError</span></td>
+            <td><span class="after">corrigé</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footnote">
+    <p>
+      Relevé fait sur la pile Docker reconstruite et redémarrée le 16 août 2026,
+      base ramenée à l&rsquo;état du seed : 6 activités, 4 coachs, 15 créneaux,
+      3 articles, 1 compte administrateur.
+    </p>
+    <p>
+      Les cinq pièges corrigés et les règles à suivre pour les prochaines routes
+      sont documentés dans <code>CLAUDE.md</code>, section « Robustesse de
+      l&rsquo;API ».
+    </p>
+  </footer>
+
+</div>
