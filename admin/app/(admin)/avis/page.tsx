@@ -36,9 +36,9 @@ export default function AvisPage() {
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
-            <div key={item.id} className="card flex items-start gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+            <div key={item.id} className="card flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="min-w-0 flex-1">
+                <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="font-bold text-white">{item.author_name}</span>
                   <span className="text-primary">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${item.is_approved ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
@@ -48,7 +48,7 @@ export default function AvisPage() {
                 <p className="text-secondary text-sm">{item.comment}</p>
                 <p className="text-dark-muted text-xs mt-2">{new Date(item.created_at).toLocaleDateString('fr-FR')}</p>
               </div>
-              <div className="flex gap-2 shrink-0">
+              <div className="flex shrink-0 flex-wrap gap-2">
                 {!item.is_approved && (
                   <button onClick={() => approve(item.id)} className="btn-primary text-sm px-3 py-1.5">Approuver</button>
                 )}

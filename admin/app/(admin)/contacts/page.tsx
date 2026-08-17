@@ -31,9 +31,9 @@ export default function ContactsPage() {
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className={`card ${!item.is_read ? 'border-primary/30' : ''}`}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="font-bold text-white">{item.name}</span>
                     {!item.is_read && <span className="w-2 h-2 rounded-full bg-primary" />}
                   </div>

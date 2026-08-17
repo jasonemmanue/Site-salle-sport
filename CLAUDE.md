@@ -504,6 +504,7 @@ public en moins d'une minute.
 | Contacts | ✅ | Lecture + marquer lu, indicateur non-lu |
 | Paramètres | ✅ | 8 clés (nom salle, téléphone, email, adresse, horaires, réseaux sociaux) |
 | Thème bi-chrome | ✅ | Contenu en clair via `.admin-content`, Sidebar et `/login` sombres |
+| Affichage mobile / tablette | ✅ | Sidebar en tiroir, DataTable en cartes — voir § Adaptation mobile |
 
 ### PHASE 4 — DOCKER ✅
 
@@ -615,6 +616,76 @@ vigilance.**
 La valeur par défaut est `#0F1724`. Ne jamais passer `#ffffff` — invisible sur
 le fond clair. Palette utilisée par le dashboard : `#0F1724`, `#16A34A`,
 `#64748B`, `#B8960A`.
+
+### Adaptation mobile et tablette
+
+Le site public était déjà responsive. **Le back-office ne l'était pas du tout** :
+il comptait 4 utilisations de breakpoints au total, et sa barre latérale
+`fixed w-64` doublée d'un `ml-64` sur le `<main>` mangeait 256 px des 375 px
+d'un téléphone — le contenu était poussé hors de l'écran.
+
+#### Le point de bascule est `lg` (1024 px)
+
+Au-dessus, rien ne change : barre latérale fixe, tableaux, grille de planning.
+En dessous, la barre devient un **tiroir** et une barre supérieure apparaît.
+
+L'état du tiroir vit dans `app/(admin)/layout.tsx`, qui gère aussi les trois
+façons de le refermer : navigation vers une autre page, clic sur le voile,
+touche Échap. Il bloque également le défilement du fond pendant l'ouverture.
+`Sidebar.tsx` ne fait qu'afficher — il reçoit `open` et `onClose`.
+
+⚠️ **La barre latérale passe en `invisible` quand le tiroir est fermé**, pas
+seulement en `-translate-x-full`. Un simple décalage laisserait les douze liens
+atteignables au clavier alors qu'ils sont hors de l'écran. `lg:visible` annule
+la règle sur grand écran.
+
+⚠️ **La barre supérieure mobile est hors de `.admin-content`.** C'est
+volontaire : elle hérite donc du bleu nuit du `body` et reste dans le même
+registre que la barre latérale, sans exception à écrire. Même raisonnement que
+pour la Sidebar, décrit plus haut.
+
+⚠️ **`min-w-0` sur le `<main>`.** Sans lui, un tableau large étire le conteneur
+et fait défiler la page entière au lieu du seul tableau.
+
+#### DataTable : tableau au-dessus de `md`, cartes en dessous
+
+Un tableau de cinq ou six colonnes impose sous 768 px un défilement horizontal
+où l'on perd la colonne qui nomme la ligne. Les mêmes `columns` alimentent donc
+une carte par enregistrement, chaque valeur précédée de son libellé. **Les 12
+pages en bénéficient sans modification** — tout est dans `DataTable.tsx`.
+
+#### Planning : la vue Liste devient le défaut sur petit écran
+
+La grille 7 jours × 15 heures réclame ~900 px, et le glisser-déposer HTML5 ne
+répond pas au tactile. Sous `lg`, `viewMode` bascule donc sur `list`, qui expose
+les mêmes actions Modifier / Supprimer. La grille reste accessible d'un clic,
+avec défilement horizontal.
+
+#### Le reste
+
+Les 12 grilles de formulaire `grid-cols-2` deviennent `grid-cols-1
+sm:grid-cols-2` — deux champs côte à côte font 150 px chacun sur un téléphone.
+Les 7 en-têtes de page titre + bouton s'empilent sous `sm`. Les marges de la
+modale passent de 24 px à 16 px sous `sm`, où elles coûtaient un sixième de la
+largeur.
+
+#### Vérification
+
+`scripts/audit-responsive.mjs` pilote Chrome par le protocole DevTools —
+Node 22 fournit `WebSocket` en global, donc aucune dépendance. Il parcourt les
+11 pages publiques et 7 pages admin en 375 px et 768 px, s'authentifie en
+injectant le jeton dans `localStorage`, et relève les débordements horizontaux
+avec le nom des éléments fautifs, plus une capture par page.
+
+⚠️ **La sonde ignore ce qui vit dans un conteneur défilable.** Un carrousel ou
+un tableau en `overflow-x-auto` dépasse la fenêtre par construction : sans ce
+filtre, `TransformationSlider`, `ScheduleGrid` et le comparatif des abonnements
+remontaient comme fautifs alors que `scrollWidth` valait exactement
+`innerWidth`.
+
+Résultat : **36 combinaisons page × largeur, aucun débordement**. Ouverture du
+tiroir, fermeture par le voile et par Échap, et tenue de la modale (351 px dans
+une fenêtre de 375 px) vérifiées séparément.
 
 ### Statistiques du tableau de bord
 

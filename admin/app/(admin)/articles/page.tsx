@@ -67,14 +67,14 @@ export default function ArticlesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-white">Articles</h1>
         <button onClick={openNew} className="btn-primary">+ Ajouter</button>
       </div>
       <DataTable columns={columns} data={items} onEdit={openEdit} onDelete={handleDelete} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier article' : 'Nouvel article'} wide>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm text-secondary mb-1">Titre</label>
               <input className="input-field" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
@@ -92,7 +92,7 @@ export default function ArticlesPage() {
             <label className="block text-sm text-secondary mb-1">Contenu</label>
             <RichEditor value={form.content} onChange={(val) => setForm({ ...form, content: val })} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FileUpload value={form.cover_image_url} onChange={(url) => setForm({ ...form, cover_image_url: url })} label="Image de couverture" />
             <div>
               <label className="block text-sm text-secondary mb-1">Statut</label>

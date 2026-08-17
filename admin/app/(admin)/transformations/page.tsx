@@ -62,14 +62,14 @@ export default function TransformationsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-white">Transformations</h1>
         <button onClick={openNew} className="btn-primary">+ Ajouter</button>
       </div>
       <DataTable columns={columns} data={items} onEdit={openEdit} onDelete={handleDelete} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier' : 'Nouvelle transformation'} wide>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm text-secondary mb-1">Nom du membre</label>
               <input className="input-field" value={form.member_name} onChange={(e) => setForm({ ...form, member_name: e.target.value })} required />
@@ -79,7 +79,7 @@ export default function TransformationsPage() {
               <input className="input-field" value={form.duration_text} onChange={(e) => setForm({ ...form, duration_text: e.target.value })} placeholder="ex: 3 mois" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FileUpload value={form.before_image_url} onChange={(url) => setForm({ ...form, before_image_url: url })} label="Image avant" />
             <FileUpload value={form.after_image_url} onChange={(url) => setForm({ ...form, after_image_url: url })} label="Image apres" />
           </div>

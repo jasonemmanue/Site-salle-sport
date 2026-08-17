@@ -62,7 +62,7 @@ export default function AbonnementsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-white">Abonnements</h1>
         <button onClick={openNew} className="btn-primary">+ Ajouter</button>
       </div>
@@ -73,7 +73,7 @@ export default function AbonnementsPage() {
             <label className="block text-sm text-secondary mb-1">Nom</label>
             <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm text-secondary mb-1">Prix (FCFA)</label>
               <input type="number" className="input-field" value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} />

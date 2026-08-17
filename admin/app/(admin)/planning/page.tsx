@@ -26,6 +26,14 @@ export default function PlanningPage() {
   const [dragSlotId, setDragSlotId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // La grille 7 jours x 15 heures reclame ~900px, et le glisser-deposer HTML5
+  // ne repond pas au tactile. Sous `lg`, la vue liste devient donc le defaut —
+  // elle expose les memes actions Modifier / Supprimer. La grille reste
+  // accessible d'un clic, avec defilement horizontal.
+  useEffect(() => {
+    if (window.matchMedia('(max-width: 1023px)').matches) setViewMode('list');
+  }, []);
+
   const load = () => {
     if (!token) return;
     apiFetch<ScheduleSlot[]>('/api/v1/schedule/', { token }).then(setSlots).catch(() => {});
@@ -131,9 +139,9 @@ export default function PlanningPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-white">Planning</h1>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex rounded-lg border border-dark-border overflow-hidden">
             <button onClick={() => setViewMode('grid')} className={`px-3 py-1.5 text-sm ${viewMode === 'grid' ? 'bg-white text-black' : 'text-secondary hover:text-white'}`}>Grille</button>
             <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 text-sm ${viewMode === 'list' ? 'bg-white text-black' : 'text-secondary hover:text-white'}`}>Liste</button>
@@ -185,10 +193,13 @@ export default function PlanningPage() {
               ))}
             </div>
           </div>
-          <p className="text-dark-muted text-xs mt-3">Double-cliquer sur une case pour ajouter. Glisser-deposer pour deplacer.</p>
+          <p className="text-dark-muted text-xs mt-3">
+            Double-cliquer sur une case pour ajouter, glisser-deposer pour deplacer.
+            Sur ecran tactile, passer par la vue Liste.
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7">
           {days.map((day, i) => {
             const daySlots = slots.filter((s) => s.day_of_week === i).sort((a, b) => a.start_time.localeCompare(b.start_time));
             return (
@@ -217,7 +228,7 @@ export default function PlanningPage() {
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier creneau' : 'Nouveau creneau'} wide>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm text-secondary mb-1">Activite</label>
               <select className="input-field" value={form.activity_id} onChange={(e) => setForm({ ...form, activity_id: e.target.value })} required>
