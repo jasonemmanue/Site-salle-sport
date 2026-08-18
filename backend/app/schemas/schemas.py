@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Generic, TypeVar
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -152,12 +152,28 @@ class ScheduleSlotResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Intitules exacts des deux questions a choix du formulaire Google de la salle.
+# Toute variante — un accent en moins — y serait refusee : autant la rejeter ici
+# par un 422 explicite plutot que de decouvrir l'echec a la recopie.
+SessionType = Literal["Individuel", "Collectif"]
+PaymentType = Literal[
+    "Abonnée mensuel", "Séance", "Abonnement de karaté", "Abonnement de box"
+]
+
+
 class EnrollmentCreate(BaseModel):
     user_name: str
     user_email: EmailStr
     user_phone: str
     slot_id: UUIDStr
     specific_date: date
+    # Renseignements complementaires, facultatifs : une reservation reste
+    # valable sans eux, mais leur presence conditionne la recopie vers le
+    # formulaire Google, qui les exige.
+    session_type: SessionType | None = None
+    payment_type: PaymentType | None = None
+    amount_paid: float | None = Field(default=None, ge=0)
+    feedback: str | None = None
 
 
 class EnrollmentResponse(BaseModel):
@@ -169,8 +185,25 @@ class EnrollmentResponse(BaseModel):
     specific_date: date
     status: str
     enrolled_at: datetime
+    session_type: str | None = None
+    payment_type: str | None = None
+    amount_paid: float | None = None
+    feedback: str | None = None
+    forwarded_to_google: bool = False
+    google_error: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class EnrollmentDetailResponse(EnrollmentResponse):
+    """Reservation accompagnee de son creneau, pour la liste du back-office.
+
+    La liste doit montrer l'activite, l'horaire et le coach sans imposer un
+    appel par ligne : le creneau est deja charge en `joinedload`, autant le
+    servir.
+    """
+
+    slot: ScheduleSlotResponse | None = None
 
 
 class SubscriptionCreate(BaseModel):

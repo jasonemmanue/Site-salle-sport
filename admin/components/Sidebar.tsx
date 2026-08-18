@@ -13,6 +13,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/activites', label: 'Activites', icon: '🏋️' },
   { href: '/planning', label: 'Planning', icon: '📅' },
+  { href: '/reservations', label: 'Reservations', icon: '📝' },
   { href: '/abonnements', label: 'Abonnements', icon: '💳' },
   { href: '/coachs', label: 'Coachs', icon: '👨‍🏫' },
   { href: '/articles', label: 'Articles', icon: '📝' },

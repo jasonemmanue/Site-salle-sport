@@ -55,6 +55,9 @@ DOSSIER_UPLOADS = tempfile.mkdtemp(prefix="uploads-tests-")
 os.environ["DATABASE_URL"] = URL_DE_TEST
 os.environ["UPLOAD_DIR"] = DOSSIER_UPLOADS
 os.environ.setdefault("SECRET_KEY", "cle-de-test-sans-valeur-en-production")
+# Aucun test ne doit poster dans le vrai formulaire Google de la salle : la
+# recopie est coupee, et les tests qui la concernent remplacent `envoyer`.
+os.environ["GOOGLE_FORM_ENABLED"] = "false"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

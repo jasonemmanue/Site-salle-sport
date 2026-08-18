@@ -47,6 +47,20 @@ export interface Enrollment {
   specific_date: string;
   status: string;
   enrolled_at: string;
+  /** Renseignements du registre de la salle. Nuls pour les reservations
+   *  anterieures a leur mise en place. */
+  session_type: string | null;
+  payment_type: string | null;
+  amount_paid: number | null;
+  feedback: string | null;
+  /** Faux si la recopie vers le formulaire Google a echoue — voir google_error. */
+  forwarded_to_google: boolean;
+  google_error: string | null;
+}
+
+/** Reservation accompagnee de son creneau : ce que sert `GET /enrollments/`. */
+export interface EnrollmentDetail extends Enrollment {
+  slot?: ScheduleSlot;
 }
 
 export interface Subscription {
@@ -146,3 +160,4 @@ export interface PaginatedResponse<T> {
   limit: number;
   pages: number;
 }
+

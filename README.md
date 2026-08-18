@@ -82,13 +82,14 @@
 - [x] Dossier versions prêt (migration auto-générée au premier `docker compose up`)
 - [x] `seed.py` — admin, 12 activités, 6 coachs, 3 abonnements, 37 créneaux, 17 équipements, 6 avis, 3 articles, 4 transformations, 4 vidéos, 4 paramètres
 
-### 1.7 Tests — 307 tests pytest
+### 1.7 Tests — 339 tests pytest
 - [x] Tests auth (connexion, inscription, renouvellement, profil, rôles)
 - [x] Tests activités, coachs, formules, vidéos, transformations, équipements
 - [x] Tests inscriptions/planning (capacité, liste d'attente, promotion)
 - [x] Tests articles (double lecture anonyme / admin)
 - [x] Tests avis (chaîne de modération de bout en bout)
 - [x] Tests réglages, contact, statistiques, envoi de fichiers
+- [x] Tests des réservations : paiement, recopie Google, export Excel
 - [x] Tests de non-régression des six familles de défauts corrigées
 
 ```bash
@@ -161,6 +162,7 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 - [x] CRUD activités, planning (glisser-déposer), abonnements, coachs, articles,
       vidéos, transformations, équipements
 - [x] Modération des avis : un avis n'est visible sur le site public qu'après approbation
+- [x] Registre des réservations : renseignements de paiement, export Excel, recopie vers le formulaire Google de la salle
 - [x] Messages de contact, paramètres de la salle
 - [x] Affichage mobile et tablette (tableaux en cartes sous 768 px)
 - [x] Vérification des formulaires : messages d'informations manquantes sur les 9 formulaires
@@ -205,6 +207,8 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 | `getSchedule(date?)` | GET | `/api/v1/schedule` |
 | `getSubscriptions()` | GET | `/api/v1/subscriptions` |
 | `enrollInClass(data)` | POST | `/api/v1/enrollments` |
+| *(admin)* registre complet | GET | `/api/v1/enrollments/` |
+| *(admin)* export Excel | GET | `/api/v1/enrollments/export.xlsx` |
 | `getArticles(page?, status?)` | GET | `/api/v1/articles` |
 | `getArticle(slug)` | GET | `/api/v1/articles/{slug}` |
 | `getVideos()` | GET | `/api/v1/videos` |

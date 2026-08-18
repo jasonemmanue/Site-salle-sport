@@ -94,6 +94,19 @@ class Enrollment(Base):
     status: Mapped[str] = mapped_column(String(20), default="enrolled", nullable=False)
     enrolled_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
+    # Informations que le registre papier de la salle collectait et que la
+    # reservation en ligne ne demandait pas. Toutes nullables : les inscriptions
+    # anterieures n'en ont pas, et une reservation reste valable sans elles.
+    session_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    payment_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    amount_paid: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
+    feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Recopie dans le formulaire Google de la salle. Faux tant qu'elle n'a pas
+    # eu lieu — un echec n'annule jamais la reservation.
+    forwarded_to_google: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    google_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     slot: Mapped["ScheduleSlot"] = relationship("ScheduleSlot", lazy="joined")
 
 

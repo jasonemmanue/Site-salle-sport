@@ -346,7 +346,7 @@ Créer `backend/app/models/models.py` :
 - `auth.py` : login, register, refresh, profile
 - `activities.py` : CRUD activités (public GET, auth POST/PUT/DELETE)
 - `schedule.py` : GET /schedule (planning semaine public), CRUD créneaux (auth)
-- `enrollments.py` : POST /enroll (public), DELETE /cancel, GET /slot/{id}/enrollments (auth)
+- `enrollments.py` : POST / (public), DELETE /{id}, GET / (registre complet, auth), GET /export.xlsx (auth), POST /{id}/resend (auth), GET /slot/{id}, GET /slot/{id}/availability
 - `subscriptions.py` : GET /subscriptions (public), POST/PUT/DELETE (auth)
 - `coaches.py` : GET (public), CRUD (auth)
 - `articles.py` : GET (public/published), CRUD (auth)
@@ -496,11 +496,11 @@ ADMIN_PASSWORD=changeme
 | Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
 | Dockerfile | ✅ | |
 | Recette complète des routes | ✅ | 115 cas passants — voir § Robustesse de l'API |
-| Tests automatisés (`backend/tests/`) | ✅ | **307 tests pytest** sur PostgreSQL — voir § Suite de tests |
+| Tests automatisés (`backend/tests/`) | ✅ | **339 tests pytest** sur PostgreSQL — voir § Suite de tests |
 
 ### Suite de tests de l'API
 
-`backend/tests/` — **307 tests**, lancés en une commande. Ils remplacent la
+`backend/tests/` — **339 tests**, lancés en une commande. Ils remplacent la
 recette manuelle de 115 cas, qui vivait hors du dépôt et ne rejouait donc rien
 après une modification.
 
@@ -521,6 +521,7 @@ et httpx n'ont rien à faire dans l'image déployée. En dehors de Docker, poser
 | `test_coaches.py` | fiches coachs, listes JSON, suppression douce |
 | `test_schedule.py` | récurrents vs datés, vue hebdomadaire, glisser-déposer |
 | `test_enrollments.py` | capacité, liste d'attente, promotion, places par date |
+| `test_reservations_export.py` | **renseignements de paiement, recopie Google, export Excel** |
 | `test_articles.py` | double lecture anonyme / admin, brouillons, horodatage |
 | `test_reviews.py` | **chaîne de modération de bout en bout** |
 | `test_catalogue.py` | formules, vidéos, transformations, équipements |
@@ -696,6 +697,7 @@ public en moins d'une minute.
 | Transformations CRUD | ✅ | FileUpload avant/après, mise en avant |
 | Équipements CRUD | ✅ | Par zone, FileUpload image |
 | Avis modération | ✅ | File filtrable, pastille de la barre latérale — voir § Modération des avis |
+| Réservations | ✅ | Registre complet + export Excel — voir § Registre des réservations |
 | Contacts | ✅ | Lecture + marquer lu, indicateur non-lu |
 | Paramètres | ✅ | 8 clés (nom salle, téléphone, email, adresse, horaires, réseaux sociaux) |
 | Thème bi-chrome | ✅ | Contenu en clair via `.admin-content`, Sidebar et `/login` sombres |
@@ -971,6 +973,83 @@ chaîne : `new Error(err.detail)` produisait « [object Object] » pour toute er
 de saisie. `messageDErreur()` dans `admin/lib/api.ts` reconstitue désormais
 `champ : message`. Les erreurs serveur s'affichent dans le bandeau du formulaire,
 plus dans une `alert()` du navigateur.
+
+### Registre des réservations
+
+La salle tenait son registre dans un **formulaire Google** : date, nom, type de
+séance, formule de paiement, montant encaissé, coach, remarque. Notre système de
+réservation ne demandait qu'une partie de ces informations — il les demande
+maintenant toutes, et **recopie chaque réservation dans ce formulaire**.
+
+Le visiteur ne voit jamais le formulaire Google. Il réserve sur le site, comme
+avant ; la recopie se fait de serveur à serveur.
+
+#### Ce qui a été ajouté à `enrollments`
+
+| Colonne | Origine |
+|---------|---------|
+| `session_type` | question « Type de séance » — Individuel / Collectif |
+| `payment_type` | question « Type de paiement » — 4 formules |
+| `amount_paid` | question « Montant payé » |
+| `feedback` | question « Vos avis » |
+| `forwarded_to_google` | suivi de la recopie |
+| `google_error` | raison du dernier échec |
+
+Toutes **nullables** : les réservations antérieures n'en ont aucune, et il
+n'existe pas de valeur par défaut honnête à leur inventer. Côté API elles sont
+facultatives — une réservation reste valable sans elles — mais leur absence
+empêche la recopie, que le formulaire Google exige.
+
+Le **nom du coach** n'est pas demandé au membre : il vient du créneau réservé.
+
+#### La recopie ne peut jamais faire échouer une réservation
+
+`enrollment_service.recopier_vers_google()` est appelée **après** que la place
+est prise et validée. Si Google refuse ou ne répond pas, le visiteur ne voit
+aucune erreur : l'échec est noté sur la ligne, la page « Réservations » du
+back-office le signale et propose de le rejouer (`POST /enrollments/{id}/resend`).
+
+⚠️ **La date part en une seule valeur `AAAA-MM-JJ`.** La recette officieuse qui
+circule décrit un triplet `entry.NNNN_year` / `_month` / `_day` : ce formulaire
+le **refuse par un 400**. Vérifié sur le formulaire réel.
+
+⚠️ **Les intitulés des choix doivent être exacts, accents compris.** Envoyer
+« Seance » au lieu de « Séance » suffit à faire rejeter tout l'envoi. Les
+`Literal` de `schemas.py` et les constantes de `frontend/lib/types.ts` reprennent
+ces intitulés mot pour mot — un 422 explicite vaut mieux qu'un 400 de Google.
+
+⚠️ `GOOGLE_FORM_ENABLED=false` coupe la recopie sans rien casser d'autre. C'est
+la valeur utilisée par la suite de tests : **aucun test ne poste dans le vrai
+formulaire**.
+
+⚠️ Le point d'entrée `formResponse` n'est pas une API publique : Google peut le
+changer sans prévenir. D'où le principe ci-dessus — la base locale fait foi.
+
+#### Export Excel
+
+`GET /enrollments/export.xlsx`, réservé à l'admin, produit un vrai `.xlsx`
+(openpyxl) : 14 colonnes, en-tête figé, filtre automatique. Un CSV renommé
+s'ouvrirait de travers dès qu'une remarque contient une virgule.
+
+Les colonnes aplatissent le créneau — activité, horaire, coach — et traduisent
+le statut (`cancelled` → « Annulé ») : le fichier doit se lire sans connaître le
+modèle de données.
+
+⚠️ **L'export applique exactement les filtres de la liste.** Période, statut,
+formule, type de séance, activité : le fichier téléchargé contient ce que
+l'écran affiche, jamais autre chose.
+
+⚠️ **Le téléchargement passe par `fetch`, pas par un lien.** La route exige un
+en-tête `Authorization` qu'un `<a href>` ne porte pas — elle répondrait 403.
+`telechargerFichier()` dans `admin/lib/api.ts` récupère le fichier, puis
+déclenche l'enregistrement depuis un lien temporaire sur le blob obtenu. Le nom
+du fichier vient du `Content-Disposition` renvoyé par l'API.
+
+#### La liste du back-office montre aussi les annulations
+
+`GET /enrollments/` sert le registre complet, annulations comprises —
+contrairement à `GET /enrollments/slot/{id}`, qui les écarte parce qu'il sert à
+compter les places. Un registre ne s'ampute pas de ses lignes barrées.
 
 ### Modération des avis
 

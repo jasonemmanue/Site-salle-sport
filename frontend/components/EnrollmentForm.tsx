@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { enrollInClass } from "@/lib/api";
-import type { EnrollmentFormProps, EnrollmentFormData, EnrollmentStatus } from "@/lib/types";
+import { PAYMENT_TYPES, SESSION_TYPES } from "@/lib/types";
+import type {
+  EnrollmentFormProps,
+  EnrollmentFormData,
+  EnrollmentStatus,
+  PaymentType,
+  SessionType,
+} from "@/lib/types";
 
 type FormErrors = Partial<Record<keyof EnrollmentFormData, string>>;
 
@@ -18,6 +25,12 @@ export default function EnrollmentForm({
     user_phone: "",
     slot_id: slot.id,
     specific_date: specificDate,
+    // Pre-remplissage raisonnable : un creneau du planning est une seance
+    // encadree, donc collective. Le membre peut corriger.
+    session_type: "Collectif",
+    payment_type: undefined,
+    amount_paid: null,
+    feedback: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -42,6 +55,16 @@ export default function EnrollmentForm({
       errs.user_phone = "Numero invalide";
     }
 
+    // La formule de paiement alimente le registre de la salle : sans elle, la
+    // reservation ne peut pas y etre reportee.
+    if (!formData.payment_type) {
+      errs.payment_type = "Choisissez une formule";
+    }
+
+    if (formData.amount_paid != null && formData.amount_paid < 0) {
+      errs.amount_paid = "Le montant ne peut pas etre negatif";
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -64,7 +87,10 @@ export default function EnrollmentForm({
     }
   }
 
-  function handleChange(field: keyof EnrollmentFormData, value: string) {
+  function handleChange(
+    field: keyof EnrollmentFormData,
+    value: string | number | null
+  ) {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -195,6 +221,97 @@ export default function EnrollmentForm({
             {errors.user_phone && (
               <p className="mt-1 text-xs text-error">{errors.user_phone}</p>
             )}
+          </div>
+
+          {/* Type de seance */}
+          <fieldset>
+            <legend className="mb-1 block text-sm font-medium text-white">
+              Type de seance
+            </legend>
+            <div className="flex gap-2">
+              {SESSION_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={formData.session_type === type}
+                  onClick={() => handleChange("session_type", type as SessionType)}
+                  className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    formData.session_type === type
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-dark-border text-secondary hover:border-primary/40 hover:text-white"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          {/* Formule de paiement */}
+          <fieldset>
+            <legend className="mb-1 block text-sm font-medium text-white">
+              Formule de paiement
+            </legend>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {PAYMENT_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={formData.payment_type === type}
+                  onClick={() => handleChange("payment_type", type as PaymentType)}
+                  className={`rounded-xl border px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
+                    formData.payment_type === type
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-dark-border text-secondary hover:border-primary/40 hover:text-white"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+            {errors.payment_type && (
+              <p className="mt-1 text-xs text-error">{errors.payment_type}</p>
+            )}
+          </fieldset>
+
+          {/* Montant */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-white">
+              Montant paye (FCFA){" "}
+              <span className="font-normal text-dark-muted">— facultatif</span>
+            </label>
+            <input
+              type="number"
+              min={0}
+              step={500}
+              value={formData.amount_paid ?? ""}
+              onChange={(e) =>
+                handleChange("amount_paid", e.target.value ? Number(e.target.value) : null)
+              }
+              placeholder="3000"
+              className={`w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm text-white placeholder-dark-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary ${
+                errors.amount_paid ? "border-error" : "border-dark-border"
+              }`}
+            />
+            {errors.amount_paid && (
+              <p className="mt-1 text-xs text-error">{errors.amount_paid}</p>
+            )}
+          </div>
+
+          {/* Remarque */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-white">
+              Une remarque ?{" "}
+              <span className="font-normal text-dark-muted">— facultatif</span>
+            </label>
+            <textarea
+              value={formData.feedback ?? ""}
+              onChange={(e) => handleChange("feedback", e.target.value)}
+              placeholder="Vos objectifs, une contrainte, une question..."
+              rows={3}
+              maxLength={1000}
+              className="w-full resize-none rounded-xl border border-dark-border bg-white/5 px-4 py-2.5 text-sm text-white placeholder-dark-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            />
           </div>
 
           {/* Selected slot display */}

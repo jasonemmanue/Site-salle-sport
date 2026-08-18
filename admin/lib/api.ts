@@ -68,3 +68,36 @@ export async function login(email: string, password: string) {
   if (!res.ok) throw new Error('Email ou mot de passe incorrect');
   return res.json() as Promise<{ access_token: string; refresh_token: string; token_type: string }>;
 }
+
+/**
+ * Telecharge un fichier servi par une route protegee.
+ *
+ * Un simple `<a href>` ne porte pas l'en-tete `Authorization` : la route
+ * repondrait 403. On recupere donc le fichier par `fetch`, puis on declenche
+ * l'enregistrement depuis un lien temporaire pointant sur le blob obtenu.
+ *
+ * Le nom du fichier vient de l'en-tete `Content-Disposition` renvoye par l'API,
+ * pour que serveur et client ne le decident pas chacun de leur cote.
+ */
+export async function telechargerFichier(path: string, token: string): Promise<void> {
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(messageDErreur(err.detail, res.statusText));
+  }
+
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const nom = /filename="?([^"]+)"?/.exec(disposition)?.[1] || 'export.xlsx';
+
+  const url = URL.createObjectURL(await res.blob());
+  const lien = document.createElement('a');
+  lien.href = url;
+  lien.download = nom;
+  document.body.appendChild(lien);
+  lien.click();
+  lien.remove();
+  // Sans cette liberation, le blob reste en memoire jusqu'au rechargement.
+  URL.revokeObjectURL(url);
+}

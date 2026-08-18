@@ -154,6 +154,19 @@ export interface PaginatedResponse<T> {
 
 /* ===== Corps des formulaires publics ===== */
 
+/** Intitules exacts attendus par le formulaire Google de la salle : toute
+ *  variante (un accent en moins) y serait refusee. */
+export const SESSION_TYPES = ['Individuel', 'Collectif'] as const;
+export type SessionType = (typeof SESSION_TYPES)[number];
+
+export const PAYMENT_TYPES = [
+  'Abonnée mensuel',
+  'Séance',
+  'Abonnement de karaté',
+  'Abonnement de box',
+] as const;
+export type PaymentType = (typeof PAYMENT_TYPES)[number];
+
 export interface EnrollmentFormData {
   user_name: string;
   user_email: string;
@@ -161,6 +174,13 @@ export interface EnrollmentFormData {
   slot_id: string;
   /** Format ISO `YYYY-MM-DD` — le backend attend un `date` Pydantic. */
   specific_date: string;
+  /** Renseignements du registre de la salle. Facultatifs cote API, demandes
+   *  ici : sans eux, la reservation ne peut pas etre recopiee dans le
+   *  formulaire Google, qui les exige. */
+  session_type?: SessionType;
+  payment_type?: PaymentType;
+  amount_paid?: number | null;
+  feedback?: string;
 }
 
 export interface ContactFormData {
