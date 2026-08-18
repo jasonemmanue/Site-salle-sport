@@ -75,30 +75,33 @@ export default function Hero() {
         <div className="absolute inset-0 hero-overlay" />
       </div>
 
-      {/* Watermark logo */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
-        <Image src="/logo.png" alt="" width={500} height={500} className="opacity-[0.04]" />
-      </div>
+      {/* Plus de filigrane ici : le badge est desormais affiche en grand au
+          premier plan, et sa copie a 4 % d'opacite juste derriere brouillait
+          l'image au lieu de meubler. Le filigrane du pied de page reste. */}
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-20">
         <div className="animate-fade-in-up">
-          {/* Logo badge */}
-          <div className="flex justify-center mb-6">
-            <Image src="/logo.png" alt="Eslie Sport" width={80} height={80} className="rounded-full shadow-lg shadow-accent/20" />
+          {/* Le logo porte le nom de la marque : il tient lieu de titre d'accueil,
+              d'ou sa taille et l'absence de sur-titre au-dessus du slogan. */}
+          <div className="flex justify-center">
+            <Image
+              src="/logo.png"
+              alt="Eslie Sport"
+              width={512}
+              height={512}
+              priority
+              className="h-auto w-52 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:w-64 md:w-72 lg:w-80"
+            />
           </div>
 
-          <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-accent font-semibold mb-6">
-            Bienvenue chez Eslie Sport
-          </p>
-
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase leading-[0.95]">
+          <h1 className="mt-8 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase leading-[1.1] tracking-tight">
             <span className="text-gradient">Parce que le corps</span>
             <br />
             <span className="text-white">a besoin de <span className="text-accent">sport</span></span>
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-5 text-base sm:text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
             Equipements de qualite, coachs passionnes et programmes
             personnalises. Rejoignez la communaute Eslie Sport et transformez
             votre vie.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
@@ -30,6 +31,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="card w-full max-w-md">
         <div className="text-center mb-8">
+          <Image
+            src="/logo.png"
+            alt="Eslie Sport"
+            width={256}
+            height={256}
+            priority
+            className="mx-auto mb-4 h-24 w-24 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          />
           <h1 className="text-2xl font-black">
             <span className="text-primary">ESLIE</span>
             <span className="text-secondary"> ADMIN</span>
