@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 
@@ -43,7 +44,7 @@ export default function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Eslie Sport" width={44} height={44} className="rounded-full" />
+            <Image src={logo} alt="Eslie Sport" width={44} height={44} />
             <span className="text-xl font-black tracking-wider">
               <span className="text-accent">ESLIE</span><span className="text-secondary"> SPORT</span>
             </span>

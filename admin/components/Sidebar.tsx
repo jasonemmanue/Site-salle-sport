@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -78,13 +79,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         {/* En-tete */}
         <div className="flex items-start justify-between gap-2 border-b border-dark-border p-5 sm:p-6">
           <div className="flex min-w-0 items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={128}
-              height={128}
-              className="h-11 w-11 shrink-0"
-            />
+            <Image src={logo} alt="" className="h-11 w-11 shrink-0" />
             <div className="min-w-0">
               <h1 className="text-xl font-black tracking-wider">
                 <span className="text-primary">ESLIE</span>

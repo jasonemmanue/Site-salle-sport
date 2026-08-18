@@ -56,7 +56,10 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('/logo.png');
+  /* `?v=2` casse le cache des navigateurs qui ont connu le logo a fond blanc.
+     Le CSS ne beneficie pas de l'empreinte des imports statiques : bumper la
+     version a la main si le fichier change de nouveau. */
+  background-image: url('/logo.png?v=2');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 300px;

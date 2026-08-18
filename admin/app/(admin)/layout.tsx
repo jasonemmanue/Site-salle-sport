@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import Sidebar from '@/components/Sidebar';
@@ -73,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="block h-0.5 w-5 bg-secondary" />
             <span className="block h-0.5 w-5 bg-secondary" />
           </button>
-          <Image src="/logo.png" alt="" width={96} height={96} className="h-8 w-8 shrink-0" />
+          <Image src={logo} alt="" className="h-8 w-8 shrink-0" />
           <span className="text-base font-black tracking-wider">
             <span className="text-primary">ESLIE</span>
             <span className="text-secondary"> ADMIN</span>

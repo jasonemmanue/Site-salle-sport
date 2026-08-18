@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import { getSettings, safe } from '@/lib/api';
 
 const quickLinks = [
@@ -43,7 +44,7 @@ export default async function Footer() {
 
       {/* Watermark */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <Image src="/logo.png" alt="" width={400} height={400} className="opacity-[0.03]" />
+        <Image src={logo} alt="" width={400} height={400} className="opacity-[0.03]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-8">
@@ -51,7 +52,7 @@ export default async function Footer() {
           {/* About */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt={gymName} width={36} height={36} className="rounded-full" />
+              <Image src={logo} alt={gymName} width={36} height={36} />
               <span className="text-xl font-black tracking-wider">
                 <span className="text-accent">ESLIE</span><span className="text-secondary"> SPORT</span>
               </span>

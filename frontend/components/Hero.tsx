@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import Link from 'next/link';
 
 interface CounterProps {
@@ -86,10 +87,8 @@ export default function Hero() {
               d'ou sa taille et l'absence de sur-titre au-dessus du slogan. */}
           <div className="flex justify-center">
             <Image
-              src="/logo.png"
+              src={logo}
               alt="Eslie Sport"
-              width={512}
-              height={512}
               priority
               className="h-auto w-52 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:w-64 md:w-72 lg:w-80"
             />

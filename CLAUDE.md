@@ -105,6 +105,30 @@ optimiser, et il n'est pas installé. D'où le fichier de 256 px côté admin �
 livrer les 1024 px ferait télécharger 1,2 Mo pour une vignette de barre latérale.
 Le site public, lui, est en Next 16 et optimise normalement.
 
+#### ⚠️ Le logo se référence par import statique, jamais par `/logo.png`
+
+```tsx
+import logo from '@/public/logo.png';
+<Image src={logo} alt="Eslie Sport" />
+```
+
+Remplacer le fichier sans changer son chemin ne suffit pas : l'URL servie par
+l'optimiseur (`/_next/image?url=%2Flogo.png&w=640&q=75`) reste identique et
+porte un `Cache-Control: public, max-age=14400`. Pendant quatre heures, un
+visiteur qui avait déjà chargé cette URL continue de voir **l'ancienne image**.
+C'est exactement ce qui s'est produit au passage au logo détouré : le serveur
+envoyait le disque transparent, les navigateurs affichaient encore le carré
+blanc.
+
+L'import statique fait passer le fichier par le pipeline de Next, qui lui donne
+une URL contenant une empreinte de son contenu (`/_next/static/media/logo.<hash>.png`).
+Changer le fichier change l'URL : les caches ne peuvent plus se tromper, sans
+intervention.
+
+Le filigrane de `globals.css` ne peut pas en profiter — le CSS ne passe pas par
+ce pipeline. Son URL porte donc `?v=2`, **à incrémenter à la main** si le
+fichier change de nouveau.
+
 **Où le logo apparaît** : en-tête et pied de page du site public, filigrane de
 `.watermark`, hero de l'accueil, en-tête de la barre latérale du back-office,
 barre supérieure mobile, page de connexion.

@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import Image from 'next/image';
+import logo from '@/public/logo.png';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
@@ -32,10 +33,8 @@ export default function LoginPage() {
       <div className="card w-full max-w-md">
         <div className="text-center mb-8">
           <Image
-            src="/logo.png"
+            src={logo}
             alt="Eslie Sport"
-            width={256}
-            height={256}
             priority
             className="mx-auto mb-4 h-24 w-24 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
           />
