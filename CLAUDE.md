@@ -496,11 +496,11 @@ ADMIN_PASSWORD=changeme
 | Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
 | Dockerfile | ✅ | |
 | Recette complète des routes | ✅ | 115 cas passants — voir § Robustesse de l'API |
-| Tests automatisés (`backend/tests/`) | ✅ | **339 tests pytest** sur PostgreSQL — voir § Suite de tests |
+| Tests automatisés (`backend/tests/`) | ✅ | **341 tests pytest** sur PostgreSQL — voir § Suite de tests |
 
 ### Suite de tests de l'API
 
-`backend/tests/` — **339 tests**, lancés en une commande. Ils remplacent la
+`backend/tests/` — **341 tests**, lancés en une commande. Ils remplacent la
 recette manuelle de 115 cas, qui vivait hors du dépôt et ne rejouait donc rien
 après une modification.
 

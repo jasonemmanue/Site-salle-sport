@@ -82,7 +82,7 @@
 - [x] Dossier versions prêt (migration auto-générée au premier `docker compose up`)
 - [x] `seed.py` — admin, 12 activités, 6 coachs, 3 abonnements, 37 créneaux, 17 équipements, 6 avis, 3 articles, 4 transformations, 4 vidéos, 4 paramètres
 
-### 1.7 Tests — 339 tests pytest
+### 1.7 Tests — 341 tests pytest
 - [x] Tests auth (connexion, inscription, renouvellement, profil, rôles)
 - [x] Tests activités, coachs, formules, vidéos, transformations, équipements
 - [x] Tests inscriptions/planning (capacité, liste d'attente, promotion)
