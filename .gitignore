@@ -38,3 +38,7 @@ yarn-debug.log*
 
 # Docker
 .docker/
+
+# Tests
+.pytest_cache/
+tsconfig.tsbuildinfo

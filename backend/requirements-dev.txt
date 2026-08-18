@@ -1,0 +1,7 @@
+# Dependances de test uniquement — volontairement hors de requirements.txt pour
+# ne pas les embarquer dans l'image deployee.
+#
+#   docker compose exec api pip install -r requirements-dev.txt
+#   docker compose exec api pytest
+pytest==8.3.5
+httpx==0.28.1
