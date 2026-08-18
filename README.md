@@ -82,10 +82,22 @@
 - [x] Dossier versions prêt (migration auto-générée au premier `docker compose up`)
 - [x] `seed.py` — admin, 12 activités, 6 coachs, 3 abonnements, 37 créneaux, 17 équipements, 6 avis, 3 articles, 4 transformations, 4 vidéos, 4 paramètres
 
-### 1.7 Tests
-- [ ] Tests auth
-- [ ] Tests activités
-- [ ] Tests inscriptions/planning
+### 1.7 Tests — 307 tests pytest
+- [x] Tests auth (connexion, inscription, renouvellement, profil, rôles)
+- [x] Tests activités, coachs, formules, vidéos, transformations, équipements
+- [x] Tests inscriptions/planning (capacité, liste d'attente, promotion)
+- [x] Tests articles (double lecture anonyme / admin)
+- [x] Tests avis (chaîne de modération de bout en bout)
+- [x] Tests réglages, contact, statistiques, envoi de fichiers
+- [x] Tests de non-régression des six familles de défauts corrigées
+
+```bash
+docker compose exec api pip install -r requirements-dev.txt   # une fois
+docker compose exec api pytest
+```
+
+Les tests tournent sur PostgreSQL, dans une base dédiée `<base>_test` — jamais
+sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests.
 
 ---
 
@@ -141,20 +153,32 @@
 
 ---
 
-## PHASE 3 — Admin Dashboard (Next.js)
+## PHASE 3 — Admin Dashboard (Next.js) ✅ TERMINÉ
 
-- [ ] À faire (Phase suivante)
+- [x] Authentification JWT + renouvellement automatique du jeton
+- [x] Sidebar 12 entrées, tiroir sous 1024 px, pastille des avis et messages en attente
+- [x] Dashboard : 8 indicateurs + 4 graphiques, sur données réelles
+- [x] CRUD activités, planning (glisser-déposer), abonnements, coachs, articles,
+      vidéos, transformations, équipements
+- [x] Modération des avis : un avis n'est visible sur le site public qu'après approbation
+- [x] Messages de contact, paramètres de la salle
+- [x] Affichage mobile et tablette (tableaux en cartes sous 768 px)
+- [x] Vérification des formulaires : messages d'informations manquantes sur les 9 formulaires
 
 ---
 
 ## PHASE 4 — Docker & Développement Local
 
-- [x] `docker-compose.yml` (api, frontend, db, redis + healthchecks)
+- [x] `docker-compose.yml` (api, frontend, admin, db, redis + healthchecks)
 - [x] `.env.example`
-- [ ] `docker compose up --build` validé
-- [ ] Migrations + seed OK
-- [ ] API : http://localhost:8000/docs
-- [ ] Frontend : http://localhost:3000
+- [x] `docker compose up --build` validé
+- [x] Migrations + seed OK
+- [x] API : http://localhost:8010/docs
+- [x] Site public : http://localhost:3000
+- [x] Back-office : http://localhost:3003
+
+> Les ports hôte sont décalés : plusieurs projets tournent en parallèle sur la
+> même machine. Le port 8000 est occupé par un autre projet. Voir `CLAUDE.md`, § Ports.
 
 ---
 

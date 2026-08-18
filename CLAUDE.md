@@ -63,6 +63,61 @@ Le site reprend les couleurs du logo ESLIE SPORT : fond **bleu nuit**, accent **
 | `.text-gradient` | Dégradé doré `#FFD600` vers gris bleuté `#A8B2C1` | idem |
 | `.watermark` | Filigrane `logo.png` centré, opacité 0.03 | idem |
 
+### Logo et icônes
+
+Le logo est le badge rond ESLIE SPORT. Le fichier d'origine
+(`scripts/logo-source.png`) est aplati sur un **fond blanc opaque** : posé sur le
+bleu nuit du site, ce fond dessinait un cadre clair autour du cercle — visible
+dans l'en-tête, le pied de page et l'onglet du navigateur.
+
+`scripts/generer-logo.py` isole le disque et produit tous les formats :
+
+```bash
+docker run --rm -v "$PWD:/work" salle-de-sport-api:latest \
+    python /work/scripts/generer-logo.py
+```
+
+(Pillow vient de l'image de l'API ; aucun outil à installer sur le poste.)
+
+| Fichier | Taille | Fond |
+|---------|--------|------|
+| `frontend/public/logo.png` | 1024 | transparent |
+| `admin/public/logo.png` | 256 | transparent |
+| `app/icon.png` | 512 | transparent |
+| `app/apple-icon.png` | 180 | bleu nuit `#0F1724` |
+| `app/favicon.ico` | 16/32/48/64 | transparent |
+
+**Ne pas retoucher ces fichiers à la main** : relancer le script, qui écrit les
+huit d'un coup pour les deux sites.
+
+⚠️ **Le badge d'origine est une ellipse**, 1163 × 1201 — 3 % plus haute que
+large. Le script la redresse au carré avant d'appliquer le masque circulaire,
+sinon `rounded-full` et les icônes carrées tombent à côté. L'œil ne perçoit pas
+la correction.
+
+⚠️ **`apple-icon.png` est le seul à garder un fond.** iOS ignore la transparence
+et compose sur du noir : un PNG détouré cerclerait le badge de noir sur l'écran
+d'accueil. Le bleu nuit retenu est celui du site, donc le carré ne se voit pas.
+
+⚠️ **Le back-office sert ses images sans optimisation.** `admin/next.config.mjs`
+pose `images.unoptimized` : Next 14 en mode `standalone` exige `sharp` pour
+optimiser, et il n'est pas installé. D'où le fichier de 256 px côté admin —
+livrer les 1024 px ferait télécharger 1,2 Mo pour une vignette de barre latérale.
+Le site public, lui, est en Next 16 et optimise normalement.
+
+**Où le logo apparaît** : en-tête et pied de page du site public, filigrane de
+`.watermark`, hero de l'accueil, en-tête de la barre latérale du back-office,
+barre supérieure mobile, page de connexion.
+
+#### Hero de l'accueil
+
+Le logo porte déjà le nom de la marque : il **tient lieu de titre d'accueil**.
+Le sur-titre « Bienvenue chez Eslie Sport » faisait donc doublon et a été retiré.
+Le badge passe de 80 px à `w-52 sm:w-64 md:w-72 lg:w-80` (208 → 320 px) pour que
+« ESLIE SPORT » y soit lisible, et le slogan descend de `text-5xl…8xl` à
+`text-2xl…5xl` pour lui laisser la vedette sans que la page cesse de tenir dans
+un écran.
+
 ### Mode Clair / Sombre
 
 Le site supporte un toggle clair/sombre via l'attribut `data-theme` sur `<html>`. Le thème par défaut est **sombre**.
@@ -417,7 +472,85 @@ ADMIN_PASSWORD=changeme
 | Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
 | Dockerfile | ✅ | |
 | Recette complète des routes | ✅ | 115 cas passants — voir § Robustesse de l'API |
-| Tests automatisés (`backend/tests/`) | ❌ | Dossier vide : la recette ci-dessus n'est pas encore portée en pytest |
+| Tests automatisés (`backend/tests/`) | ✅ | **307 tests pytest** sur PostgreSQL — voir § Suite de tests |
+
+### Suite de tests de l'API
+
+`backend/tests/` — **307 tests**, lancés en une commande. Ils remplacent la
+recette manuelle de 115 cas, qui vivait hors du dépôt et ne rejouait donc rien
+après une modification.
+
+```bash
+docker compose exec api pip install -r requirements-dev.txt   # une fois
+docker compose exec api pytest                                # ~2 min
+```
+
+`requirements-dev.txt` est volontairement séparé de `requirements.txt` : pytest
+et httpx n'ont rien à faire dans l'image déployée. En dehors de Docker, poser
+`TEST_DATABASE_URL` pour viser la base voulue.
+
+| Fichier | Couvre |
+|---------|--------|
+| `test_infrastructure.py` | `/health`, OpenAPI, en-têtes CORS et préflight |
+| `test_auth.py` | connexion, inscription, renouvellement, profil, rôles |
+| `test_activities.py` | catalogue, filtres, pagination, slug, suppression douce |
+| `test_coaches.py` | fiches coachs, listes JSON, suppression douce |
+| `test_schedule.py` | récurrents vs datés, vue hebdomadaire, glisser-déposer |
+| `test_enrollments.py` | capacité, liste d'attente, promotion, places par date |
+| `test_articles.py` | double lecture anonyme / admin, brouillons, horodatage |
+| `test_reviews.py` | **chaîne de modération de bout en bout** |
+| `test_catalogue.py` | formules, vidéos, transformations, équipements |
+| `test_settings_contact.py` | liste blanche des réglages publics, messages reçus |
+| `test_stats_upload.py` | 9 indicateurs, 4 séries, envoi de fichiers |
+| `test_regressions.py` | **les six familles de défauts corrigées** |
+
+#### ⚠️ Les tests tournent sur PostgreSQL, pas sur SQLite
+
+C'est délibéré et il ne faut pas « simplifier » vers SQLite. Les garde-fous que
+cette suite vérifie existent parce que **PostgreSQL** refuse ce que SQLite
+accepte : cast `uuid`, violation de clé étrangère, contrainte `unique`. Sur
+SQLite, la suite resterait verte après une régression — elle donnerait une
+confiance fausse.
+
+La base de test est une base **dédiée**, `<base>_test`, créée au premier
+lancement et dont le schéma est reconstruit à chaque session. Les données de
+développement ne sont jamais touchées.
+
+#### ⚠️ Isolation : une transaction annulée par test
+
+Chaque test ouvre une transaction et y greffe la session applicative en
+`join_transaction_mode="create_savepoint"` : les `db.commit()` des services
+deviennent des relâchements de point de reprise, et le `rollback()` final efface
+tout. Aucun ordre de passage à respecter, aucun nettoyage à écrire.
+
+**Seule exception : le compte administrateur**, écrit en dur hors transaction.
+Le hachage bcrypt coûte ~0,3 s ; le refaire à chaque test coûterait plus cher
+que toute la suite. C'est la seule ligne qui survit d'un test à l'autre — ce qui
+permet aux tests de statistiques d'affirmer des valeurs exactes. Son rôle
+`admin` l'exclut du comptage des membres.
+
+#### ⚠️ `str(url)` masque le mot de passe
+
+`URL.__str__` de SQLAlchemy rend `postgresql://user:***@…`. La chaîne obtenue ne
+se reconnecte pas : `conftest.py` utilise `render_as_string(hide_password=False)`.
+Le symptôme était une authentification refusée alors que les identifiants
+étaient bons.
+
+#### Ce que la suite fige, au-delà du nominal
+
+- **403 sans en-tête `Authorization`, 401 avec un jeton invalide.** Le premier
+  vient de `HTTPBearer`, le second de notre code. Le back-office distingue les
+  deux.
+- **La connexion attend un formulaire**, pas du JSON, avec un champ `username`.
+- **`GET /enrollments/slot/{id}/availability` sans date ne compte personne** :
+  la comparaison porte sur `NULL`. Le site public passe toujours la date.
+- **Un créneau inconnu y rend 200 avec zéro place**, pas 404 : un badge
+  « complet » vaut mieux qu'une erreur sur une page publique.
+- **`test_regressions.py` parcourt les 23 routes à identifiant** et exige 422 sur
+  un identifiant non-UUID, et jamais de 500 sur un UUID inconnu. Une nouvelle
+  route qui oublierait `UUIDStr` tombe ici — à condition de l'ajouter à la liste.
+- **Un garde-fou syntaxique** relit les services par arbre syntaxique pour
+  interdire toute variable locale nommée `status`.
 
 ### PHASE 2 — FRONTEND PUBLIC ✅
 
@@ -426,8 +559,8 @@ ADMIN_PASSWORD=changeme
 | Header, Footer, Hero | ✅ | Navbar + ThemeToggle + CTA |
 | Mode clair/sombre | ✅ | `data-theme` sur `<html>`, anti-flash script |
 | Image hero Unsplash | ✅ | Next.js Image + overlay adaptatif |
-| Logo | ✅ | `frontend/public/logo.png` |
-| Favicon / icônes | ✅ | Généré depuis le logo (badge rogné, coins transparents) via les conventions de fichiers Next.js : `app/favicon.ico` (16/32/48/64), `app/icon.png` (512), `app/apple-icon.png` (180, fond bleu nuit). Identique côté `admin/app/`. Ne pas déclarer `metadata.icons` : les fichiers ont priorité. |
+| Logo | ✅ | Badge circulaire **à fond transparent**, généré par `scripts/generer-logo.py` — voir § Logo et icônes |
+| Favicon / icônes | ✅ | Régénérés depuis la même source, disque détouré : `app/favicon.ico` (16/32/48/64), `app/icon.png` (512), `app/apple-icon.png` (180). Identique côté `admin/app/`. Ne pas déclarer `metadata.icons` : les fichiers ont priorité. |
 | **Branchement API** | ✅ | **Les 13 pages consomment l'API. Plus aucune donnée factice.** Voir § Branchement du site public. |
 | Formulaires publics | ✅ | Contact → `POST /contact/`, inscription cours → `POST /enrollments/`, avis → `POST /reviews/` |
 
@@ -538,11 +671,12 @@ public en moins d'une minute.
 | Vidéos CRUD | ✅ | URL vidéo + miniature FileUpload |
 | Transformations CRUD | ✅ | FileUpload avant/après, mise en avant |
 | Équipements CRUD | ✅ | Par zone, FileUpload image |
-| Avis modération | ✅ | Approuver/Supprimer, étoiles, badge statut |
+| Avis modération | ✅ | File filtrable, pastille de la barre latérale — voir § Modération des avis |
 | Contacts | ✅ | Lecture + marquer lu, indicateur non-lu |
 | Paramètres | ✅ | 8 clés (nom salle, téléphone, email, adresse, horaires, réseaux sociaux) |
 | Thème bi-chrome | ✅ | Contenu en clair via `.admin-content`, Sidebar et `/login` sombres |
 | Affichage mobile / tablette | ✅ | Sidebar en tiroir, DataTable en cartes — voir § Adaptation mobile |
+| Vérification des formulaires | ✅ | Messages d'informations manquantes sur les 9 formulaires — voir § Vérification des formulaires |
 
 ### PHASE 4 — DOCKER ✅
 
@@ -741,6 +875,112 @@ remontaient comme fautifs alors que `scrollWidth` valait exactement
 Résultat : **36 combinaisons page × largeur, aucun débordement**. Ouverture du
 tiroir, fermeture par le voile et par Échap, et tenue de la modale (351 px dans
 une fenêtre de 375 px) vérifiées séparément.
+
+### Vérification des formulaires du back-office
+
+Les neuf formulaires (activités, coachs, abonnements, vidéos, équipements,
+transformations, articles, planning, paramètres) refusent l'envoi tant qu'une
+information obligatoire manque, et **disent laquelle**.
+
+Avant, ils s'appuyaient sur l'attribut `required` du navigateur pour une partie
+des champs seulement, et l'API répondait pour le reste — par un code et un nom de
+colonne en anglais.
+
+#### Le mécanisme, identique partout
+
+`admin/lib/validation.ts` fournit les briques (`verifierRequis`,
+`verifierNombre`, `estEmail`, `estUrl`, `heureEnMinutes`, `texteBrut`), chaque
+page déclare sa fonction `valider(form)`, et `admin/components/FormErrors.tsx`
+affiche : un récapitulatif en tête de formulaire, un message sous chaque champ
+fautif, une bordure rouge (`.input-error`) et un astérisque au libellé.
+
+```tsx
+const valider = (form: Form): Erreurs => { ... };          // règles de la page
+
+useEffect(() => { if (soumis) setErreurs(valider(form)); }, [form, soumis]);
+
+const manques = valider(form);                              // à l'envoi
+setErreurs(manques);
+if (aDesErreurs(manques)) return;                           // aucun appel API
+```
+
+Rien ne s'affiche avant la première tentative d'enregistrement ; ensuite la liste
+se vide au fur et à mesure de la saisie. Le `useEffect` évite d'avoir à modifier
+les vingt `onChange` de chaque page.
+
+#### ⚠️ Les `required` natifs ont été retirés, les `<form>` portent `noValidate`
+
+Sinon le navigateur interrompt l'envoi **avant** notre code, avec sa propre
+bulle, dans sa propre langue, et un seul champ à la fois. Les deux mécanismes ne
+cohabitent pas : c'est l'un ou l'autre.
+
+#### Ce qui est exigé, et pourquoi
+
+La règle est : **les colonnes NOT NULL du modèle**, plus les cas où une valeur
+vide passe la base mais casse le site public.
+
+| Formulaire | Obligatoire | Au-delà de la base |
+|------------|-------------|--------------------|
+| Activités | nom, description, catégorie, niveau, durée, capacité | — |
+| Coachs | nom | — |
+| Abonnements | nom, prix, durée | — |
+| Vidéos | titre, URL, catégorie | URL en `http(s)://` |
+| Équipements | nom, zone, quantité | — |
+| Transformations | nom du membre | **les deux images** : la page publique est un curseur avant/après |
+| Articles | titre, contenu | contenu jugé sur le **texte**, pas sur le HTML |
+| Planning | activité, coach, début, fin | fin > début ; date exigée si non récurrent |
+| Paramètres | nom, téléphone, e-mail, adresse, horaires | e-mail et URL des réseaux vérifiés |
+
+⚠️ **Les champs numériques retombent à `0` quand on les vide** (`+e.target.value`
+sur une chaîne vide). Sans minimum, une formule à 0 FCFA ou une activité de durée
+nulle partiraient en base sans que personne ne s'en aperçoive : d'où
+`verifierNombre`, qui exige au moins 1.
+
+⚠️ **Le contenu d'un article se juge sur son texte brut.** Le `contentEditable`
+laisse `<p><br></p>` dès qu'on y clique : sans retirer les balises, un article
+visuellement vide passerait pour rédigé.
+
+#### ⚠️ `apiFetch` affichait « [object Object] »
+
+Sur un 422, FastAPI renvoie un **tableau d'objets** dans `detail`, pas une
+chaîne : `new Error(err.detail)` produisait « [object Object] » pour toute erreur
+de saisie. `messageDErreur()` dans `admin/lib/api.ts` reconstitue désormais
+`champ : message`. Les erreurs serveur s'affichent dans le bandeau du formulaire,
+plus dans une `alert()` du navigateur.
+
+### Modération des avis
+
+Un avis déposé par un visiteur **n'est visible sur le site public qu'après
+approbation d'un administrateur**. Le chemin complet :
+
+1. `POST /reviews/` — sans authentification, depuis `ReviewForm.tsx`. Le service
+   force `is_approved=False` ; le schéma `ReviewCreate` ne porte pas ce champ,
+   donc un client ne peut pas se publier lui-même. Le visiteur lit « Votre avis
+   sera publié après modération ».
+2. `GET /reviews/all` — réservé à l'admin, montre la file complète.
+3. `PUT /reviews/{id}/approve` — bascule `is_approved`.
+4. `GET /reviews/` — public, ne renvoie que les avis approuvés. C'est cette route
+   qu'appellent la page `/avis` et l'accueil.
+
+Supprimer un avis le retire **définitivement** de la base (pas de suppression
+douce, contrairement aux activités ou aux coachs).
+
+#### Ce que voit l'administrateur
+
+La page `/avis` s'ouvre sur les avis **en attente** et propose trois onglets
+comptés — En attente / Publiés / Tous. Le badge d'un avis approuvé dit « Visible
+sur le site », pas seulement « Approuvé ».
+
+La barre latérale porte une **pastille orange** sur *Avis* et *Messages*,
+alimentée par `pending_reviews` et `unread_contacts` de `GET /stats/`, rechargée
+à chaque navigation. Sans elle, rien ne signalait qu'un avis attendait tant qu'on
+n'ouvrait pas la page.
+
+⚠️ **Le site public met jusqu'à une minute à refléter une approbation** :
+`fetchApi` revalide toutes les 60 s. Ce n'est pas un défaut de la modération.
+
+Les 22 tests de `backend/tests/test_reviews.py` figent cette chaîne, y compris la
+tentative de s'auto-publier en envoyant `is_approved: true`.
 
 ### Statistiques du tableau de bord
 

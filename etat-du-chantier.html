@@ -449,9 +449,10 @@
       l&rsquo;API, le site public et le back-office sont fonctionnels de bout en bout,
       sans aucune donnée factice. <strong>Rien n&rsquo;est déployé</strong> — la phase 5
       n&rsquo;a pas commencé et aucun fichier de déploiement n&rsquo;existe. Trois
-      éléments annoncés au plan n&rsquo;ont jamais été écrits : les tests
-      automatisés, la notification e-mail des messages de contact, et la génération
-      des QR codes membres.
+      éléments annoncés au plan restent à écrire : la notification e-mail des
+      messages de contact, la génération des QR codes membres, et un usage pour
+      Redis. Les tests automatisés, eux, existent désormais : 307 tests pytest
+      couvrent l&rsquo;API sur PostgreSQL.
     </p>
   </header>
 
@@ -496,13 +497,13 @@
             <h3>Backend API — FastAPI</h3>
             <span class="chip" data-state="partial">Livré, avec réserves</span>
           </div>
-          <div class="meter" role="img" aria-label="Avancement estimé : 85 %">
-            <div class="meter-fill" style="width: 85%"></div>
+          <div class="meter" role="img" aria-label="Avancement estimé : 92 %">
+            <div class="meter-fill" style="width: 92%"></div>
           </div>
           <p class="phase-note">
-            Modèles, schémas, services, routes, migrations et seed sont en place et
-            vérifiés route par route. Restent en dehors : le dossier de tests, vide,
-            l&rsquo;envoi SMTP des messages de contact, et
+            Modèles, schémas, services, routes, migrations et seed sont en place, et
+            la recette manuelle est portée en 307 tests pytest rejouables. Restent en
+            dehors : l&rsquo;envoi SMTP des messages de contact et
             <code>generate_qr_code</code>, jamais écrite alors que la colonne
             <code>users.qr_code</code> l&rsquo;attend.
           </p>
@@ -511,7 +512,7 @@
             <span>15 services métier</span>
             <span>58 routes</span>
             <span>2 migrations Alembic</span>
-            <span>0 test</span>
+            <span>307 tests</span>
           </div>
         </div>
       </article>
@@ -673,18 +674,9 @@
       <div class="gap-group">
         <div class="gap-head">
           <h3>Annoncé au plan, absent du code</h3>
-          <span class="count">4 points</span>
+          <span class="count">3 points</span>
         </div>
         <ul class="gap-list">
-          <li class="gap-item">
-            <span class="gap-item-title">Aucun test automatisé</span>
-            <span class="gap-item-note">
-              <code>backend/tests/</code> ne contient qu&rsquo;un
-              <code>.gitkeep</code>. La recette de 115 cas qui a servi aujourd&rsquo;hui
-              existe mais vit hors du dépôt : rien ne rejouera ces vérifications
-              après une modification.
-            </span>
-          </li>
           <li class="gap-item">
             <span class="gap-item-title">Les messages de contact ne préviennent personne</span>
             <span class="gap-item-note">
