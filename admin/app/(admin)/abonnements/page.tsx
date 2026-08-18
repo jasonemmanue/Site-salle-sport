@@ -5,9 +5,25 @@ import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
+import { ErrorSummary, FieldError, Requis } from '@/components/FormErrors';
+import { aDesErreurs, verifierNombre, verifierRequis, type Erreurs } from '@/lib/validation';
 import type { Subscription } from '@/lib/types';
 
 const emptyForm = { name: '', price: 25000, duration_months: 1, features: '', is_active: true, order: 0 };
+
+type Form = typeof emptyForm;
+
+// `name`, `price` et `duration_months` sont NOT NULL. Les champs numeriques
+// retombent a 0 quand on les vide : sans minimum, une formule a 0 FCFA partirait
+// en base sans que personne ne s'en apercoive.
+const valider = (form: Form): Erreurs => {
+  const erreurs = verifierRequis(form, [['name', 'Le nom de la formule']]);
+  const prix = verifierNombre(form.price, 'Le prix');
+  if (prix) erreurs.price = prix;
+  const duree = verifierNombre(form.duration_months, 'La duree en mois');
+  if (duree) erreurs.duration_months = duree;
+  return erreurs;
+};
 
 export default function AbonnementsPage() {
   const { token } = useAuth();
@@ -16,6 +32,15 @@ export default function AbonnementsPage() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [erreurs, setErreurs] = useState<Erreurs>({});
+  const [erreurApi, setErreurApi] = useState('');
+  const [soumis, setSoumis] = useState(false);
+
+  // Rien ne s'affiche avant la premiere tentative d'enregistrement ;
+  // ensuite la liste se vide au fur et a mesure de la saisie.
+  useEffect(() => {
+    if (soumis) setErreurs(valider(form));
+  }, [form, soumis]);
 
   const load = () => {
     if (!token) return;
@@ -24,15 +49,24 @@ export default function AbonnementsPage() {
 
   useEffect(load, [token]);
 
-  const openNew = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
+  const reinitialiser = () => { setErreurs({}); setErreurApi(''); setSoumis(false); };
+
+  const openNew = () => { setForm(emptyForm); setEditId(null); reinitialiser(); setModalOpen(true); };
   const openEdit = (item: Subscription) => {
     setForm({ name: item.name, price: item.price, duration_months: item.duration_months, features: item.features.join('\n'), is_active: item.is_active, order: item.order });
     setEditId(item.id);
+    reinitialiser();
     setModalOpen(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSoumis(true);
+    setErreurApi('');
+    const manques = valider(form);
+    setErreurs(manques);
+    if (aDesErreurs(manques)) return;
+
     setSaving(true);
     try {
       const body = { ...form, features: form.features.split('\n').filter(Boolean) };
@@ -43,8 +77,9 @@ export default function AbonnementsPage() {
       }
       setModalOpen(false);
       load();
-    } catch (err) { alert(err instanceof Error ? err.message : 'Erreur'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      setErreurApi(err instanceof Error ? err.message : "Erreur inconnue a l'enregistrement.");
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (item: Subscription) => {
@@ -68,19 +103,23 @@ export default function AbonnementsPage() {
       </div>
       <DataTable columns={columns} data={items} onEdit={openEdit} onDelete={handleDelete} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier abonnement' : 'Nouvel abonnement'}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <ErrorSummary erreurs={erreurs} erreurApi={erreurApi} />
           <div>
-            <label className="block text-sm text-secondary mb-1">Nom</label>
-            <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <label className="block text-sm text-secondary mb-1">Nom<Requis /></label>
+            <input className={`input-field ${erreurs.name ? 'input-error' : ''}`} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <FieldError message={erreurs.name} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm text-secondary mb-1">Prix (FCFA)</label>
-              <input type="number" className="input-field" value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Prix (FCFA)<Requis /></label>
+              <input type="number" min={1} className={`input-field ${erreurs.price ? 'input-error' : ''}`} value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} />
+              <FieldError message={erreurs.price} />
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">Duree (mois)</label>
-              <input type="number" className="input-field" value={form.duration_months} onChange={(e) => setForm({ ...form, duration_months: +e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Duree (mois)<Requis /></label>
+              <input type="number" min={1} className={`input-field ${erreurs.duration_months ? 'input-error' : ''}`} value={form.duration_months} onChange={(e) => setForm({ ...form, duration_months: +e.target.value })} />
+              <FieldError message={erreurs.duration_months} />
             </div>
           </div>
           <div>

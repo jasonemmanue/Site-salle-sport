@@ -6,9 +6,17 @@ import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
 import FileUpload from '@/components/FileUpload';
+import { ErrorSummary, FieldError, Requis } from '@/components/FormErrors';
+import { aDesErreurs, verifierRequis, type Erreurs } from '@/lib/validation';
 import type { Coach } from '@/lib/types';
 
 const emptyForm = { name: '', photo_url: '', certifications: '', specialties: '', bio: '', is_active: true, order: 0 };
+
+type Form = typeof emptyForm;
+
+// Seul `name` est NOT NULL cote base ; le reste de la fiche est facultatif.
+const valider = (form: Form): Erreurs =>
+  verifierRequis(form, [['name', 'Le nom du coach']]);
 
 export default function CoachsPage() {
   const { token } = useAuth();
@@ -17,6 +25,15 @@ export default function CoachsPage() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [erreurs, setErreurs] = useState<Erreurs>({});
+  const [erreurApi, setErreurApi] = useState('');
+  const [soumis, setSoumis] = useState(false);
+
+  // Rien ne s'affiche avant la premiere tentative d'enregistrement ;
+  // ensuite la liste se vide au fur et a mesure de la saisie.
+  useEffect(() => {
+    if (soumis) setErreurs(valider(form));
+  }, [form, soumis]);
 
   const load = () => {
     if (!token) return;
@@ -25,15 +42,24 @@ export default function CoachsPage() {
 
   useEffect(load, [token]);
 
-  const openNew = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
+  const reinitialiser = () => { setErreurs({}); setErreurApi(''); setSoumis(false); };
+
+  const openNew = () => { setForm(emptyForm); setEditId(null); reinitialiser(); setModalOpen(true); };
   const openEdit = (item: Coach) => {
-    setForm({ name: item.name, photo_url: item.photo_url || '', certifications: item.certifications.join('\n'), specialties: item.specialties.join('\n'), bio: item.bio, is_active: item.is_active, order: item.order });
+    setForm({ name: item.name, photo_url: item.photo_url || '', certifications: item.certifications.join('\n'), specialties: item.specialties.join('\n'), bio: item.bio || '', is_active: item.is_active, order: item.order });
     setEditId(item.id);
+    reinitialiser();
     setModalOpen(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSoumis(true);
+    setErreurApi('');
+    const manques = valider(form);
+    setErreurs(manques);
+    if (aDesErreurs(manques)) return;
+
     setSaving(true);
     try {
       const body = { ...form, certifications: form.certifications.split('\n').filter(Boolean), specialties: form.specialties.split('\n').filter(Boolean) };
@@ -44,8 +70,9 @@ export default function CoachsPage() {
       }
       setModalOpen(false);
       load();
-    } catch (err) { alert(err instanceof Error ? err.message : 'Erreur'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      setErreurApi(err instanceof Error ? err.message : "Erreur inconnue a l'enregistrement.");
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (item: Coach) => {
@@ -68,11 +95,13 @@ export default function CoachsPage() {
       </div>
       <DataTable columns={columns} data={items} onEdit={openEdit} onDelete={handleDelete} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier coach' : 'Nouveau coach'} wide>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <ErrorSummary erreurs={erreurs} erreurApi={erreurApi} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm text-secondary mb-1">Nom</label>
-              <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+              <label className="block text-sm text-secondary mb-1">Nom<Requis /></label>
+              <input className={`input-field ${erreurs.name ? 'input-error' : ''}`} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <FieldError message={erreurs.name} />
             </div>
             <FileUpload value={form.photo_url} onChange={(url) => setForm({ ...form, photo_url: url })} label="Photo" />
           </div>

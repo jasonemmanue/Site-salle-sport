@@ -4,6 +4,8 @@ import { useEffect, useState, FormEvent, useRef, DragEvent } from 'react';
 import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import Modal from '@/components/Modal';
+import { ErrorSummary, FieldError, Requis } from '@/components/FormErrors';
+import { aDesErreurs, heureEnMinutes, verifierRequis, type Erreurs } from '@/lib/validation';
 import type { ScheduleSlot, Activity, Coach } from '@/lib/types';
 
 const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -12,6 +14,39 @@ const hours = Array.from({ length: 15 }, (_, i) => i + 6);
 const emptyForm = {
   activity_id: '', coach_id: '', day_of_week: 0, start_time: '08:00', end_time: '09:00',
   is_recurring: true, specific_date: '', max_capacity_override: '', is_active: true,
+};
+
+type Form = typeof emptyForm;
+
+// L'activite et le coach sont des cles etrangeres NOT NULL : sans elles, l'API
+// repond 404 « Activite introuvable » sans dire lequel des deux manque.
+// La date est exigee des que le creneau n'est pas recurrent — un creneau
+// ponctuel sans date n'apparaitrait nulle part, ni au planning public ni dans
+// les inscriptions.
+const valider = (form: Form): Erreurs => {
+  const erreurs = verifierRequis(form, [
+    ['activity_id', "L'activite"],
+    ['coach_id', 'Le coach'],
+    ['start_time', "L'heure de debut"],
+    ['end_time', "L'heure de fin"],
+  ]);
+
+  const debut = heureEnMinutes(form.start_time);
+  const fin = heureEnMinutes(form.end_time);
+  if (!erreurs.start_time && debut === null) {
+    erreurs.start_time = "L'heure de debut est invalide (format HH:MM).";
+  }
+  if (!erreurs.end_time && fin === null) {
+    erreurs.end_time = "L'heure de fin est invalide (format HH:MM).";
+  }
+  if (debut !== null && fin !== null && fin <= debut) {
+    erreurs.end_time = "L'heure de fin doit etre posterieure a l'heure de debut.";
+  }
+
+  if (!form.is_recurring && !form.specific_date) {
+    erreurs.specific_date = 'La date est obligatoire pour un creneau non recurrent.';
+  }
+  return erreurs;
 };
 
 export default function PlanningPage() {
@@ -25,6 +60,15 @@ export default function PlanningPage() {
   const [saving, setSaving] = useState(false);
   const [dragSlotId, setDragSlotId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [erreurs, setErreurs] = useState<Erreurs>({});
+  const [erreurApi, setErreurApi] = useState('');
+  const [soumis, setSoumis] = useState(false);
+
+  // Rien ne s'affiche avant la premiere tentative d'enregistrement ;
+  // ensuite la liste se vide au fur et a mesure de la saisie.
+  useEffect(() => {
+    if (soumis) setErreurs(valider(form));
+  }, [form, soumis]);
 
   // La grille 7 jours x 15 heures reclame ~900px, et le glisser-deposer HTML5
   // ne repond pas au tactile. Sous `lg`, la vue liste devient donc le defaut —
@@ -43,6 +87,8 @@ export default function PlanningPage() {
 
   useEffect(load, [token]);
 
+  const reinitialiser = () => { setErreurs({}); setErreurApi(''); setSoumis(false); };
+
   const openNew = (day?: number, hour?: number) => {
     setForm({
       ...emptyForm,
@@ -51,6 +97,7 @@ export default function PlanningPage() {
       end_time: hour !== undefined ? `${String(hour + 1).padStart(2, '0')}:00` : '09:00',
     });
     setEditId(null);
+    reinitialiser();
     setModalOpen(true);
   };
   const openEdit = (slot: ScheduleSlot) => {
@@ -61,11 +108,18 @@ export default function PlanningPage() {
       is_active: slot.is_active,
     });
     setEditId(slot.id);
+    reinitialiser();
     setModalOpen(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSoumis(true);
+    setErreurApi('');
+    const manques = valider(form);
+    setErreurs(manques);
+    if (aDesErreurs(manques)) return;
+
     setSaving(true);
     try {
       const body = {
@@ -80,8 +134,9 @@ export default function PlanningPage() {
       }
       setModalOpen(false);
       load();
-    } catch (err) { alert(err instanceof Error ? err.message : 'Erreur'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      setErreurApi(err instanceof Error ? err.message : "Erreur inconnue a l'enregistrement.");
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (slot: ScheduleSlot) => {
@@ -227,21 +282,24 @@ export default function PlanningPage() {
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier creneau' : 'Nouveau creneau'} wide>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <ErrorSummary erreurs={erreurs} erreurApi={erreurApi} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm text-secondary mb-1">Activite</label>
-              <select className="input-field" value={form.activity_id} onChange={(e) => setForm({ ...form, activity_id: e.target.value })} required>
+              <label className="block text-sm text-secondary mb-1">Activite<Requis /></label>
+              <select className={`input-field ${erreurs.activity_id ? 'input-error' : ''}`} value={form.activity_id} onChange={(e) => setForm({ ...form, activity_id: e.target.value })}>
                 <option value="">Choisir...</option>
                 {activities.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
+              <FieldError message={erreurs.activity_id} />
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">Coach</label>
-              <select className="input-field" value={form.coach_id} onChange={(e) => setForm({ ...form, coach_id: e.target.value })} required>
+              <label className="block text-sm text-secondary mb-1">Coach<Requis /></label>
+              <select className={`input-field ${erreurs.coach_id ? 'input-error' : ''}`} value={form.coach_id} onChange={(e) => setForm({ ...form, coach_id: e.target.value })}>
                 <option value="">Choisir...</option>
                 {coaches.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
+              <FieldError message={erreurs.coach_id} />
             </div>
             <div>
               <label className="block text-sm text-secondary mb-1">Jour</label>
@@ -254,12 +312,14 @@ export default function PlanningPage() {
               <input type="number" className="input-field" value={form.max_capacity_override} onChange={(e) => setForm({ ...form, max_capacity_override: e.target.value })} placeholder="Defaut activite" />
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">Debut</label>
-              <input type="time" className="input-field" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Debut<Requis /></label>
+              <input type="time" className={`input-field ${erreurs.start_time ? 'input-error' : ''}`} value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} />
+              <FieldError message={erreurs.start_time} />
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">Fin</label>
-              <input type="time" className="input-field" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Fin<Requis /></label>
+              <input type="time" className={`input-field ${erreurs.end_time ? 'input-error' : ''}`} value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
+              <FieldError message={erreurs.end_time} />
             </div>
           </div>
           <div className="flex gap-6">
@@ -272,8 +332,9 @@ export default function PlanningPage() {
           </div>
           {!form.is_recurring && (
             <div>
-              <label className="block text-sm text-secondary mb-1">Date specifique</label>
-              <input type="date" className="input-field" value={form.specific_date} onChange={(e) => setForm({ ...form, specific_date: e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Date specifique<Requis /></label>
+              <input type="date" className={`input-field ${erreurs.specific_date ? 'input-error' : ''}`} value={form.specific_date} onChange={(e) => setForm({ ...form, specific_date: e.target.value })} />
+              <FieldError message={erreurs.specific_date} />
             </div>
           )}
           <div className="flex justify-end gap-3 pt-4">

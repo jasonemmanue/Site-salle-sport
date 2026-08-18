@@ -2,6 +2,7 @@
 
 import { useState, useRef, ChangeEvent } from 'react';
 import { useAuth } from '@/lib/auth';
+import { FieldError, Requis } from '@/components/FormErrors';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -10,9 +11,13 @@ interface FileUploadProps {
   onChange: (url: string) => void;
   accept?: string;
   label?: string;
+  /** Ajoute l'asterisque au libelle. La verification, elle, reste dans la page. */
+  requis?: boolean;
+  /** Message d'information manquante, affiche sous la zone de depot. */
+  erreur?: string;
 }
 
-export default function FileUpload({ value, onChange, accept = 'image/*', label = 'Image' }: FileUploadProps) {
+export default function FileUpload({ value, onChange, accept = 'image/*', label = 'Image', requis, erreur }: FileUploadProps) {
   const { token } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -53,9 +58,12 @@ export default function FileUpload({ value, onChange, accept = 'image/*', label 
 
   return (
     <div>
-      <label className="block text-sm text-secondary mb-1">{label}</label>
+      <label className="block text-sm text-secondary mb-1">
+        {label}
+        {requis && <Requis />}
+      </label>
       <div
-        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${dragOver ? 'border-primary bg-primary/5' : 'border-dark-border hover:border-primary/40'}`}
+        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${erreur ? 'border-red-500' : dragOver ? 'border-primary bg-primary/5' : 'border-dark-border hover:border-primary/40'}`}
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
@@ -82,6 +90,7 @@ export default function FileUpload({ value, onChange, accept = 'image/*', label 
         onChange={(e) => onChange(e.target.value)}
         placeholder="ou coller une URL"
       />
+      <FieldError message={erreur} />
     </div>
   );
 }

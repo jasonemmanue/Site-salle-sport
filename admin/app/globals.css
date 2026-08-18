@@ -106,6 +106,17 @@ body {
    Même vigilance pour toute future classe @apply-ant un utilitaire surchargé. */
 .admin-content .btn-danger { color: #FFFFFF; }
 
+/* Champ signalé en information manquante. La bordure rouge double le message
+   texte : la couleur seule ne suffit pas, et le message seul se perd dans une
+   modale qui défile.
+   Les deux sélecteurs sont nécessaires : `.admin-content .input-field` a la
+   même spécificité que `.input-field.input-error`, et l'ordre déciderait
+   sinon du gagnant selon le contexte. */
+.input-field.input-error,
+.admin-content .input-field.input-error {
+  border-color: #DC2626;
+}
+
 ::selection {
   background: rgba(255, 214, 0, 0.3);
   color: #fff;

@@ -6,10 +6,25 @@ import { apiFetch } from '@/lib/api';
 import DataTable from '@/components/DataTable';
 import Modal from '@/components/Modal';
 import FileUpload from '@/components/FileUpload';
+import { ErrorSummary, FieldError, Requis } from '@/components/FormErrors';
+import { aDesErreurs, verifierNombre, verifierRequis, type Erreurs } from '@/lib/validation';
 import type { Equipment } from '@/lib/types';
 
 const zones = ['musculation', 'cardio', 'stretching', 'functional', 'locker'];
 const emptyForm = { name: '', description: '', zone: 'musculation', image_url: '', quantity: 1, is_active: true };
+
+type Form = typeof emptyForm;
+
+// `name`, `zone` et `quantity` sont NOT NULL.
+const valider = (form: Form): Erreurs => {
+  const erreurs = verifierRequis(form, [
+    ['name', "Le nom de l'equipement"],
+    ['zone', 'La zone'],
+  ]);
+  const quantite = verifierNombre(form.quantity, 'La quantite');
+  if (quantite) erreurs.quantity = quantite;
+  return erreurs;
+};
 
 export default function EquipementsPage() {
   const { token } = useAuth();
@@ -18,6 +33,15 @@ export default function EquipementsPage() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [erreurs, setErreurs] = useState<Erreurs>({});
+  const [erreurApi, setErreurApi] = useState('');
+  const [soumis, setSoumis] = useState(false);
+
+  // Rien ne s'affiche avant la premiere tentative d'enregistrement ;
+  // ensuite la liste se vide au fur et a mesure de la saisie.
+  useEffect(() => {
+    if (soumis) setErreurs(valider(form));
+  }, [form, soumis]);
 
   const load = () => {
     if (!token) return;
@@ -26,15 +50,24 @@ export default function EquipementsPage() {
 
   useEffect(load, [token]);
 
-  const openNew = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
+  const reinitialiser = () => { setErreurs({}); setErreurApi(''); setSoumis(false); };
+
+  const openNew = () => { setForm(emptyForm); setEditId(null); reinitialiser(); setModalOpen(true); };
   const openEdit = (item: Equipment) => {
-    setForm({ name: item.name, description: item.description, zone: item.zone, image_url: item.image_url || '', quantity: item.quantity, is_active: item.is_active });
+    setForm({ name: item.name, description: item.description || '', zone: item.zone, image_url: item.image_url || '', quantity: item.quantity, is_active: item.is_active });
     setEditId(item.id);
+    reinitialiser();
     setModalOpen(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSoumis(true);
+    setErreurApi('');
+    const manques = valider(form);
+    setErreurs(manques);
+    if (aDesErreurs(manques)) return;
+
     setSaving(true);
     try {
       if (editId) {
@@ -44,8 +77,9 @@ export default function EquipementsPage() {
       }
       setModalOpen(false);
       load();
-    } catch (err) { alert(err instanceof Error ? err.message : 'Erreur'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      setErreurApi(err instanceof Error ? err.message : "Erreur inconnue a l'enregistrement.");
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (item: Equipment) => {
@@ -69,21 +103,24 @@ export default function EquipementsPage() {
       </div>
       <DataTable columns={columns} data={items} onEdit={openEdit} onDelete={handleDelete} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier equipement' : 'Nouvel equipement'}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <ErrorSummary erreurs={erreurs} erreurApi={erreurApi} />
           <div>
-            <label className="block text-sm text-secondary mb-1">Nom</label>
-            <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <label className="block text-sm text-secondary mb-1">Nom<Requis /></label>
+            <input className={`input-field ${erreurs.name ? 'input-error' : ''}`} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <FieldError message={erreurs.name} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm text-secondary mb-1">Zone</label>
+              <label className="block text-sm text-secondary mb-1">Zone<Requis /></label>
               <select className="input-field" value={form.zone} onChange={(e) => setForm({ ...form, zone: e.target.value })}>
                 {zones.map((z) => <option key={z} value={z}>{z}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">Quantite</label>
-              <input type="number" className="input-field" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: +e.target.value })} />
+              <label className="block text-sm text-secondary mb-1">Quantite<Requis /></label>
+              <input type="number" min={1} className={`input-field ${erreurs.quantity ? 'input-error' : ''}`} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: +e.target.value })} />
+              <FieldError message={erreurs.quantity} />
             </div>
           </div>
           <div>
