@@ -48,6 +48,12 @@ export function mediaUrl(path?: string | null): string {
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
+  // Les visuels livres avec le site vivent dans `frontend/public/images/` : ils
+  // sont servis par le frontend lui-meme. Les prefixer par l'URL de l'API
+  // pointerait sur un 404, l'API n'ayant jamais entendu parler de ces fichiers.
+  if (path.startsWith('/images/')) {
+    return path;
+  }
   return `${BROWSER_API_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
 

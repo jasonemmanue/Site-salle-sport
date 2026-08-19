@@ -19,7 +19,16 @@ class Settings(BaseSettings):
     GOOGLE_FORM_ID: str = "1FAIpQLSfiKgySwuURrPtz5C7XNmzl9ma0BUDklBiOd7VDa9vK6LAVwQ"
     GOOGLE_FORM_ENABLED: bool = True
     GOOGLE_FORM_TIMEOUT: int = 10
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3003"]
+    # Ports de developpement local (3000/3001) et ports hote publies par Docker
+    # (3400 pour le site public, 3403 pour le back-office). Le navigateur appelle
+    # l'API depuis le port HOTE : c'est celui-la qui doit figurer ici.
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3003",
+        "http://localhost:3400",
+        "http://localhost:3403",
+    ]
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

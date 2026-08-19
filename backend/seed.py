@@ -38,13 +38,18 @@ def seed():
         db.add(admin)
 
         # Activities — donnees reelles ESLIE SPORT
+        # `image_url` pointe sur `frontend/public/images/activites/`, livre avec
+        # le site et produit par `scripts/telecharger-images-sports.mjs`. Sans
+        # visuel, la carte de l'activite tombe sur son degrade de repli, presque
+        # noir. L'admin peut televerser sa propre photo par-dessus.
         activities_data = [
-            {"name": "Musculation", "slug": "musculation", "description": "Renforcez votre masse musculaire avec nos equipements de pointe. Salle ouverte tous les jours de 07h a 20h.", "category": "force", "level": "all", "duration_minutes": 60, "max_capacity": 20, "order": 1},
-            {"name": "Seance Collective", "slug": "seance-collective", "description": "Seances de groupe encadrees par nos coachs certifies. Cardio, renforcement musculaire et bien-etre en groupe.", "category": "cardio", "level": "all", "duration_minutes": 90, "max_capacity": 25, "order": 2},
-            {"name": "Kung-Fu Wushu", "slug": "kung-fu-wushu", "description": "Ecole de Kung-Fu Wushu Karate Academy ouverte dans la salle ESLIE SPORT a Blaukauss. Recoit toutes categories de personnes a partir de 4 ans.", "category": "martial_arts", "level": "all", "duration_minutes": 90, "max_capacity": 20, "order": 3},
-            {"name": "HIIT Cardio", "slug": "hiit-cardio", "description": "Entrainement fractionne haute intensite pour bruler un maximum de calories en un minimum de temps.", "category": "cardio", "level": "intermediate", "duration_minutes": 45, "max_capacity": 15, "order": 4},
-            {"name": "Yoga", "slug": "yoga", "description": "Fluidite, souplesse et serenite. Enchainements dynamiques pour equilibrer corps et esprit.", "category": "flexibility", "level": "beginner", "duration_minutes": 60, "max_capacity": 12, "order": 5},
-            {"name": "Stretching", "slug": "stretching", "description": "Seance d'etirements pour ameliorer la souplesse et favoriser la recuperation musculaire.", "category": "flexibility", "level": "beginner", "duration_minutes": 30, "max_capacity": 20, "order": 6},
+            {"name": "Musculation", "slug": "musculation", "description": "Renforcez votre masse musculaire avec nos equipements de pointe. Salle ouverte tous les jours de 07h a 20h.", "category": "force", "level": "all", "duration_minutes": 60, "max_capacity": 20, "image_url": "/images/activites/musculation.jpg", "order": 1},
+            {"name": "Seance Collective", "slug": "seance-collective", "description": "Seances de groupe encadrees par nos coachs certifies. Cardio, renforcement musculaire et bien-etre en groupe.", "category": "cardio", "level": "all", "duration_minutes": 90, "max_capacity": 25, "image_url": "/images/activites/seance-collective.jpg", "order": 2},
+            {"name": "Kung-Fu Wushu", "slug": "kung-fu-wushu", "description": "Ecole de Kung-Fu Wushu Karate Academy ouverte dans la salle ESLIE SPORT a Blaukauss. Recoit toutes categories de personnes a partir de 4 ans.", "category": "martial_arts", "level": "all", "duration_minutes": 90, "max_capacity": 20, "image_url": "/images/activites/kung-fu-wushu.jpg", "order": 3},
+            {"name": "Boxe & Kick Boxing", "slug": "boxe-kick-boxing", "description": "Cours de boxe et de kick boxing a ESLIE SPORT, Blochkauss residence Zeina. Mercredi et samedi de 15h a 16h30, enfants et adultes.", "category": "martial_arts", "level": "all", "duration_minutes": 90, "max_capacity": 20, "image_url": "/images/activites/boxe-kick-boxing.jpg", "order": 4},
+            {"name": "HIIT Cardio", "slug": "hiit-cardio", "description": "Entrainement fractionne haute intensite pour bruler un maximum de calories en un minimum de temps.", "category": "cardio", "level": "intermediate", "duration_minutes": 45, "max_capacity": 15, "image_url": "/images/activites/hiit-cardio.jpg", "order": 5},
+            {"name": "Yoga", "slug": "yoga", "description": "Fluidite, souplesse et serenite. Enchainements dynamiques pour equilibrer corps et esprit.", "category": "flexibility", "level": "beginner", "duration_minutes": 60, "max_capacity": 12, "image_url": "/images/activites/yoga.jpg", "order": 6},
+            {"name": "Stretching", "slug": "stretching", "description": "Seance d'etirements pour ameliorer la souplesse et favoriser la recuperation musculaire.", "category": "flexibility", "level": "beginner", "duration_minutes": 30, "max_capacity": 20, "image_url": "/images/activites/stretching.jpg", "order": 7},
         ]
         activities = []
         for data in activities_data:
@@ -73,13 +78,22 @@ def seed():
             {"name": "Kung-Fu Wushu — Inscription", "price": 10000, "duration_months": 0, "features": ["Inscription ecole Kung-Fu Wushu", "Karate Academy"], "order": 4},
             {"name": "Kung-Fu Wushu — Mensuel", "price": 10000, "duration_months": 1, "features": ["Cours Mercredi 14h-15h30", "Cours Samedi 10h-11h30", "A partir de 4 ans"], "order": 5},
             {"name": "Kung-Fu Wushu — Tenue", "price": 20000, "duration_months": 0, "features": ["Tenue de sport complete", "Obligatoire pour les cours"], "order": 6},
+            # Boxe & Kick Boxing — affiche officielle : inscription 10 000,
+            # mensualite 15 000 (et non 10 000 comme le Kung-Fu), tenue 20 000.
+            {"name": "Boxe & Kick Boxing — Inscription", "price": 10000, "duration_months": 0, "features": ["Inscription cours de boxe", "Boxe et kick boxing"], "order": 7},
+            {"name": "Boxe & Kick Boxing — Mensuel", "price": 15000, "duration_months": 1, "features": ["Cours Mercredi 15h-16h30", "Cours Samedi 15h-16h30", "Enfants et adultes"], "order": 8},
+            {"name": "Boxe & Kick Boxing — Tenue", "price": 20000, "duration_months": 0, "features": ["Tenue complete", "Obligatoire pour les cours"], "order": 9},
         ]
         for data in subs_data:
             db.add(Subscription(id=str(uuid4()), **data, is_active=True))
 
         # Schedule slots — planning reel ESLIE SPORT
-        # Indices: 0=Musculation, 1=Seance Collective, 2=Kung-Fu Wushu
+        # Indices: 0=Musculation, 1=Seance Collective, 2=Kung-Fu Wushu, 3=Boxe
         # Coaches: 0=Toussaint, 1=Leo, 2=David, 3=Adonis
+        # Les affiches Kung-Fu et Boxe ne nomment aucun coach, mais la colonne
+        # `coach_id` est NOT NULL : Adonis, seul coach a porter « arts martiaux »
+        # dans ses specialites, encadre les deux par defaut. A corriger depuis
+        # le back-office des que la salle communique les vrais noms.
         schedule_data = [
             # Musculation — Tous les jours 07h-20h (Toussaint)
             (0, "07:00", "20:00", 0, 0),  # Lundi
@@ -99,6 +113,9 @@ def seed():
             # Kung-Fu Wushu
             (2, "14:00", "15:30", 2, 3),  # Mercredi — 14h-15h30
             (5, "10:00", "11:30", 2, 3),  # Samedi — 10h-11h30
+            # Boxe & Kick Boxing
+            (2, "15:00", "16:30", 3, 3),  # Mercredi — 15h-16h30
+            (5, "15:00", "16:30", 3, 3),  # Samedi — 15h-16h30
         ]
         for day, start, end, act_idx, coach_idx in schedule_data:
             db.add(ScheduleSlot(
@@ -164,14 +181,17 @@ def seed():
             ))
 
         # Videos
+        # La miniature reprend le visuel du sport concerne : sans elle, la carte
+        # video tombe sur un aplat sombre orne d'une icone.
         videos_data = [
-            ("Seance Musculation Complete", "Programme complet pour developper votre masse musculaire avec Coach Toussaint.", "musculation-demo.mp4", "Musculation"),
-            ("Seance Collective avec Leo", "Apercu d'une seance collective energique avec Coach Leo.", "collective-leo.mp4", "Cardio"),
-            ("Initiation Kung-Fu Wushu", "Decouverte du Kung-Fu Wushu pour debutants a ESLIE SPORT.", "kungfu-initiation.mp4", "Arts Martiaux"),
-            ("Stretching Post-Entrainement", "10 minutes d'etirements essentiels apres votre seance.", "stretching.mp4", "Stretching"),
+            ("Seance Musculation Complete", "Programme complet pour developper votre masse musculaire avec Coach Toussaint.", "musculation-demo.mp4", "Musculation", "/images/activites/musculation.jpg"),
+            ("Seance Collective avec Leo", "Apercu d'une seance collective energique avec Coach Leo.", "collective-leo.mp4", "Cardio", "/images/activites/seance-collective.jpg"),
+            ("Initiation Kung-Fu Wushu", "Decouverte du Kung-Fu Wushu pour debutants a ESLIE SPORT.", "kungfu-initiation.mp4", "Arts Martiaux", "/images/activites/kung-fu-wushu.jpg"),
+            ("Boxe & Kick Boxing — Les bases", "Garde, deplacements et premiers enchainements avec les cours du mercredi et du samedi.", "boxe-bases.mp4", "Arts Martiaux", "/images/activites/boxe-kick-boxing.jpg"),
+            ("Stretching Post-Entrainement", "10 minutes d'etirements essentiels apres votre seance.", "stretching.mp4", "Stretching", "/images/activites/stretching.jpg"),
         ]
-        for title, desc, url, cat in videos_data:
-            db.add(Video(id=str(uuid4()), title=title, description=desc, video_url=url, category=cat, is_published=True))
+        for title, desc, url, cat, thumb in videos_data:
+            db.add(Video(id=str(uuid4()), title=title, description=desc, video_url=url, category=cat, thumbnail_url=thumb, is_published=True))
 
         # Settings — infos reelles ESLIE SPORT
         settings_data = [

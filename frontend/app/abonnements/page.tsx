@@ -7,7 +7,7 @@ import { getSubscriptions, safe } from '@/lib/api';
 export const metadata = {
   title: 'Nos Formules | Eslie Sport',
   description:
-    'Inscription, mensualite, formules Kung-Fu Wushu — comparez nos abonnements et choisissez celui qui vous correspond.',
+    'Inscription, mensualite, formules Kung-Fu Wushu et Boxe & Kick Boxing — comparez nos abonnements et choisissez celui qui vous correspond.',
 };
 
 const faqItems: FaqItem[] = [

@@ -17,8 +17,10 @@ import { join, resolve } from 'node:path';
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PORT = 9431;
 const OUT = process.argv[2] || './captures';
-const PUBLIC_URL = 'http://localhost:3000';
-const ADMIN_URL = 'http://localhost:3003';
+// Ports HOTE publies par docker-compose. Surchargeables pour viser un serveur
+// de developpement lance hors Docker (`npm run dev` sur 3000 / 3001).
+const PUBLIC_URL = process.env.PUBLIC_URL || 'http://localhost:3400';
+const ADMIN_URL = process.env.ADMIN_URL || 'http://localhost:3403';
 
 const VIEWPORTS = [
   { nom: 'phone', width: 375, height: 812, mobile: true, scale: 3 },

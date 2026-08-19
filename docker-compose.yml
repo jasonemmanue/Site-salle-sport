@@ -36,6 +36,10 @@ services:
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@sport.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
+      # Origines autorisees a appeler l'API depuis un navigateur. Elles doivent
+      # suivre les ports HOTE publies plus bas : le navigateur voit
+      # localhost:3400, jamais le port interne du conteneur.
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:3001","http://localhost:3003","http://localhost:3400","http://localhost:3403"]'
     ports:
       - "8010:8000"
     depends_on:
@@ -59,7 +63,7 @@ services:
       # de service, pas par localhost. Variable de runtime, pas de rebuild requis.
       API_INTERNAL_URL: http://api:8000
     ports:
-      - "3000:3000"
+      - "3400:3000"
     depends_on:
       - api
 
@@ -72,7 +76,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8010}
     ports:
-      - "3003:3001"
+      - "3403:3001"
     depends_on:
       - api
 

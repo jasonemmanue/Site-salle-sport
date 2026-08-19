@@ -209,11 +209,105 @@ défaut ne se voit qu'à l'œil, dans un seul thème.
 | Kung-Fu Wushu — Inscription | 10 000 FCFA | Paiement unique |
 | Kung-Fu Wushu — Mensuel | 10 000 FCFA | Mensuel récurrent |
 | Kung-Fu Wushu — Tenue de sport | 20 000 FCFA | Paiement unique |
+| Boxe & Kick Boxing — Inscription | 10 000 FCFA | Paiement unique |
+| Boxe & Kick Boxing — Mensualité | 15 000 FCFA | Mensuel récurrent |
+| Boxe & Kick Boxing — Tenue | 20 000 FCFA | Paiement unique |
 
 - Devise : **FCFA** (Franc CFA) — jamais EUR ou USD
 - Format nombre : `30 000` (espace comme séparateur de milliers, format français)
 - Contact : **+225 0545079850**
 - Localisation : **Blaukauss, Abidjan, Côte d'Ivoire**
+
+⚠️ **La mensualité de la boxe est à 15 000, pas 10 000.** C'est le seul tarif où
+la boxe et le Kung-Fu divergent : inscription et tenue sont identiques
+(10 000 et 20 000), la mensualité ne l'est pas. Recopier la ligne du Kung-Fu
+ferait perdre 5 000 FCFA par mois et par membre.
+
+⚠️ **La boxe manquait entièrement au catalogue**, alors que « Abonnement de box »
+figurait déjà parmi les quatre formules de paiement du formulaire de réservation
+(`PAYMENT_TYPES` dans `frontend/lib/types.ts`, repris du formulaire Google de la
+salle). Un visiteur pouvait donc choisir de payer un abonnement de boxe sans
+qu'aucun cours de boxe n'existe : ni activité, ni créneau, ni formule. Les trois
+sont désormais semés.
+
+⚠️ **Deux orthographes du quartier circulent sur les affiches** : « Blaukauss »
+sur celle du Kung-Fu, « Blochkauss, résidence Zeina » sur celle de la boxe. Le
+site retient **Blaukauss** partout — c'est la valeur du réglage `address`, donc
+celle du pied de page et de la page Contact. Seule la description de l'activité
+Boxe cite « Blochkauss résidence Zeina », qui précise l'emplacement du cours.
+Trancher entre les deux graphies demande de le demander à la salle : ce n'est pas
+une décision technique.
+
+### Visuels des sports
+
+Les cartes d'activité tombaient toutes sur leur dégradé de repli, c'est-à-dire un
+rectangle **quasi noir** : aucune activité n'avait de photo. `image_url` est
+désormais renseigné pour les sept sports, et pointe sur des fichiers livrés avec
+le site public.
+
+```bash
+node scripts/telecharger-images-sports.mjs
+```
+
+Le script écrit `frontend/public/images/activites/<slug>.jpg` (1600 × 900, ~200 ko
+pièce) plus un `CREDITS.md`. Aucune dépendance : Node 22 fournit `fetch`.
+
+⚠️ **Les identifiants de photo sont épinglés dans le script, pas cherchés à
+l'exécution.** Une recherche live ferait dépendre l'apparence du site du
+classement d'Unsplash du jour ; deux lancements doivent produire les mêmes
+fichiers.
+
+⚠️ **Le script refuse toute photo Unsplash+** (`plus` ou `premium` à vrai) et
+s'arrête en erreur. Ce fonds est payant et sa licence ne couvre pas un site
+commercial sans abonnement. Le contrôle est refait à chaque lancement : une photo
+gratuite peut basculer sur ce fonds après coup. Trois de nos premiers choix ont
+été écartés à ce titre.
+
+⚠️ **`mediaUrl()` laisse passer les chemins `/images/` tels quels.** Les uploads
+du back-office vivent sous `/uploads/` et sont servis par l'API, donc préfixés
+par son URL publique ; ces visuels-ci vivent dans `frontend/public/` et sont
+servis par le frontend. Les préfixer par l'URL de l'API donnerait un 404.
+
+⚠️ **Une photo téléversée depuis le back-office a la priorité.** Le script de
+mise à jour n'écrit que sur une colonne vide ou pointant déjà sur
+`/images/activites/`. Remplacer le visuel d'un sport se fait donc depuis l'admin,
+sans rien casser.
+
+Les miniatures des vidéos réutilisent les mêmes fichiers, pour la même raison :
+sans miniature, la carte vidéo affiche un aplat sombre et une icône.
+
+| Sport | Fichier | Auteur (Unsplash) |
+|-------|---------|-------------------|
+| Musculation | `musculation.jpg` | Frederik Rosar |
+| Séance Collective | `seance-collective.jpg` | Photo Genius |
+| Kung-Fu Wushu | `kung-fu-wushu.jpg` | SOON SANTOS |
+| Boxe & Kick Boxing | `boxe-kick-boxing.jpg` | Ahmad Thomas |
+| HIIT Cardio | `hiit-cardio.jpg` | Karsten Winegeart |
+| Yoga | `yoga.jpg` | Gabor Kozmon |
+| Stretching | `stretching.jpg` | Michael Starkie |
+
+#### Appliquer ces données à une base déjà en service
+
+`seed.py` s'arrête net dès que le compte administrateur existe : il ne peut donc
+rien apporter à une base en production. D'où `backend/mise_a_jour_donnees.py`,
+qui fait le complément et **se rejoue sans dommage** :
+
+```bash
+docker compose exec api python mise_a_jour_donnees.py
+```
+
+Il crée l'activité Boxe, ses trois formules, ses deux créneaux et sa vidéo, pose
+les visuels manquants et les miniatures. Un second lancement affiche « Rien à
+faire ». Les deux fichiers doivent rester d'accord : **toute donnée ajoutée à
+`seed.py` doit l'être aussi ici**, sans quoi les bases neuves et les bases
+existantes divergent.
+
+Les affiches fournies par la salle n'ont pas servi de source : elles sont
+composées (texte, logo, filigrane d'une banque d'images) et un découpage y
+laisserait des morceaux de titre. Les visuels ci-dessus sont des photos
+d'illustration libres, choisies pour coller au sport de l'affiche — le kick au
+sac et les pattes d'ours pour la boxe, le coup de pied sauté en kimono pour le
+Kung-Fu Wushu.
 
 ### Planning hebdomadaire réel
 
@@ -228,6 +322,15 @@ défaut ne se voit qu'à l'œil, dans un seul thème.
 | Vendredi | Séance collective | 20h30 - 22h | Léo |
 | Samedi | Séance collective | 7h - 9h | David |
 | Samedi | Kung-Fu Wushu | 10h - 11h30 | — |
+| Mercredi | Boxe & Kick Boxing | 15h - 16h30 | — |
+| Samedi | Boxe & Kick Boxing | 15h - 16h30 | — |
+
+⚠️ **Les affiches ne nomment aucun coach pour le Kung-Fu ni pour la boxe**, mais
+`schedule_slots.coach_id` est **NOT NULL** : un créneau sans coach ne peut pas
+exister en base. Les quatre créneaux concernés sont donc rattachés à **Adonis**,
+seul coach dont les spécialités mentionnent les arts martiaux. À corriger depuis
+le back-office dès que la salle communique les vrais noms — c'est un simple
+changement de valeur, pas une migration.
 
 ### Coachs
 
@@ -492,7 +595,8 @@ ADMIN_PASSWORD=changeme
 | Services métier | ✅ | auth, activity, schedule, enrollment, subscription, coach, article, video, transformation, equipment, review, media, contact, stats |
 | Routes API v1 | ✅ | Toutes les routes documentées dans Phase 1 |
 | Alembic migration initiale | ✅ | `091934929730_initial.py` |
-| Seed script | ✅ | Admin + données exemples |
+| Seed script | ✅ | Admin + données réelles (7 activités, 9 formules, 17 créneaux) |
+| Mise à jour d'une base en service | ✅ | `backend/mise_a_jour_donnees.py`, rejouable — voir § Appliquer ces données à une base déjà en service |
 | Auth login | ✅ | `OAuth2PasswordRequestForm` (form-urlencoded, champ `username`) |
 | Dockerfile | ✅ | |
 | Recette complète des routes | ✅ | 115 cas passants — voir § Robustesse de l'API |
@@ -588,6 +692,8 @@ Le symptôme était une authentification refusée alors que les identifiants
 | Favicon / icônes | ✅ | Régénérés depuis la même source, disque détouré : `app/favicon.ico` (16/32/48/64), `app/icon.png` (512), `app/apple-icon.png` (180). Identique côté `admin/app/`. Ne pas déclarer `metadata.icons` : les fichiers ont priorité. |
 | **Branchement API** | ✅ | **Les 13 pages consomment l'API. Plus aucune donnée factice.** Voir § Branchement du site public. |
 | Formulaires publics | ✅ | Contact → `POST /contact/`, inscription cours → `POST /enrollments/`, avis → `POST /reviews/` |
+| Visuels des sports | ✅ | 7 photos livrées dans `frontend/public/images/activites/` — voir § Visuels des sports |
+| Réservation en 3 étapes | ✅ | Fenêtre défilante, saisie découpée, récapitulatif — voir § Le formulaire se remplit en trois temps |
 
 ### Branchement du site public sur l'API
 
@@ -708,7 +814,7 @@ public en moins d'une minute.
 
 | Élément | Statut | Notes |
 |---------|--------|-------|
-| docker-compose.yml | ✅ | db, redis, api, frontend, admin — ports hôte décalés (voir § Ports) |
+| docker-compose.yml | ✅ | db, redis, api, frontend, admin — ports hôte décalés 3400/3403/8010 et `CORS_ORIGINS` accordé (voir § Ports) |
 | Dockerfiles | ✅ | Backend, Frontend, Admin (multi-stage, `output: standalone`, user non-root) |
 | `.dockerignore` | ✅ | Frontend + Admin — évite de copier le `node_modules` Windows de l'hôte |
 | Variables `NEXT_PUBLIC_*` | ✅ | Passées en `build.args` (voir ci-dessous) |
@@ -898,6 +1004,9 @@ filtre, `TransformationSlider`, `ScheduleGrid` et le comparatif des abonnements
 remontaient comme fautifs alors que `scrollWidth` valait exactement
 `innerWidth`.
 
+⚠️ **Le script vise les ports hôte Docker** (3400 / 3403). Pour auditer un
+serveur lancé hors Docker, poser `PUBLIC_URL` et `ADMIN_URL`.
+
 Résultat : **36 combinaisons page × largeur, aucun débordement**. Ouverture du
 tiroir, fermeture par le voile et par Échap, et tenue de la modale (351 px dans
 une fenêtre de 375 px) vérifiées séparément.
@@ -983,6 +1092,60 @@ maintenant toutes, et **recopie chaque réservation dans ce formulaire**.
 
 Le visiteur ne voit jamais le formulaire Google. Il réserve sur le site, comme
 avant ; la recopie se fait de serveur à serveur.
+
+#### Le formulaire se remplit en trois temps, et il défile
+
+`EnrollmentForm.tsx` demandait ses huit champs sur une seule colonne, dans une
+fenêtre modale **sans hauteur maximale ni défilement**. Sur un écran bas — un
+téléphone couché, un portable 13 pouces avec la barre d'onglets — le bas de la
+fenêtre passait sous le bord de l'écran et **le bouton « Confirmer » devenait
+inatteignable** : la page de fond ne défilait pas non plus, la fenêtre étant en
+`fixed inset-0`. La réservation était alors impossible à terminer.
+
+Deux corrections, indépendantes l'une de l'autre :
+
+**Le défilement.** Le voile (`fixed inset-0`) porte `overflow-y-auto`, et la
+fenêtre est une colonne flex `max-h-[calc(100dvh-1.5rem)]` : en-tête et pied
+fixes (`shrink-0`), corps défilant (`flex-1 overflow-y-auto min-h-0`). Le bouton
+d'action reste donc toujours visible, en bas, quelle que soit la hauteur du
+contenu.
+
+⚠️ **`min-h-0` sur le corps est indispensable.** Un enfant flex a
+`min-height: auto` par défaut : sans cette classe il refuse de se comprimer sous
+la taille de son contenu, `overflow-y-auto` n'a rien à faire, et la fenêtre
+repousse le pied hors de l'écran — exactement le défaut qu'on corrige.
+
+⚠️ **`dvh`, pas `vh`.** Sur mobile, `100vh` compte la barre d'adresse comme si
+elle était rétractée : la fenêtre dépasse de la hauteur de cette barre tant
+qu'elle est déployée.
+
+**Les trois étapes.** La saisie est découpée en *Vos coordonnées* → *Votre
+séance* → *Confirmation*, avec un fil de progression dans l'en-tête et un
+récapitulatif à la dernière étape. Chaque étape ne valide que ses propres
+champs : on ne reproche pas au visiteur, dès la première page, d'avoir laissé
+vide un champ qu'il n'a pas encore vu.
+
+⚠️ **`handleSubmit` avance d'une étape au lieu d'envoyer** tant qu'on n'est pas
+à la dernière. Un « Entrée » frappé dans un champ soumet le `<form>` quel que
+soit le bouton affiché ; sans ce garde-fou, la réservation partait avec une
+saisie incomplète. Le `<form>` porte `noValidate`, pour la même raison que les
+formulaires du back-office (voir § Vérification des formulaires).
+
+⚠️ **La validation est rejouée intégralement avant l'appel API**, et renvoie sur
+l'étape fautive. Revenir en arrière pour vider un champ déjà validé est possible ;
+sans ce filet, l'envoi partirait quand même.
+
+Le montant payé reste facultatif, mais l'étape 2 affiche désormais le **tarif de
+la formule choisie** (`MONTANTS_INDICATIFS`) en indication et en `placeholder`.
+⚠️ Cette table est une **aide à la saisie recopiée de la grille tarifaire**, pas
+une source de vérité : les prix font foi côté API, dans `subscriptions`. La faire
+diverger n'a aucun effet sur ce qui est enregistré — c'est bien ce qui a été
+saisi qui part en base — mais elle induirait le visiteur en erreur. La ligne
+« Abonnement de box » y vaut **15 000**.
+
+La fenêtre ferme aussi sur **Échap** et sur un clic dans le voile, et bloque le
+défilement du fond pendant qu'elle est ouverte — même traitement que le tiroir du
+back-office.
 
 #### Ce qui a été ajouté à `enrollments`
 
@@ -1249,16 +1412,31 @@ s'appelle `statut`. Le piège vaut pour tout service qui importe `status`.
 ## Ports
 
 Plusieurs projets tournent en parallèle sur la même machine ; les ports hôte de
-`docker-compose.yml` sont décalés pour éviter les collisions. **Le port 8000 est
-occupé par un autre projet (`salon-coiffure`)** — ne jamais y pointer.
+`docker-compose.yml` sont décalés pour éviter les collisions. **Les ports 8000 et
+3000 sont occupés par d'autres projets** — ne jamais y pointer.
 
 | Service | Port hôte (Docker) | Port interne | Dev local (hors Docker) |
 |---------|--------------------|--------------|--------------------------|
-| Frontend | 3000 | 3000 | 3000 |
-| Admin | **3003** | 3001 | 3001 |
+| Frontend | **3400** | 3000 | 3000 |
+| Admin | **3403** | 3001 | 3001 |
 | API | **8010** | 8000 | 8000 |
 | PostgreSQL | **5600** | 5432 | — |
 | Redis | **6381** | 6379 | — |
 
-Le CORS du backend autorise `localhost:3000`, `:3001` et `:3003`
-(`backend/app/core/config.py`).
+Le CORS du backend autorise `localhost:3000`, `:3001`, `:3003`, `:3400` et
+`:3403` (`backend/app/core/config.py`, et `CORS_ORIGINS` dans
+`docker-compose.yml`).
+
+⚠️ **Le dépôt affichait 3000 / 3003 alors que les conteneurs tournaient sur
+3400 / 3403.** Le décalage avait été fait à la main sur la machine, jamais
+commité : un `docker compose up` depuis un clone neuf échouait donc à publier le
+frontend (port 3000 déjà pris par un autre projet Docker), et le back-office
+était refusé par le CORS, qui ignorait `:3403`. Le fichier et la configuration
+CORS reflètent désormais ce qui tourne réellement.
+
+⚠️ **Le CORS suit le port HÔTE, pas le port interne.** Le navigateur voit
+`localhost:3403` ; le conteneur admin, lui, écoute sur 3001. Inscrire le port
+interne dans `CORS_ORIGINS` ne servirait à rien.
+
+⚠️ **Changer un port hôte impose de toucher trois endroits** : la ligne `ports:`
+du service, `CORS_ORIGINS` (sans quoi le navigateur est bloqué), et ce tableau.

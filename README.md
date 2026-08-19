@@ -119,7 +119,7 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 - [x] `ScheduleGrid.tsx` — Planning interactif 7 jours, créneaux colorés par catégorie
 - [x] `SubscriptionCard.tsx` — Carte abonnement avec badge "POPULAIRE"
 - [x] `TransformationSlider.tsx` — Carrousel avant/après avec navigation
-- [x] `EnrollmentForm.tsx` — Modal inscription cours avec validation
+- [x] `EnrollmentForm.tsx` — Inscription en 3 étapes, fenêtre défilante, récapitulatif
 - [x] `BMICalculator.tsx` — Calculateur IMC avec jauge SVG animée
 - [x] `CapacityBadge.tsx` — Badge places restantes (vert/orange/rouge/complet)
 - [x] `ArticleCard.tsx` — Carte blog avec zoom image hover
@@ -143,6 +143,12 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 - [x] `app/avis/page.tsx` — Note 4.8/5 + formulaire
 - [x] `app/contact/page.tsx` — Formulaire + infos
 - [x] `app/not-found.tsx` — Page 404 custom
+
+### 2.5 Visuels des sports
+- [x] 7 photos livrées dans `frontend/public/images/activites/` (Unsplash, licence gratuite)
+- [x] `scripts/telecharger-images-sports.mjs` — identifiants épinglés, refus des photos Unsplash+
+- [x] `image_url` semé pour les 7 activités, miniatures des vidéos comprises
+- [x] `mediaUrl()` laisse passer les chemins `/images/` (servis par le frontend, pas par l'API)
 
 ### 2.4 Responsive & Finitions
 - [x] Responsive mobile/tablette/desktop
@@ -176,11 +182,13 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 - [x] `docker compose up --build` validé
 - [x] Migrations + seed OK
 - [x] API : http://localhost:8010/docs
-- [x] Site public : http://localhost:3000
-- [x] Back-office : http://localhost:3003
+- [x] Site public : http://localhost:3400
+- [x] Back-office : http://localhost:3403
 
 > Les ports hôte sont décalés : plusieurs projets tournent en parallèle sur la
-> même machine. Le port 8000 est occupé par un autre projet. Voir `CLAUDE.md`, § Ports.
+> même machine. Les ports 8000 et 3000 sont occupés par d'autres projets. Le
+> `CORS_ORIGINS` de l'API doit suivre ces ports hôte, sans quoi le navigateur
+> bloque les appels du back-office. Voir `CLAUDE.md`, § Ports.
 
 ---
 
@@ -194,7 +202,7 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 
 ### Variable d'environnement
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8010
 ```
 
 ### Endpoints API
@@ -247,13 +255,17 @@ docker compose up --build -d
 docker compose exec api alembic revision --autogenerate -m "initial"
 docker compose exec api alembic upgrade head
 
-# 3. Seed des données
+# 3. Seed des données (base neuve uniquement)
 docker compose exec api python seed.py
 
+# 3 bis. Base déjà semée : compléter sans écraser (rejouable)
+docker compose exec api python mise_a_jour_donnees.py
+
 # 4. Vérifier
-# API : http://localhost:8000/docs (Swagger)
-# API Health : http://localhost:8000/health
-# Frontend : http://localhost:3000
+# API : http://localhost:8010/docs (Swagger)
+# API Health : http://localhost:8010/health
+# Frontend : http://localhost:3400
+# Back-office : http://localhost:3403
 
 # 5. Logs
 docker compose logs -f api
@@ -275,3 +287,7 @@ docker compose down -v
 | 2026-07-23 | Frontend complet | 14 pages, 16 composants, API client, types TS |
 | 2026-07-23 | Fix hydration | ScheduleGrid : Math.random() → données déterministes |
 | 2026-07-23 | Backend complet | 13 modèles, 16 services, 15 routes, schemas Pydantic, Alembic, seed, Docker |
+| 2026-08-19 | Réservation en 3 étapes | Fenêtre défilante (`dvh` + flex `min-h-0`), saisie découpée, récapitulatif |
+| 2026-08-19 | Visuels des sports | 7 photos livrées, script épinglé, refus des photos Unsplash+ |
+| 2026-08-19 | Boxe & Kick Boxing | Activité, 3 formules (10 000 / 15 000 / 20 000), 2 créneaux, vidéo |
+| 2026-08-19 | Ports Docker alignés | 3400 / 3403 dans le dépôt + `CORS_ORIGINS` accordé |
