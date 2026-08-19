@@ -61,7 +61,7 @@ Le site reprend les couleurs du logo ESLIE SPORT : fond **bleu nuit**, accent **
 | `.card-gradient` | Gradient sombre `#1a1a1a` | Gradient clair `#f0f0f0` |
 | `.glass` | Fond `rgba(26,35,50,0.85)` + blur + bordure dorée à 8 % | Fond clair + blur |
 | `.text-gradient` | Dégradé doré `#FFD600` vers gris bleuté `#A8B2C1` | idem |
-| `.watermark` | Filigrane `logo.png` centré, opacité 0.03 | idem |
+| `.watermark` | Filigrane `filigrane.png` centré, opacité 0.07 | opacité 0.08 |
 
 ### Logo et icônes
 
@@ -86,9 +86,11 @@ docker run --rm -v "$PWD:/work" salle-de-sport-api:latest \
 | `app/icon.png` | 512 | transparent |
 | `app/apple-icon.png` | 180 | bleu nuit `#0F1724` |
 | `app/favicon.ico` | 16/32/48/64 | transparent |
+| `frontend/public/filigrane.png` | 512 | transparent |
 
 **Ne pas retoucher ces fichiers à la main** : relancer le script, qui écrit les
-huit d'un coup pour les deux sites.
+neuf d'un coup — huit pour les deux sites, plus le filigrane, réservé au site
+public.
 
 ⚠️ **Le badge d'origine est une ellipse**, 1163 × 1201 — 3 % plus haute que
 large. Le script la redresse au carré avant d'appliquer le masque circulaire,
@@ -126,12 +128,48 @@ Changer le fichier change l'URL : les caches ne peuvent plus se tromper, sans
 intervention.
 
 Le filigrane de `globals.css` ne peut pas en profiter — le CSS ne passe pas par
-ce pipeline. Son URL porte donc `?v=2`, **à incrémenter à la main** si le
-fichier change de nouveau.
+ce pipeline. Si `filigrane.png` change un jour, lui accoler un `?v=2` dans la
+règle `.watermark::after`, **à incrémenter à la main** ensuite.
 
-**Où le logo apparaît** : en-tête et pied de page du site public, filigrane de
-`.watermark`, hero de l'accueil, en-tête de la barre latérale du back-office,
-barre supérieure mobile, page de connexion.
+**Où le logo apparaît** : en-tête et pied de page du site public, filigrane des
+bannières (voir § Filigrane des bannières), hero de l'accueil, en-tête de la
+barre latérale du back-office, barre supérieure mobile, page de connexion.
+
+#### Filigrane des bannières
+
+Le badge est posé en fond des **dix bannières de haut de page** du site public —
+`/activites`, `/planning`, `/abonnements`, `/coachs`, `/articles`, `/videos`,
+`/transformations`, `/avis`, `/equipements`, `/contact` — par la classe
+`.watermark` sur la `<section>`. Sans lui, ces bandeaux n'étaient qu'un dégradé
+nu, particulièrement vide en mode clair.
+
+⚠️ **La fiche d'activité (`/activites/[slug]`) en est exclue** : sa bannière
+porte désormais toujours la photo du sport, et un filigrane par-dessus
+brouillerait l'image sans rien meubler. Le hero de l'accueil en est exclu pour
+la même raison — le badge y est déjà affiché en grand au premier plan.
+
+⚠️ **`::after`, pas `::before`.** Les bannières empilent leurs dégradés dans des
+`<div>` en `absolute inset-0`, qui suivent le pseudo-élément dans l'arbre : un
+`::before` passerait dessous et disparaîtrait. Le filigrane est donc un `::after`
+en `z-index: 1`, et **le contenu de la bannière doit monter à `z-10`** — la
+famille `pt-32 pb-20` l'avait déjà, les six pages en `py-20 sm:py-28` ont reçu
+le `z-10` manquant. Une bannière qui l'oublierait verrait son texte passer
+*sous* le filigrane.
+
+⚠️ **Le filigrane vise `filigrane.png`, jamais `logo.png`.** Le CSS ne passe pas
+par l'optimiseur de Next : c'est le fichier **brut** qui part sur le réseau.
+`logo.png` pèse 1,2 Mo — soit 1,2 Mo téléchargés sur dix pages pour un fond à
+moins de 10 % d'opacité. `filigrane.png` fait **19 ko** (512 px, palette de
+64 couleurs) ; à cette opacité, la postérisation ne se voit pas.
+
+Opacités : **0.07** en sombre, **0.08** en clair. Le badge est un disque bleu
+nuit : il porte plus loin sur le gris clair que sur le bleu nuit, mais il lui
+faut malgré tout un peu plus d'encre pour se lire. Les deux valeurs sont réglées
+à l'œil pour rester un filigrane — présent, jamais lisible comme une
+illustration.
+
+`background-size: min(340px, 62vw)` : à 340 px fixes, le disque débordait de la
+bannière sur un téléphone.
 
 #### Hero de l'accueil
 
@@ -183,8 +221,42 @@ défaut ne se voit qu'à l'œil, dans un seul thème.
 
 **Image Hero :**
 - Le hero principal utilise une image Unsplash (`images.unsplash.com`) via Next.js `Image` avec `fill` + `object-cover`
-- L'overlay `.hero-overlay` s'adapte au thème (sombre ou clair semi-transparent)
+- L'overlay `.hero-overlay` s'adapte au thème (sombre ou clair semi-transparent) — **sauf sur l'accueil**, voir ci-dessous
 - Config `next.config.ts` : `images.remotePatterns` autorise `images.unsplash.com`
+
+#### Le haut de l'accueil ne change pas de thème
+
+Le hero de l'accueil est une photo de salle assombrie, surmontée du badge et
+d'un texte clair. En mode clair, `.hero-overlay` posait par-dessus un voile
+**blanc** et les utilitaires `text-white` viraient au navy : la photo se
+délavait, le badge perdait son détourage et le haut de la page ne ressemblait
+plus à rien. Le hero garde donc son traitement sombre **dans les deux thèmes** —
+même parti pris que le pied de page, sombre par identité de marque.
+
+La bascule tient en une classe `hero-brand` posée sur la `<section>` de
+`Hero.tsx`. Y **redéclarer les variables de couleur** suffit pour tout ce qui
+passe par `text-secondary`, `text-accent` ou `from-dark`. Seules les règles qui
+codent une couleur en dur demandent une surcharge nommée : `.hero-overlay`,
+`.text-white` (et ses variantes d'opacité), `.text-gradient`, `.glass`. Elles la
+gagnent par spécificité — `.hero-brand` ajoute une classe à un sélecteur qui en
+comptait déjà deux.
+
+⚠️ **L'en-tête devait suivre.** Il est transparent tant qu'on n'a pas défilé :
+sur l'accueil, il flotte donc au-dessus de cette photo sombre, et
+`[data-theme="light"] nav a { color: #334155 }` y peignait des liens navy sur
+navy — illisibles. `Header.tsx` pose `header-sur-hero` **uniquement** quand
+`pathname === '/' && !scrolled`, et la retire au premier défilement : l'en-tête
+redevient alors clair, avec ses valeurs de contraste habituelles (`#334155`,
+actif `#8A6D0A`).
+
+⚠️ **Le menu mobile est dans le même `<header>`.** Sa surface `glass` bascule
+donc elle aussi au sombre tant que `header-sur-hero` est posée — sans quoi on
+aurait obtenu un panneau blanc avec des liens gris clair, invisibles. Vérifié
+dans les deux thèmes : mêmes couleurs exactement.
+
+⚠️ **Toute nouvelle page dont la bannière serait sombre en mode clair** doit
+reprendre ces deux classes ensemble. `hero-brand` seule laisserait l'en-tête
+illisible par-dessus.
 
 ### Règles pour les ajouts futurs
 
@@ -694,6 +766,8 @@ Le symptôme était une authentification refusée alors que les identifiants
 | Formulaires publics | ✅ | Contact → `POST /contact/`, inscription cours → `POST /enrollments/`, avis → `POST /reviews/` |
 | Visuels des sports | ✅ | 7 photos livrées dans `frontend/public/images/activites/` — voir § Visuels des sports |
 | Réservation en 3 étapes | ✅ | Fenêtre défilante, saisie découpée, récapitulatif — voir § Le formulaire se remplit en trois temps |
+| Filigrane des bannières | ✅ | 10 bannières, `filigrane.png` 19 ko — voir § Filigrane des bannières |
+| Haut de l'accueil identique clair/sombre | ✅ | `hero-brand` + `header-sur-hero` — voir § Le haut de l'accueil ne change pas de thème |
 
 ### Branchement du site public sur l'API
 

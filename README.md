@@ -144,6 +144,11 @@ sur les données de développement. Détails dans `CLAUDE.md`, § Suite de tests
 - [x] `app/contact/page.tsx` — Formulaire + infos
 - [x] `app/not-found.tsx` — Page 404 custom
 
+### 2.6 Filigrane et parite des themes
+- [x] Badge ESLIE SPORT en filigrane sur les 10 bannieres de haut de page (clair et sombre)
+- [x] `frontend/public/filigrane.png` — 512 px, 19 ko, produit par `scripts/generer-logo.py`
+- [x] Haut de l'accueil identique en mode clair et en mode sombre (`hero-brand` + `header-sur-hero`)
+
 ### 2.5 Visuels des sports
 - [x] 7 photos livrées dans `frontend/public/images/activites/` (Unsplash, licence gratuite)
 - [x] `scripts/telecharger-images-sports.mjs` — identifiants épinglés, refus des photos Unsplash+
@@ -291,3 +296,5 @@ docker compose down -v
 | 2026-08-19 | Visuels des sports | 7 photos livrées, script épinglé, refus des photos Unsplash+ |
 | 2026-08-19 | Boxe & Kick Boxing | Activité, 3 formules (10 000 / 15 000 / 20 000), 2 créneaux, vidéo |
 | 2026-08-19 | Ports Docker alignés | 3400 / 3403 dans le dépôt + `CORS_ORIGINS` accordé |
+| 2026-08-19 | Filigrane des bannieres | 10 pages, fichier dedie de 19 ko au lieu des 1,2 Mo de `logo.png` |
+| 2026-08-19 | Haut de l'accueil | Mode clair et sombre rendus identiques (hero + en-tete + menu mobile) |

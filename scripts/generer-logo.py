@@ -21,6 +21,7 @@ Fichiers produits, identiques cote site public et cote back-office :
 | Fichier | Taille | Fond |
 |---------|--------|------|
 | `public/logo.png` | 1024 (256 cote admin) | transparent |
+| `frontend/public/filigrane.png` | 512 | transparent |
 | `app/icon.png` | 512 | transparent |
 | `app/apple-icon.png` | 180 | bleu nuit `#0F1724` |
 | `app/favicon.ico` | 16/32/48/64 | transparent |
@@ -50,6 +51,12 @@ TAILLE_LOGO = 1024
 TAILLE_LOGO_ADMIN = 256
 TAILLE_ICONE = 512
 TAILLE_APPLE = 180
+# Filigrane des bannieres du site public. Il est appele depuis `globals.css`, qui
+# ne passe pas par l'optimiseur de Next : c'est le fichier BRUT qui part sur le
+# reseau. Servir `logo.png` ferait donc telecharger 1,2 Mo sur chaque page pour
+# un fond a 10 % d'opacite. 512 px suffisent : le filigrane s'affiche a 340 px au
+# plus, et a 62 vw sur telephone.
+TAILLE_FILIGRANE = 512
 TAILLES_FAVICON = [(16, 16), (32, 32), (48, 48), (64, 64)]
 BLEU_NUIT = (15, 23, 36, 255)  # --color-dark
 
@@ -106,6 +113,17 @@ def main() -> None:
     apple.paste(disque.resize((diametre, diametre), Image.LANCZOS), (marge, marge), disque.resize((diametre, diametre), Image.LANCZOS))
 
     admin = disque.resize((TAILLE_LOGO_ADMIN, TAILLE_LOGO_ADMIN), Image.LANCZOS)
+
+    # Filigrane : site public uniquement, le back-office n'en a pas.
+    # Palette de 64 couleurs : a 10 % d'opacite derriere un degrade, la
+    # posterisation ne se voit pas, et le fichier tombe de 286 a ~40 Ko. C'est du
+    # poids reel — le CSS le telecharge sur dix pages.
+    print("filigrane :")
+    _ecrit(
+        disque.resize((TAILLE_FILIGRANE, TAILLE_FILIGRANE), Image.LANCZOS)
+        .quantize(colors=64, method=Image.Quantize.FASTOCTREE),
+        RACINE / "frontend" / "public" / "filigrane.png",
+    )
 
     for site in ("frontend", "admin"):
         print(f"{site} :")

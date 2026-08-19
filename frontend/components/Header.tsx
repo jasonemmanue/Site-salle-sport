@@ -32,13 +32,20 @@ export default function Header() {
     setMobileOpen(false);
   }, [pathname]);
 
+  // Tant qu'on n'a pas defile, l'en-tete est transparent et flotte au-dessus du
+  // hero. Celui de l'accueil reste sombre dans les deux themes (`hero-brand`) :
+  // en mode clair, les liens y seraient navy sur navy. `header-sur-hero` leur
+  // rend les couleurs du mode sombre, et disparait des le premier defilement —
+  // l'en-tete redevient alors clair comme le reste de la page.
+  const surHeroSombre = pathname === '/' && !scrolled;
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'glass shadow-lg shadow-black/20'
           : 'bg-transparent'
-      }`}
+      } ${surHeroSombre ? 'header-sur-hero' : ''}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">

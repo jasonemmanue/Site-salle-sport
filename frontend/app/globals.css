@@ -48,24 +48,33 @@
   background-clip: text;
 }
 
-/* ── Watermark / Filigrane ── */
+/* ── Watermark / Filigrane ──
+   Pose le badge ESLIE SPORT en fond de banniere. `::after` et non `::before` :
+   les bannieres empilent leurs degrades dans des `div` absolus, qui suivent le
+   pseudo-element dans l'arbre et le recouvriraient. Le contenu de la banniere
+   monte a `z-10`, le filigrane se glisse a `z-1` entre les deux. */
 .watermark {
   position: relative;
 }
-.watermark::before {
+.watermark::after {
   content: '';
   position: absolute;
   inset: 0;
-  /* `?v=2` casse le cache des navigateurs qui ont connu le logo a fond blanc.
-     Le CSS ne beneficie pas de l'empreinte des imports statiques : bumper la
-     version a la main si le fichier change de nouveau. */
-  background-image: url('/logo.png?v=2');
+  /* Fichier DEDIE, pas `logo.png`. Le CSS ne passe pas par l'optimiseur de
+     Next : c'est le fichier brut qui part sur le reseau, et `logo.png` pese
+     1,2 Mo — pour un fond a moins de 10 % d'opacite, sur dix pages. `filigrane.png`
+     fait 19 Ko (512 px, palette de 64 couleurs), produit par le meme
+     `scripts/generer-logo.py`.
+     Le CSS ne beneficie pas de l'empreinte des imports statiques : ajouter
+     `?v=2`, puis incrementer a la main, si le fichier change un jour. */
+  background-image: url('/filigrane.png');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 300px;
-  opacity: 0.03;
+  /* `min()` : sur un telephone, 340px deborderaient de la banniere. */
+  background-size: min(340px, 62vw) auto;
+  opacity: 0.07;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 /* ── Keyframe animations ── */
@@ -269,6 +278,76 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #1E293B !important;
 }
 
+/* ── Le haut de l'accueil ne change pas de theme ──
+
+   Le hero de l'accueil est une photo de salle assombrie, surmontee du badge et
+   d'un texte clair. En mode clair, `.hero-overlay` posait par-dessus un voile
+   BLANC et les utilitaires `text-white` viraient au navy : la photo se delavait,
+   le badge perdait son detourage et le haut de la page ne ressemblait plus a
+   rien. Le hero garde donc son traitement sombre dans les deux themes — meme
+   parti pris que le pied de page, sombre par identite de marque.
+
+   La bascule tient en une classe posee sur la `<section>` : redeclarer les
+   variables de couleur suffit pour tout ce qui passe par `text-secondary`,
+   `text-accent` ou `from-dark`. Seules les regles qui codent une couleur en dur
+   (`text-white`, `.hero-overlay`, `.text-gradient`, `.glass`) demandent une
+   surcharge nommee. Elles la gagnent par specificite : `.hero-brand` ajoute une
+   classe a un selecteur qui en comptait deja deux. */
+[data-theme="light"] .hero-brand,
+[data-theme="light"] .header-sur-hero {
+  --color-primary: #FFD600;
+  --color-primary-light: #FFE44D;
+  --color-secondary: #A8B2C1;
+  --color-secondary-light: #C5CDD8;
+  --color-accent: #FFD600;
+  --color-dark: #0F1724;
+  --color-dark-card: #1A2332;
+  --color-dark-lighter: #1E293B;
+  --color-dark-border: #2D3A4A;
+  --color-dark-muted: #8896A8;
+}
+
+[data-theme="light"] .hero-brand .hero-overlay {
+  background: linear-gradient(180deg, rgba(15,23,36,0.8) 0%, rgba(15,23,36,0.6) 50%, rgba(15,23,36,0.85) 100%) !important;
+}
+
+[data-theme="light"] .hero-brand .text-white { color: #FFFFFF !important; }
+[data-theme="light"] .hero-brand .text-white\/80 { color: rgba(255,255,255,0.8) !important; }
+[data-theme="light"] .hero-brand .text-white\/60 { color: rgba(255,255,255,0.6) !important; }
+[data-theme="light"] .hero-brand .text-white\/40 { color: rgba(255,255,255,0.4) !important; }
+
+[data-theme="light"] .hero-brand .text-gradient {
+  background: linear-gradient(135deg, #FFD600, #A8B2C1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-brand .glass,
+[data-theme="light"] .header-sur-hero .glass {
+  background: rgba(26, 35, 50, 0.85);
+  border: 1px solid rgba(255, 214, 0, 0.08);
+}
+
+/* L'en-tete est transparent tant qu'on n'a pas defile : sur l'accueil, il
+   flotte donc au-dessus de cette photo sombre. Sans ces regles, ses liens
+   restaient navy sur navy — illisibles. `Header.tsx` ne pose la classe que dans
+   ce cas precis (accueil + haut de page), et la retire des le premier
+   defilement : l'en-tete redevient alors clair, comme le reste de la page. */
+[data-theme="light"] .header-sur-hero nav a {
+  color: #A8B2C1;
+}
+
+[data-theme="light"] .header-sur-hero nav a:hover,
+[data-theme="light"] .header-sur-hero nav a.text-accent,
+[data-theme="light"] .header-sur-hero nav a.text-primary {
+  color: #FFD600;
+}
+
+[data-theme="light"] .header-sur-hero nav a.gradient-primary {
+  color: #0F1724;
+}
+
 /* Light mode: scrollbar */
 [data-theme="light"] ::-webkit-scrollbar-track {
   background: #F1F5F9;
@@ -310,9 +389,12 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #1A2332 !important;
 }
 
-/* Light mode: watermark */
-[data-theme="light"] .watermark::before {
-  opacity: 0.04;
+/* Le badge est un disque bleu nuit : sur le gris clair du mode clair il porte
+   plus loin que sur le bleu nuit du mode sombre, mais il lui faut malgre tout
+   un peu plus d'encre pour se lire. Les deux valeurs ont ete reglees a l'oeil
+   pour rester un filigrane — present, jamais lisible comme une illustration. */
+[data-theme="light"] .watermark::after {
+  opacity: 0.08;
 }
 
 /* ── Scrollbar ── */

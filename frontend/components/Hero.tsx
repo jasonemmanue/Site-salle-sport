@@ -60,9 +60,12 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
 
   return (
+    // `hero-brand` : le haut de l'accueil garde son traitement sombre dans les
+    // deux themes. Voir le bloc du meme nom dans `globals.css` — en mode clair,
+    // le voile blanc delavait la photo et le texte passait au navy.
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="hero-brand relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Background: gym photo + overlay */}
       <div className="absolute inset-0">
